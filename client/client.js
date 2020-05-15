@@ -1,7 +1,7 @@
-const request_methods = {
+const RequestMethods = Object.freeze({
     GET: "GET",
     POST: "POST"
-}
+})
 
 function send_request() {
     const xhr = new XMLHttpRequest();
@@ -19,7 +19,8 @@ function handle_response() {
 
 function reset() {
     set_request_url("https://z1cd3i3sn5.execute-api.eu-west-2.amazonaws.com/test/")
-    set_request_method(request_methods.GET)
+    populate_request_method_list()
+    set_request_method(RequestMethods.GET)
     request_method_changed()
     set_response_body("")
     set_response_body_visible(false)
@@ -43,13 +44,23 @@ function set_request_method(value) {
     document.getElementById("request-method").value = value
 }
 
+function populate_request_method_list() {
+    let request_method = document.getElementById("request-method");
+    request_method.options.length = 0
+    for (const method in RequestMethods) {
+        const option = document.createElement("option");
+        option.text = method
+        request_method.add(option)
+    }
+}
+
 function request_method_changed() {
     set_request_body("")
     switch (get_request_method()) {
-        case request_methods.GET:
+        case RequestMethods.GET:
             set_request_body_visible(false)
             break
-        case request_methods.POST:
+        case RequestMethods.POST:
             set_request_body_visible(true)
             break
     }
