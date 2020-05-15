@@ -3,52 +3,46 @@ const RequestMethods = Object.freeze({
     POST: "POST"
 })
 
-function send_request() {
+function sendRequest() {
     const xhr = new XMLHttpRequest();
-    xhr.onload = handle_response
-    const request_method = get_request_method();
-    xhr.open(request_method, get_request_url());
-    if (should_include_request_body(request_method)) {
-        xhr.send(get_request_body());
+    xhr.onload = handleResponse
+    const requestMethod = getRequestMethod();
+    xhr.open(requestMethod, getRequestUrl());
+    if (shouldIncludeRequestBody(requestMethod)) {
+        xhr.send(getRequestBody());
     } else {
         xhr.send(null);
     }
 }
 
-function handle_response() {
-    set_response_status(this.status + " " + this.statusText)
-    set_response_status_visible(true)
-    set_response_body(this.responseText)
-    set_response_body_visible(true);
+function handleResponse() {
+    setResponseStatus(this.status + " " + this.statusText)
+    setResponseBody(this.responseText)
+    setResponseVisible(true);
 }
 
 function reset() {
-    set_request_url("https://z1cd3i3sn5.execute-api.eu-west-2.amazonaws.com/test/")
-    populate_request_method_list()
-    request_method_changed()
-    set_response_body("")
-    set_response_body_visible(false)
-    set_response_status("")
-    set_response_status_visible(false)
+    setRequestUrl("https://z1cd3i3sn5.execute-api.eu-west-2.amazonaws.com/test/")
+    populateRequestMethodList()
+    requestMethodChanged()
+    setResponseBody("")
+    setResponseStatus("")
+    setResponseVisible(false)
 }
 
-function get_request_url() {
+function getRequestUrl() {
     return document.getElementById("request-url").value
 }
 
-function set_request_url(value) {
+function setRequestUrl(value) {
     document.getElementById("request-url").value = value
 }
 
-function get_request_method() {
+function getRequestMethod() {
     return document.getElementById("request-method").value
 }
 
-function set_request_method(value) {
-    document.getElementById("request-method").value = value
-}
-
-function populate_request_method_list() {
+function populateRequestMethodList() {
     let request_method = document.getElementById("request-method");
     request_method.options.length = 0
     for (const method in RequestMethods) {
@@ -58,54 +52,50 @@ function populate_request_method_list() {
     }
 }
 
-function request_method_changed() {
-    set_request_body("")
-    const include_request_body = should_include_request_body(get_request_method());
-    set_request_body_visible(include_request_body)
+function requestMethodChanged() {
+    setRequestBody("")
+    const include_request_body = shouldIncludeRequestBody(getRequestMethod());
+    setRequestBodyVisible(include_request_body)
 }
 
-function should_include_request_body(request_method) {
-    switch (request_method) {
+function shouldIncludeRequestBody(requestMethod) {
+    switch (requestMethod) {
         case RequestMethods.GET:
             return false
         case RequestMethods.POST:
             return true
         default:
-            console.error("Unhandled request method " + request_method)
+            console.error("Unhandled request method " + requestMethod)
             return false
     }
 }
 
-function get_request_body() {
+function getRequestBody() {
     return document.getElementById("request-body").value
 }
 
-function set_request_body(value) {
+function setRequestBody(value) {
     document.getElementById("request-body").value = value
 }
 
-function set_request_body_visible(value) {
-    set_field_visible("request-body-field-row", value)
+function setRequestBodyVisible(value) {
+    setElementVisible("request-body-field-row", value)
 }
 
-function set_response_body(value) {
+function setResponseBody(value) {
     document.getElementById("response-body").innerHTML = value
 }
 
-function set_response_body_visible(value) {
-    set_field_visible("response-body-field-row", value)
-}
-
-function set_response_status(value) {
+function setResponseStatus(value) {
     document.getElementById("response-status").value = value
 }
 
-function set_response_status_visible(value) {
-    set_field_visible("response-status-field-row", value)
+function setResponseVisible(value) {
+    setElementVisible("response", value)
 }
 
-function set_field_visible(field_id, visible) {
-    const field = document.getElementById(field_id)
+function setElementVisible(elementId, visible) {
+    const field = document.getElementById(elementId)
     if (visible) {
         field.style.display = "block"
     } else {
