@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>EPS Steel Thread Test Client</title>
+    <link rel="stylesheet" href="https://unpkg.com/98.css">
+    <script type="application/javascript" src="client.js"></script>
+</head>
+<body onload="reset()">
+    <div class="window" style="width: 480px">
+        <div class="title-bar">
+            <div class="title-bar-text">Hello World Test</div>
+            <div class="title-bar-controls">
+                <button aria-label="Minimize"></button>
+                <button aria-label="Maximize"></button>
+                <button aria-label="Close"></button>
+            </div>
+        </div>
+        <div class="window-body">
+            <p>Make a request to the EPS Steel Thread API.</p>
+            <div class="field-row-stacked" style="width: 100%">
+                <label for="request-url">Request URL</label>
+                <input id="request-url" type="text"/>
+            </div>
+            <div class="field-row-stacked" style="width: 100%">
+                <label for="request-method">Request method</label>
+                <select onchange="request_method_changed()" id="request-method">
+                    <option>GET</option>
+                    <option>POST</option>
+                </select>
+            </div>
+            <div class="field-row-stacked" id="request-body-field-row" style="width: 100%">
+                <label for="request-body">Request body</label>
+                <textarea style="width: 100%; resize: none" id="request-body" rows="8"></textarea>
+            </div>
+            <div class="field-row" style="width: 100%">
+                <button onclick="send_request()">Make Request</button>
+                <button onclick="reset()">Reset</button>
+            </div>
+            <div class="field-row-stacked" id="response-status-field-row" style="width: 100%">
+                <label for="response-status">Response status code</label>
+                <input disabled style="width: 100%;" id="response-status" type="text"/>
+            </div>
+            <div class="field-row-stacked" id="response-body-field-row" style="width: 100%">
+                <label for="response-body">Response body</label>
+                <textarea disabled style="width: 100%; resize: none" id="response-body" rows="8"></textarea>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
