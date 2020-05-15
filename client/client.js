@@ -6,8 +6,13 @@ const RequestMethods = Object.freeze({
 function send_request() {
     const xhr = new XMLHttpRequest();
     xhr.onload = handle_response
-    xhr.open(get_request_method(), get_request_url());
-    xhr.send(get_request_body());
+    const request_method = get_request_method();
+    xhr.open(request_method, get_request_url());
+    if (should_include_request_body(request_method)) {
+        xhr.send(get_request_body());
+    } else {
+        xhr.send(null);
+    }
 }
 
 function handle_response() {
@@ -20,7 +25,6 @@ function handle_response() {
 function reset() {
     set_request_url("https://z1cd3i3sn5.execute-api.eu-west-2.amazonaws.com/test/")
     populate_request_method_list()
-    set_request_method(RequestMethods.GET)
     request_method_changed()
     set_response_body("")
     set_response_body_visible(false)
@@ -56,23 +60,24 @@ function populate_request_method_list() {
 
 function request_method_changed() {
     set_request_body("")
-    switch (get_request_method()) {
+    const include_request_body = should_include_request_body(get_request_method());
+    set_request_body_visible(include_request_body)
+}
+
+function should_include_request_body(request_method) {
+    switch (request_method) {
         case RequestMethods.GET:
-            set_request_body_visible(false)
-            break
+            return false
         case RequestMethods.POST:
-            set_request_body_visible(true)
-            break
+            return true
+        default:
+            console.error("Unhandled request method " + request_method)
+            return false
     }
 }
 
 function get_request_body() {
-    const request_body = document.getElementById("request-body")
-    if (request_body.style.display === "none") {
-        return null
-    } else {
-        return request_body.value
-    }
+    return document.getElementById("request-body").value
 }
 
 function set_request_body(value) {
