@@ -22,7 +22,7 @@ function handleResponse() {
 }
 
 function reset() {
-    setRequestUrl("https://z1cd3i3sn5.execute-api.eu-west-2.amazonaws.com/test/")
+    setRequestUrl("https://internal-dev.api.service.nhs.uk/eps-steel-thread")
     populateRequestMethodList()
     requestMethodChanged()
     setResponseBody("")
