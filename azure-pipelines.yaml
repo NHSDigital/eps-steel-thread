@@ -9,11 +9,11 @@ pr:
     include: ['*']
 
 steps:
-  - script: pipenv run pip install -r <(pipenv lock -r) --target ./package/
-    displayname: 'add dependencies to package folder'
+- script: pipenv run pip install -r <(pipenv lock -r) --target ./package/
+  displayname: 'add dependencies to package folder'
 
-  - script: zip handler.zip handler.py ./package/
-    displayName: 'zip the handler function for the release'
+- script: zip handler.zip handler.py ./package/
+  displayName: 'zip the handler function for the release'
 
 - script: mkdir dist
   displayName: 'create a dist folder'
