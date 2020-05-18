@@ -36,5 +36,8 @@ steps:
 - script: cp -R build/. dist/
   displayName: 'Copy build to dist'
 
+- script: cp -R terraform dist
+  displayName: 'Copy proxy terraform'
+
 - publish: dist/
   artifact: eps-steel-thread
