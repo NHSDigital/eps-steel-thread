@@ -41,6 +41,6 @@
     </Request>
   </PreFlow>
   <HTTPTargetConnection>
-    <URL>https://z1cd3i3sn5.execute-api.eu-west-2.amazonaws.com/test</URL>
+    <URL>https://z1cd3i3sn5.execute-api.eu-west-2.amazonaws.com</URL>
   </HTTPTargetConnection>
 </TargetEndpoint>
