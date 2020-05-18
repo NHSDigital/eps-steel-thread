@@ -24,5 +24,11 @@ steps:
 - script: mv variables.tf dist/variables.tf
   displayName: 'move required variable file into dist'
 
+- script: scripts/build_proxy.sh
+  displayName: 'build proxy'
+
+- script: cp -R build/. dist/
+  displayName: 'Copy build to dist'
+
 - publish: dist/
   artifact: eps-steel-thread
