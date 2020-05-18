@@ -1,4 +1,4 @@
-<APIProxy name="pds">
+<APIProxy name="eps-steel-thread">
   <!-- This is the root of the application -->
-  <Description>Proxy to personal demographics endpoints on spine via ig3.</Description>
+  <Description>Proxy to eps-steel-thread app on AWS</Description>
 </APIProxy>
