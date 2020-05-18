@@ -12,10 +12,13 @@ steps:
 - script: zip handler.zip handler.py
   displayName: 'zip the handler function for the release'
 
-- script: mkdir dist; mv handler.zip dist/handler.zip
+- script: zip client.zip client/*
+  displayName: 'zip the client for the release'
+
+- script: mkdir dist
   displayName: 'create a dist folder'
 
-- script: mv handler.zip dist/handler.zip; mv main.tf dist/main.tf; mv variables.tf dist/variables.tf; 
+- script: mv handler.zip dist/handler.zip; mv client.zip dist/client.zip; mv main.tf dist/main.tf; mv variables.tf dist/variables.tf;
   displayName: 'move required files into dist'
 
 - publish: dist/
