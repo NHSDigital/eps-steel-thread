@@ -12,7 +12,7 @@ steps:
 - script: pip install pipenv
   displayName: 'install pipenv'
 
-- script: pipenv run pip install -r <(pipenv lock -r) --target ./package/
+- script: python -m pipenv run pip install -r <(pipenv lock -r) --target ./package/
   displayName: 'add dependencies to package folder'
 
 - script: zip -r9 handler.zip handler.py ./package/
