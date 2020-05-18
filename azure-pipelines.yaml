@@ -9,7 +9,7 @@ pr:
     include: ['*']
 
 steps:
-  - script: sudo apt install python3
+- script: sudo apt install python3
   displayName: 'install python 3'
 
 - script: pip3 install pipenv
