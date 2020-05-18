@@ -9,11 +9,8 @@ pr:
     include: ['*']
 
 steps:
-- script: sudo apt update
-  displayName: 'update package lists'
-
-- script: sudo apt install pipenv
-  displayName: 'add dependencies to package folder'
+- script: pip install pipenv
+  displayName: 'install pipenv'
 
 - script: pipenv run pip install -r <(pipenv lock -r) --target ./package/
   displayName: 'add dependencies to package folder'
