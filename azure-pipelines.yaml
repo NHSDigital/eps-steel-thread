@@ -12,6 +12,9 @@ steps:
 - script: sudo apt install python3
   displayName: 'install python 3'
 
+- script: sudo apt-get install python3-setuptools
+  displayName: 'install python 3 setuptools'
+
 - script: pip3 install pipenv
   displayName: 'install pipenv'
 
