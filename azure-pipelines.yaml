@@ -18,8 +18,17 @@ steps:
 - script: mkdir dist/client
   displayName: 'create a client folder'
 
-- script: mv handler.zip dist/handler.zip; mv client/** dist/client; mv main.tf dist/main.tf; mv variables.tf dist/variables.tf;
-  displayName: 'move required files into dist'
+- script: mv handler.zip dist/handler.zip
+  displayName: 'move handler files into dist'
+  
+- script: mv client/** dist/client
+  displayName: 'move client files into dist'
+
+- script: mv main.tf dist/main.tf
+  displayName: 'move main terraform file into dist'
+
+- script: mv variables.tf dist/variables.tf
+  displayName: 'move required variable file into dist'
 
 - publish: dist/
   artifact: eps-steel-thread
