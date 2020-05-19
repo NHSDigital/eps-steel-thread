@@ -1,4 +1,4 @@
-const ExamplePrescription = {
+const EXAMPLE_PRESCRIPTION = {
   "resourceType": "Bundle",
   "id": "7EB02341-5F62-4A76-2CD3-34F523452356",
   "type": "collection",

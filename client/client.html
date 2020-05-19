@@ -11,7 +11,7 @@
 <body onload="reset()">
 <header class="nhsuk-header nhsuk-header--transactional" role="banner">
     <div class="nhsuk-width-container nhsuk-header__container">
-        <div class="nhsuk-header__logo nhsuk-header__logo--only"><a class="nhsuk-header__link" href="/" aria-label="NHS homepage">
+        <div class="nhsuk-header__logo nhsuk-header__logo--only"><a class="nhsuk-header__link" href="#" aria-label="NHS homepage">
             <svg class="nhsuk-logo" xmlns="http://www.w3.org/2000/svg" role="presentation" focusable="false" viewBox="0 0 40 16">
                 <path class="nhsuk-logo__background" d="M0 0h40v16H0z"></path>
                 <path class="nhsuk-logo__text" d="M3.9 1.5h4.4l2.6 9h.1l1.8-9h3.3l-2.8 13H9l-2.7-9h-.1l-1.8 9H1.1M17.3 1.5h3.6l-1 4.9h4L25 1.5h3.5l-2.7 13h-3.5l1.1-5.6h-4.1l-1.2 5.6h-3.4M37.7 4.4c-.7-.3-1.6-.6-2.9-.6-1.4 0-2.5.2-2.5 1.3 0 1.8 5.1 1.2 5.1 5.1 0 3.6-3.3 4.5-6.4 4.5-1.3 0-2.9-.3-4-.7l.8-2.7c.7.4 2.1.7 3.2.7s2.8-.2 2.8-1.5c0-2.1-5.1-1.3-5.1-5 0-3.4 2.9-4.4 5.8-4.4 1.6 0 3.1.2 4 .6"></path>
@@ -20,12 +20,12 @@
         </a>
         </div>
         <div class="nhsuk-header__transactional-service-name">
-            <a class="nhsuk-header__transactional-service-name--link" href="/">Review and Sign</a>
+            <a class="nhsuk-header__transactional-service-name--link" href="#">Review and Sign</a>
         </div>
     </div>
 </header>
 <div class="nhsuk-width-container">
-    <main class="nhsuk-main-wrapper" id="request-summary">
+    <main class="nhsuk-main-wrapper" id="main-content">
         <div class="nhsuk-grid-row">
             <div class="nhsuk-grid-column-two-thirds">
                 <div class="nhsuk-form-group">
@@ -40,21 +40,21 @@
                 <div class="nhsuk-panel-with-label">
                     <h3 class="nhsuk-panel-with-label__label">Patient</h3>
                     <dl class="nhsuk-summary-list">
-                        <div class="nhsuk-summary-list__row" rv-each-name="patient.name">
+                        <div class="nhsuk-summary-list__row" rv-each-name="signRequestSummary.patient.name">
                             <dt class="nhsuk-summary-list__key">Name</dt>
                             <dd class="nhsuk-summary-list__value">{name | fullName}</dd>
                         </div>
                         <div class="nhsuk-summary-list__row">
                             <dt class="nhsuk-summary-list__key">NHS number</dt>
-                            <dd class="nhsuk-summary-list__value">{patient.identifier | nhsNumber}</dd>
+                            <dd class="nhsuk-summary-list__value">{signRequestSummary.patient.identifier | nhsNumber}</dd>
                         </div>
                         <div class="nhsuk-summary-list__row">
                             <dt class="nhsuk-summary-list__key">Date of birth</dt>
-                            <dd class="nhsuk-summary-list__value">{patient.birthDate}</dd>
+                            <dd class="nhsuk-summary-list__value">{signRequestSummary.patient.birthDate}</dd>
                         </div>
                         <div class="nhsuk-summary-list__row">
                             <dt class="nhsuk-summary-list__key">Gender</dt>
-                            <dd class="nhsuk-summary-list__value">{patient.gender | titleCase}</dd>
+                            <dd class="nhsuk-summary-list__value">{signRequestSummary.patient.gender | titleCase}</dd>
                         </div>
                     </dl>
                 </div>
@@ -76,7 +76,7 @@
                             </tr>
                             </thead>
                             <tbody class="nhsuk-table__body">
-                            <tr class="nhsuk-table__row" rv-each-medication="medicationRequests">
+                            <tr class="nhsuk-table__row" rv-each-medication="signRequestSummary.medicationRequests">
                                 <td class="nhsuk-table__cell">{medication.medicationCodeableConcept.coding | snomedCode}</td>
                                 <td class="nhsuk-table__cell ">{medication.medicationCodeableConcept.coding | snomedCodeDescription}</td>
                                 <td class="nhsuk-table__cell ">{medication.dispenseRequest.quantity.value}</td>
@@ -93,7 +93,7 @@
                 <div class="nhsuk-panel-with-label">
                     <h3 class="nhsuk-panel-with-label__label">Prescriber</h3>
                     <dl class="nhsuk-summary-list">
-                        <div class="nhsuk-summary-list__row" rv-each-name="practitioner.name">
+                        <div class="nhsuk-summary-list__row" rv-each-name="signRequestSummary.practitioner.name">
                             <dt class="nhsuk-summary-list__key">Name</dt>
                             <dd class="nhsuk-summary-list__value">{name | fullName}</dd>
                         </div>
@@ -107,18 +107,38 @@
                 <button class="nhsuk-button nhsuk-button--secondary" type="submit" onclick="reset()">Reset</button>
             </div>
         </div>
-        <div class="nhsuk-grid-row" id="response">
+        <div class="nhsuk-grid-row" rv-if="errorList">
+            <div class="nhsuk-grid-column-two-thirds">
+                <div class="nhsuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1">
+                    <h2 class="nhsuk-error-summary__title" id="error-summary-title">
+                        There is a problem
+                    </h2>
+                    <div class="nhsuk-error-summary__body">
+                        <p>An error occurred while sending the request. See console for details.</p>
+                        <ul class="nhsuk-list nhsuk-error-summary__list">
+                            <li rv-each-error="errorList"><a href="#">Error message here (hopefully)</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="nhsuk-grid-row" rv-if="signResponse">
             <div class="nhsuk-grid-column-two-thirds">
                 <div class="nhsuk-panel-with-label">
                     <h3 class="nhsuk-panel-with-label__label">API Response</h3>
                     <dl class="nhsuk-summary-list">
                         <div class="nhsuk-summary-list__row">
-                            <dt class="nhsuk-summary-list__key">Response status</dt>
-                            <dd class="nhsuk-summary-list__value">{response | status}</dd>
+                            <dt class="nhsuk-summary-list__key">Status code</dt>
+                            <dd class="nhsuk-summary-list__value">{signResponse.statusCode}</dd>
                         </div>
                         <div class="nhsuk-summary-list__row">
-                            <dt class="nhsuk-summary-list__key">Response body</dt>
-                            <dd class="nhsuk-summary-list__value">{response | body}</dd>
+                            <dt class="nhsuk-summary-list__key">Status text</dt>
+                            <dd class="nhsuk-summary-list__value">{signResponse.statusText}</dd>
+                        </div>
+                        <div class="nhsuk-summary-list__row">
+                            <dt class="nhsuk-summary-list__key">Body</dt>
+                            <dd class="nhsuk-summary-list__value">{signResponse.body}</dd>
                         </div>
                     </dl>
                 </div>
