@@ -1,8 +1,1 @@
-flask
-flask_sqlalchemy
-flask_migrate
-httpx
-uwsgi
-cryptography
-jwt
-psycopg2
+boto3
