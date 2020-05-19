@@ -18,4 +18,4 @@ def sign():
     }
 
 def main_handler(event, context):
-    return serverless_wsgi.handle_request(app, event, context)
+    return serverless_wsgi.handle_request(app.wsgi_app, event, context)
