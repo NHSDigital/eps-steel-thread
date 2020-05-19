@@ -1,4 +1,4 @@
-SITE_PACKAGES=$(python3 -m pipenv --venv)/lib/python3.8/site-packages
+SITE_PACKAGES=$(python3 -m pipenv --venv)/lib/python3.6/site-packages
 echo "Library Location: $SITE_PACKAGES"
 DIR=$(pwd)
 
