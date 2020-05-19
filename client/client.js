@@ -1,10 +1,5 @@
 let signRequest = EXAMPLE_PRESCRIPTION
-const pageData = {
-    signRequestSummary: {},
-    signResponse: null,
-    errorList: null
-}
-let boundView = null
+const pageData = {}
 
 rivets.formatters.snomedCode = function(codings) {
     return codings.filter(coding => coding.system === "http://snomed.info/sct")[0].code
@@ -45,7 +40,7 @@ function sendRequest() {
     const xhr = new XMLHttpRequest()
     xhr.onload = handleResponse
     xhr.onerror = handleError
-    xhr.open("POST", "https://internal-dev.api.service.nhs.uk/eps-steel-thread/sign")
+    xhr.open("POST", "https://internal-dev.api.service.nhs.uk/eps-steel-thread/test/sign")
     xhr.setRequestHeader("Content-Type", "application/json")
     const bearerToken = document.getElementById("bearer-token").value
     if (bearerToken !== "") {
@@ -97,17 +92,17 @@ function getResourcesOfType(prescriptionBundle, resourceType) {
     return resources.filter(resource => resource.resourceType === resourceType);
 }
 
-function reset() {
-    pageData.signRequestSummary = getSummary(signRequest)
-    pageData.signResponse = null
-    pageData.errorList = null
+function onLoad() {
+    resetPageData()
     bind()
 }
 
+function resetPageData() {
+    pageData.signRequestSummary = getSummary(signRequest)
+    pageData.signResponse = null
+    pageData.errorList = null
+}
+
 function bind() {
-    if (boundView) {
-        //boundView.update(pageData)
-    } else {
-        boundView = rivets.bind(document.querySelector('#main-content'), pageData)
-    }
+    rivets.bind(document.querySelector('#main-content'), pageData)
 }

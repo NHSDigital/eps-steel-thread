@@ -8,7 +8,7 @@
     <script type="application/javascript" src="example-prescription.js"></script>
     <script type="application/javascript" src="client.js"></script>
 </head>
-<body onload="reset()">
+<body onload="onLoad()">
 <header class="nhsuk-header nhsuk-header--transactional" role="banner">
     <div class="nhsuk-width-container nhsuk-header__container">
         <div class="nhsuk-header__logo nhsuk-header__logo--only"><a class="nhsuk-header__link" href="#" aria-label="NHS homepage">
@@ -108,7 +108,7 @@
         <div class="nhsuk-grid-row">
             <div class="nhsuk-grid-column-two-thirds">
                 <button class="nhsuk-button" type="submit" onclick="sendRequest()">Sign prescription</button>
-                <button class="nhsuk-button nhsuk-button--secondary" type="submit" onclick="reset()">Reset</button>
+                <button class="nhsuk-button nhsuk-button--secondary" type="submit" onclick="resetPageData()">Reset</button>
             </div>
         </div>
         <div class="nhsuk-grid-row" rv-if="errorList">
