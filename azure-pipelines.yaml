@@ -12,6 +12,9 @@ steps:
 - script: sudo apt update
   displayName: 'Update OS'
 
+- script: sudo apt install python3-setuptools
+  displayName: 'Install setuptools'
+
 - script: pip3 install --user pipenv
   displayName: 'install pipenv'
 
