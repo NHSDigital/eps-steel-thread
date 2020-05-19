@@ -18,7 +18,7 @@ steps:
 - script: pip3 install --user pipenv
   displayName: 'install pipenv'
 
-- script: python3 -m pipenv run pip install -r <(pipenv lock -r) --target ./package/
+- script: python3 -m pipenv run pip install -r <(python3 -m pipenv lock -r) --target package/
   displayName: 'add dependencies to package folder'
 
 - script: zip -r9 handler.zip handler.py ./package/
