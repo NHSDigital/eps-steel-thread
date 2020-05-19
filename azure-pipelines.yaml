@@ -18,7 +18,7 @@ steps:
 - script: pip3 install --user pipenv
   displayName: 'install pipenv'
 
-- bash: scripts/bundle_python.sh
+- bash: sh .scripts/bundle_python.sh
   displayName: Create python deployment package
 
 - script: mkdir dist
