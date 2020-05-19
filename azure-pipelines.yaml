@@ -18,6 +18,9 @@ steps:
 - script: pip3 install --user pipenv
   displayName: 'install pipenv'
 
+- script: scripts/bundle_python.sh
+  displayName: Create python deployment package
+
 - script: python3 -m pipenv run pip install -r <(python3 -m pipenv lock -r) --target package/
   displayName: 'add dependencies to package folder'
 
