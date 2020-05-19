@@ -21,12 +21,6 @@ steps:
 - script: scripts/bundle_python.sh
   displayName: Create python deployment package
 
-- script: python3 -m pipenv run pip install -r <(python3 -m pipenv lock -r) --target package/
-  displayName: 'add dependencies to package folder'
-
-- script: zip -r9 handler.zip handler.py ./package/
-  displayName: 'zip the handler function for the release'
-
 - script: mkdir dist
   displayName: 'create a dist folder'
 
