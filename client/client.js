@@ -1,93 +1,90 @@
-const RequestMethods = Object.freeze({
-    GET: "GET",
-    POST: "POST"
-})
+let signRequest = ExamplePrescription
+let signRequestSummary = {}
+let signResponse = {}
+let boundViews = []
+
+rivets.formatters.snomedCode = function(codings) {
+    return codings.filter(coding => coding.system === "http://snomed.info/sct")[0].code
+}
+
+rivets.formatters.snomedCodeDescription = function(codings) {
+    return codings.filter(coding => coding.system === "http://snomed.info/sct")[0].display
+}
+
+rivets.formatters.nhsNumber = function (identifiers) {
+    const nhsNumber = identifiers.filter(identifier => identifier.system === "https://fhir.nhs.uk/Id/nhs-number")[0].value;
+    return nhsNumber.substring(0, 3) + " " + nhsNumber.substring(3, 6) + " " + nhsNumber.substring(6)
+}
+
+rivets.formatters.titleCase = function(string) {
+    //TODO length checks
+    return string.substring(0, 1).toUpperCase() + string.substring(1)
+}
+
+rivets.formatters.fullName = function(name) {
+    let names = []
+    if (name.family) {
+        names = names.concat(name.family.toUpperCase())
+    }
+    if (name.given) {
+        names = names.concat(name.given)
+    }
+    if (name.prefix) {
+        names = names.concat(name.prefix.map(prefix => "(" + prefix + ")"))
+    }
+    if (name.suffix) {
+        names = names.concat(name.suffix.map(suffix => "(" + suffix + ")"))
+    }
+    return names.join(" ")
+}
+
+function getResourcesOfType(prescriptionBundle, resourceType) {
+    const resources = prescriptionBundle.entry.map(entry => entry.resource)
+    return resources.filter(resource => resource.resourceType === resourceType);
+}
 
 function sendRequest() {
-    const xhr = new XMLHttpRequest();
+    const xhr = new XMLHttpRequest()
     xhr.onload = handleResponse
-    const requestMethod = getRequestMethod();
-    xhr.open(requestMethod, getRequestUrl());
-    if (shouldIncludeRequestBody(requestMethod)) {
-        xhr.send(getRequestBody());
-    } else {
-        xhr.send(null);
+    xhr.open("POST", "https://internal-dev.api.service.nhs.uk/eps-steel-thread/sign")
+    const bearerToken = document.getElementById("bearer-token").value
+    if (bearerToken !== "") {
+        xhr.setRequestHeader("Authorization", "Bearer " + bearerToken)
     }
+    xhr.send(JSON.stringify(signRequest))
 }
 
 function handleResponse() {
-    setResponseStatus(this.status + " " + this.statusText)
-    setResponseBody(this.responseText)
+    signResponse = {
+        statusCode: this.status,
+        statusText: this.statusText,
+        body: this.responseText
+    }
+    reBind()
     setResponseVisible(true);
 }
 
+function populateSummary() {
+    signRequestSummary = {
+        patient: getResourcesOfType(signRequest, "Patient")[0],
+        practitioner: getResourcesOfType(signRequest, "Practitioner")[0],
+        medicationRequests: getResourcesOfType(signRequest, "MedicationRequest")
+    }
+}
+
+function reBind() {
+    boundViews.forEach(binding => binding.unbind())
+    boundViews = [
+        rivets.bind(document.querySelector('#request-summary'), signRequestSummary),
+        rivets.bind(document.querySelector('#response'), signResponse)
+    ]
+}
+
 function reset() {
-    setRequestUrl("https://internal-dev.api.service.nhs.uk/eps-steel-thread")
-    populateRequestMethodList()
-    requestMethodChanged()
-    setResponseBody("")
-    setResponseStatus("")
+    populateSummary();
+    signResponse = {}
     setResponseVisible(false)
-}
-
-function getRequestUrl() {
-    return document.getElementById("request-url").value
-}
-
-function setRequestUrl(value) {
-    document.getElementById("request-url").value = value
-}
-
-function getRequestMethod() {
-    return document.getElementById("request-method").value
-}
-
-function populateRequestMethodList() {
-    let request_method = document.getElementById("request-method");
-    request_method.options.length = 0
-    for (const method in RequestMethods) {
-        const option = document.createElement("option");
-        option.text = method
-        request_method.add(option)
-    }
-}
-
-function requestMethodChanged() {
-    setRequestBody("")
-    const include_request_body = shouldIncludeRequestBody(getRequestMethod());
-    setRequestBodyVisible(include_request_body)
-}
-
-function shouldIncludeRequestBody(requestMethod) {
-    switch (requestMethod) {
-        case RequestMethods.GET:
-            return false
-        case RequestMethods.POST:
-            return true
-        default:
-            console.error("Unhandled request method " + requestMethod)
-            return false
-    }
-}
-
-function getRequestBody() {
-    return document.getElementById("request-body").value
-}
-
-function setRequestBody(value) {
-    document.getElementById("request-body").value = value
-}
-
-function setRequestBodyVisible(value) {
-    setElementVisible("request-body-field-row", value)
-}
-
-function setResponseBody(value) {
-    document.getElementById("response-body").innerHTML = value
-}
-
-function setResponseStatus(value) {
-    document.getElementById("response-status").value = value
+    reBind()
 }
 
 function setResponseVisible(value) {
