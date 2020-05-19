@@ -9,8 +9,17 @@ pr:
     include: ['*']
 
 steps:
-- script: zip handler.zip handler.py
-  displayName: 'zip the handler function for the release'
+- script: sudo apt update
+  displayName: 'Update OS'
+
+- script: sudo apt install python3-setuptools
+  displayName: 'Install setuptools'
+
+- script: pip3 install --user pipenv
+  displayName: 'install pipenv'
+
+- bash: sh ./scripts/bundle_python.sh
+  displayName: Create python deployment package
 
 - script: mkdir dist
   displayName: 'create a dist folder'
