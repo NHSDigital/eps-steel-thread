@@ -40,15 +40,14 @@ function sendRequest() {
     const xhr = new XMLHttpRequest()
     xhr.onload = handleResponse
     xhr.onerror = handleError
+    xhr.ontimeout = handleTimeout
     xhr.open("POST", "https://internal-dev.api.service.nhs.uk/eps-steel-thread/test/sign")
     xhr.setRequestHeader("Content-Type", "application/json")
-    const bearerToken = document.getElementById("bearer-token").value
-    if (bearerToken !== "") {
-        xhr.setRequestHeader("Authorization", "Bearer " + bearerToken)
+    if (pageData.bearerToken && pageData.bearerToken !== "") {
+        xhr.setRequestHeader("Authorization", "Bearer " + pageData.bearerToken)
     }
-    const sessionUrid = document.getElementById("session-urid").value
-    if (sessionUrid !== "") {
-        xhr.setRequestHeader("NHSD-Session-URID", sessionUrid)
+    if (pageData.sessionUrid && pageData.sessionUrid !== "") {
+        xhr.setRequestHeader("NHSD-Session-URID", pageData.sessionUrid)
     }
     xhr.send(JSON.stringify(signRequest))
 }
@@ -62,11 +61,15 @@ function handleResponse() {
 }
 
 function handleError() {
-    addError(this.statusText)
+    addError("Network error")
+}
+
+function handleTimeout() {
+    addError("Network timeout")
 }
 
 window.onerror = function(msg, url, line, col, error) {
-    addError(msg);
+    addError("Unhandled error: " + msg);
     return true;
 }
 
@@ -101,6 +104,8 @@ function resetPageData() {
     pageData.signRequestSummary = getSummary(signRequest)
     pageData.signResponse = null
     pageData.errorList = null
+    //pageData.bearerToken = null
+    //pageData.sessionUrid = null
 }
 
 function bind() {
