@@ -1,7 +1,11 @@
-let signRequest = ExamplePrescription
-let signRequestSummary = {}
-let signResponse = {}
+let signRequest = EXAMPLE_PRESCRIPTION
 let boundViews = []
+
+const pageData = {
+    signRequestSummary: {},
+    signResponse: null,
+    errorList: null
+}
 
 rivets.formatters.snomedCode = function(codings) {
     return codings.filter(coding => coding.system === "http://snomed.info/sct")[0].code
@@ -46,6 +50,7 @@ function getResourcesOfType(prescriptionBundle, resourceType) {
 function sendRequest() {
     const xhr = new XMLHttpRequest()
     xhr.onload = handleResponse
+    xhr.onerror = handleError
     xhr.open("POST", "https://internal-dev.api.service.nhs.uk/eps-steel-thread/sign")
     const bearerToken = document.getElementById("bearer-token").value
     if (bearerToken !== "") {
@@ -55,17 +60,33 @@ function sendRequest() {
 }
 
 function handleResponse() {
-    signResponse = {
+    pageData.signResponse = {
         statusCode: this.status,
         statusText: this.statusText,
         body: this.responseText
     }
-    reBind()
-    setResponseVisible(true);
 }
 
-function populateSummary() {
-    signRequestSummary = {
+function handleError() {
+    addError(this.statusText)
+}
+
+window.onerror = function(msg, url, line, col, error) {
+    addError(msg);
+    return true;
+}
+
+function addError(message) {
+    if (pageData.errorList === null) {
+        pageData.errorList = []
+    }
+    pageData.errorList.push({
+        message: message
+    })
+}
+
+function getSummary(signRequest) {
+    return {
         patient: getResourcesOfType(signRequest, "Patient")[0],
         practitioner: getResourcesOfType(signRequest, "Practitioner")[0],
         medicationRequests: getResourcesOfType(signRequest, "MedicationRequest")
@@ -75,27 +96,13 @@ function populateSummary() {
 function reBind() {
     boundViews.forEach(binding => binding.unbind())
     boundViews = [
-        rivets.bind(document.querySelector('#request-summary'), signRequestSummary),
-        rivets.bind(document.querySelector('#response'), signResponse)
+        rivets.bind(document.querySelector('#main-content'), pageData)
     ]
 }
 
 function reset() {
-    populateSummary();
-    signResponse = {}
-    setResponseVisible(false)
+    pageData.signRequestSummary = getSummary(signRequest)
+    pageData.signResponse = null
+    pageData.errorList = null
     reBind()
-}
-
-function setResponseVisible(value) {
-    setElementVisible("response", value)
-}
-
-function setElementVisible(elementId, visible) {
-    const field = document.getElementById(elementId)
-    if (visible) {
-        field.style.display = "block"
-    } else {
-        field.style.display = "none"
-    }
 }
