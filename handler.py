@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request
 import serverless_wsgi
 
 app = Flask(__name__)
@@ -14,8 +14,11 @@ def hello_world():
 def sign():
     return {
         "statusCode": 200,
-        "body": request.body
+        "body": request.json
     }
+
+if __name__ == "__main__":
+    app.run(debug=True)
 
 def main_handler(event, context):
     return serverless_wsgi.handle_request(app.wsgi_app, event, context)
