@@ -1,6 +1,6 @@
 from flask import Flask, request
 import serverless_wsgi
-
+import hashlib
 app = Flask(__name__)
 
 @app.route('/', methods=['GET'])
@@ -14,7 +14,8 @@ def hello_world():
 def sign():
     return {
         "statusCode": 200,
-        "body": request.json
+        "signature": hashlib.sha256(request.data).hexdigest(),
+        "alg": "sha256"
     }
 
 @app.after_request
