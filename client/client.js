@@ -1,11 +1,10 @@
 let signRequest = EXAMPLE_PRESCRIPTION
-let boundViews = []
-
 const pageData = {
     signRequestSummary: {},
     signResponse: null,
     errorList: null
 }
+let boundView = null
 
 rivets.formatters.snomedCode = function(codings) {
     return codings.filter(coding => coding.system === "http://snomed.info/sct")[0].code
@@ -42,19 +41,19 @@ rivets.formatters.fullName = function(name) {
     return names.join(" ")
 }
 
-function getResourcesOfType(prescriptionBundle, resourceType) {
-    const resources = prescriptionBundle.entry.map(entry => entry.resource)
-    return resources.filter(resource => resource.resourceType === resourceType);
-}
-
 function sendRequest() {
     const xhr = new XMLHttpRequest()
     xhr.onload = handleResponse
     xhr.onerror = handleError
     xhr.open("POST", "https://internal-dev.api.service.nhs.uk/eps-steel-thread/sign")
+    xhr.setRequestHeader("Content-Type", "application/json")
     const bearerToken = document.getElementById("bearer-token").value
     if (bearerToken !== "") {
         xhr.setRequestHeader("Authorization", "Bearer " + bearerToken)
+    }
+    const sessionUrid = document.getElementById("session-urid").value
+    if (sessionUrid !== "") {
+        xhr.setRequestHeader("NHSD-Session-URID", sessionUrid)
     }
     xhr.send(JSON.stringify(signRequest))
 }
@@ -93,16 +92,22 @@ function getSummary(signRequest) {
     }
 }
 
-function reBind() {
-    boundViews.forEach(binding => binding.unbind())
-    boundViews = [
-        rivets.bind(document.querySelector('#main-content'), pageData)
-    ]
+function getResourcesOfType(prescriptionBundle, resourceType) {
+    const resources = prescriptionBundle.entry.map(entry => entry.resource)
+    return resources.filter(resource => resource.resourceType === resourceType);
 }
 
 function reset() {
     pageData.signRequestSummary = getSummary(signRequest)
     pageData.signResponse = null
     pageData.errorList = null
-    reBind()
+    bind()
+}
+
+function bind() {
+    if (boundView) {
+        //boundView.update(pageData)
+    } else {
+        boundView = rivets.bind(document.querySelector('#main-content'), pageData)
+    }
 }
