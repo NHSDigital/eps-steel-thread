@@ -116,9 +116,7 @@
                     <div class="nhsuk-error-summary__body">
                         <p>An error occurred while sending the request. See console for details.</p>
                         <ul class="nhsuk-list nhsuk-error-summary__list">
-                            <li rv-each-error="errorList">
-                                <a href="#example-error-1">Error message here (hopefully)</a>
-                            </li>
+                            <li rv-each-error="errorList">Error message here (hopefully)</li>
                         </ul>
                     </div>
                 </div>
@@ -131,11 +129,15 @@
                     <h3 class="nhsuk-panel-with-label__label">API Response</h3>
                     <dl class="nhsuk-summary-list">
                         <div class="nhsuk-summary-list__row">
-                            <dt class="nhsuk-summary-list__key">Response status</dt>
-                            <dd class="nhsuk-summary-list__value">{signResponse.statusCode} {signResponse.statusText}</dd>
+                            <dt class="nhsuk-summary-list__key">Status code</dt>
+                            <dd class="nhsuk-summary-list__value">{signResponse.statusCode}</dd>
                         </div>
                         <div class="nhsuk-summary-list__row">
-                            <dt class="nhsuk-summary-list__key">Response body</dt>
+                            <dt class="nhsuk-summary-list__key">Status text</dt>
+                            <dd class="nhsuk-summary-list__value">{signResponse.statusText}</dd>
+                        </div>
+                        <div class="nhsuk-summary-list__row">
+                            <dt class="nhsuk-summary-list__key">Body</dt>
                             <dd class="nhsuk-summary-list__value">{signResponse.body}</dd>
                         </div>
                     </dl>
