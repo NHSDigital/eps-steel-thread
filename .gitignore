@@ -5,3 +5,4 @@ handler.zip
 .backend.config
 .idea
 package
+.envrc
