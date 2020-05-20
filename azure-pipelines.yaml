@@ -18,7 +18,7 @@ steps:
 - script: pip3 install --user pipenv
   displayName: 'install pipenv'
 
-- script: python3 -m pipenv install
+- script: python3 -m pipenv install --dev
   displayName: Install dependencies
 
 - script: python3 -m pipenv run pytest -v

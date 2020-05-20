@@ -15,9 +15,9 @@ def test_get_request(client):
     get_request_response = b'"body":"Hello, world"'
 
     response = client.get('/')
+    response_contains_cors_headers(response)
     assert status_code in response.data
     assert get_request_response in response.data
-    response_contains_cors_headers(response)
 
 def test_post_request(client):
     post_request_data = {"data": "post request data"}
