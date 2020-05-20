@@ -10,12 +10,12 @@ function Example(description, message) {
     this.description = description
     this.message = message
     this.select = function () {
-        selectExample(this)
+        changeMessage(message)
     }
 }
 
-function selectExample(example) {
-    signRequest = example.message
+function changeMessage(message) {
+    signRequest = message
     resetPageData()
 }
 
@@ -87,7 +87,7 @@ function handleTimeout() {
 }
 
 window.onerror = function(msg, url, line, col, error) {
-    addError("Unhandled error: " + msg);
+    addError("Unhandled error: " + msg + " at " + url + " " + line + ":" + col);
     return true;
 }
 
