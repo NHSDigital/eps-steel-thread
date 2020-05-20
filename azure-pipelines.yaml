@@ -21,6 +21,9 @@ steps:
 - bash: sh ./scripts/bundle_python.sh
   displayName: Create python deployment package
 
+- script: pipenv run pytest -v
+  displayName: Run tests in python package
+
 - script: mkdir dist
   displayName: 'create a dist folder'
 
