@@ -21,12 +21,21 @@
             </a>
         </div>
         <div class="nhsuk-header__transactional-service-name">
-            <a class="nhsuk-header__transactional-service-name--link" href="#">Review and Sign</a>
+            <a class="nhsuk-header__transactional-service-name--link" href="#">EPS Steel Thread</a>
         </div>
     </div>
 </header>
 <div class="nhsuk-width-container">
     <main class="nhsuk-main-wrapper" id="main-content">
+        <div class="nhsuk-grid-row">
+            <div class="nhsuk-grid-column-two-thirds">
+                <fieldset class="nhsuk-fieldset">
+                    <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--xl">
+                        <h1 class="nhsuk-fieldset__heading">Review and sign</h1>
+                    </legend>
+                </fieldset>
+            </div>
+        </div>
         <div class="nhsuk-grid-row">
             <div class="nhsuk-grid-column-two-thirds">
                 <div class="nhsuk-form-group">
@@ -76,6 +85,10 @@
                             <dt class="nhsuk-summary-list__key">Gender</dt>
                             <dd class="nhsuk-summary-list__value">{signRequestSummary.patient.gender | titleCase}</dd>
                         </div>
+                        <div class="nhsuk-summary-list__row" rv-each-address="signRequestSummary.patient.address">
+                            <dt class="nhsuk-summary-list__key">Address</dt>
+                            <dd class="nhsuk-summary-list__value">{address | fullAddress}</dd>
+                        </div>
                     </dl>
                 </div>
             </div>
@@ -116,6 +129,18 @@
                         <div class="nhsuk-summary-list__row" rv-each-name="signRequestSummary.practitioner.name">
                             <dt class="nhsuk-summary-list__key">Name</dt>
                             <dd class="nhsuk-summary-list__value">{name | fullName}</dd>
+                        </div>
+                        <div class="nhsuk-summary-list__row">
+                            <dt class="nhsuk-summary-list__key">Organization</dt>
+                            <dd class="nhsuk-summary-list__value">{signRequestSummary.prescribingOrganization.name} ({signRequestSummary.prescribingOrganization.identifier | odsCode})</dd>
+                        </div>
+                        <div class="nhsuk-summary-list__row" rv-each-address="signRequestSummary.prescribingOrganization.address">
+                            <dt class="nhsuk-summary-list__key">Address</dt>
+                            <dd class="nhsuk-summary-list__value">{address | fullAddress}</dd>
+                        </div>
+                        <div class="nhsuk-summary-list__row">
+                            <dt class="nhsuk-summary-list__key">Trust / CCG</dt>
+                            <dd class="nhsuk-summary-list__value">{signRequestSummary.parentOrganization.name} ({signRequestSummary.parentOrganization.identifier | odsCode})</dd>
                         </div>
                     </dl>
                 </div>
