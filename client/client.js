@@ -1,5 +1,23 @@
-let signRequest = EXAMPLE_PRESCRIPTION
-const pageData = {}
+let signRequest = {}
+const pageData = {
+    examples: [
+        new Example("Single line item", EXAMPLE_PRESCRIPTION_SINGLE_LINE_ITEM),
+        new Example("Multiple line items", EXAMPLE_PRESCRIPTION_MULTIPLE_LINE_ITEMS)
+    ]
+}
+
+function Example(description, message) {
+    this.description = description
+    this.message = message
+    this.select = function () {
+        selectExample(this)
+    }
+}
+
+function selectExample(example) {
+    signRequest = example.message
+    resetPageData()
+}
 
 rivets.formatters.snomedCode = function(codings) {
     return codings.filter(coding => coding.system === "http://snomed.info/sct")[0].code
@@ -74,6 +92,7 @@ window.onerror = function(msg, url, line, col, error) {
 }
 
 function addError(message) {
+    console.log(message)
     if (pageData.errorList === null) {
         pageData.errorList = []
     }
@@ -96,7 +115,7 @@ function getResourcesOfType(prescriptionBundle, resourceType) {
 }
 
 function onLoad() {
-    resetPageData()
+    pageData.examples[0].select()
     bind()
 }
 
