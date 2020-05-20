@@ -11,3 +11,6 @@ boto3 = "*"
 [packages]
 flask = "*"
 serverless-wsgi = "*"
+
+[requires]
+python_version = "3.8"
