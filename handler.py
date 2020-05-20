@@ -18,6 +18,17 @@ def sign():
         "alg": "sha256"
     }
 
+@app.route('/verify', methods=['POST'])
+def verify():
+    request_json = request.get_json()
+    request_data = request_json["data"]
+    signature = request_json["signature"]
+    signed_data = hashlib.sha256(bytes(request_data.encode())).hexdigest()
+    return {
+        "statusCode": 200,
+        "valid": signed_data == signature,
+    }
+
 @app.after_request
 def set_access_control(response):
     response.headers["Access-Control-Allow-Origin"] = "*"
