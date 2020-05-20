@@ -6,7 +6,11 @@ verify_ssl = true
 [dev-packages]
 pylint = "*"
 pytest = "*"
+boto3 = "*"
 
 [packages]
 flask = "*"
 serverless-wsgi = "*"
+
+[requires]
+python_version = "3.8"
