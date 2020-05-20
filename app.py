@@ -1,33 +1,64 @@
+#!/usr/bin/env python
 import os
-from cryptography.fernet import Fernet
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
+from urllib.parse import urlencode
 
-SESSION_TOKEN_ENCRYPTION_KEY = os.environ["SESSION_TOKEN_ENCRYPTION_KEY"].encode('utf-8')
+import httpx
+import uvicorn
+from fastapi import FastAPI
+from starlette.requests import Request
+from starlette.staticfiles import StaticFiles
+from starlette.templating import Jinja2Templates
 
-fernet = Fernet(SESSION_TOKEN_ENCRYPTION_KEY)
-db = SQLAlchemy()
-migrate = Migrate()
+app = FastAPI()
+app.mount("/assets", StaticFiles(directory="client/assets"), name="assets")
+templates = Jinja2Templates(directory="client")
 
-def create_app():
-    app = Flask(__name__)
-    app.config.from_mapping(
-        SECRET_KEY = SESSION_TOKEN_ENCRYPTION_KEY,
-        # SQLAlchemy 1.4 removed the deprecated postgres dialect name, the name postgresql must be used instead now
-        # Heroku uses postgres in the DATABASE_URL
-        SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL').replace('postgres://', 'postgresql://') or \
-            'sqlite:///' + os.path.join(app.instance_path, 'epsdemo.sqlite'),
-        SQLALCHEMY_TRACK_MODIFICATIONS = False
+# Configure
+OAUTH_SERVER_BASE_PATH = os.environ["OAUTH_SERVER_BASE_PATH"]
+REDIRECT_URI = os.environ["REDIRECT_URI"]
+CLIENT_ID = os.environ["CLIENT_ID"]
+CLIENT_SECRET = os.environ["CLIENT_SECRET"]
+APP_NAME = os.environ["APP_NAME"]
+
+
+@app.get("/")
+def read_root(request: Request):
+    query_params = {
+        "client_id": CLIENT_ID,
+        "redirect_uri": REDIRECT_URI,
+        "response_type": "code",
+        "state": "1234567890",
+    }
+    signin_url = OAUTH_SERVER_BASE_PATH + "authorize?" + urlencode(query_params)
+    return templates.TemplateResponse(
+        "client.html",
+        {
+            "request": request,
+            "signin_url": signin_url,
+            "bearer_token": None,
+        }
     )
-    db.init_app(app)
-    migrate.init_app(app, db)
 
-    return app
 
-app = create_app()
+@app.get("/callback")
+def do_callback(request: Request, code: str, state: str):
+    formdata = {
+        "grant_type": "authorization_code",
+        "code": code,
+        "redirect_uri": REDIRECT_URI,
+        "client_id": CLIENT_ID,
+        "client_secret": CLIENT_SECRET,
+    }
+    response = httpx.post(OAUTH_SERVER_BASE_PATH + "token", data=formdata)
+    response_json = response.json()
+    return templates.TemplateResponse(
+        "client.html",
+        {
+            "request": request,
+            "bearer_token": response_json["access_token"],
+        },
+    )
 
-from routes import *
 
 if __name__ == "__main__":
-    app.run(port=5000, debug=DEV_MODE)
+    uvicorn.run(app, host="0.0.0.0", port=5001)

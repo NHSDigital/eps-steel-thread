@@ -1,1 +1,1 @@
-web: flask db upgrade; uwsgi --socket 0.0.0.0:${PORT:-5000} --protocol=http -w app:app
+web: uvicorn app:app --host=0.0.0.0 --port=${PORT:-5000}
