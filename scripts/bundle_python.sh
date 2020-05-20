@@ -1,7 +1,3 @@
-# Make sure pipenv is good to go
-echo "Do fresh install to make sure everything is there"
-python3 -m pipenv install
-
 VENV=$(python3 -m pipenv --venv)
 ls $VENV/lib
 SITE_PACKAGES=$VENV/lib/python3.6/site-packages
