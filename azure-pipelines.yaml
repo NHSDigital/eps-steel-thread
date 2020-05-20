@@ -21,12 +21,15 @@ steps:
     addToPath: true
 
 - script: pip install --user pipenv
-  displayName: 'Install pipenv' 
+  displayName: 'Install pipenv'
 
-- script: ~/.local/bin/pipenv --python 3.8 && ~/.local/bin/pipenv install --dev
+- script: echo 'export PATH="~/.local/bin/"' >> .bashrc
+  displayName: 'Add pipenv to PATH'
+
+- script: pipenv --python 3.8 && pipenv install --dev
   displayName: Install dependencies
 
-- script: ~/.local/bin/pipenv run pytest -v
+- script: pipenv run pytest -v
   displayName: Run tests in python package
 
 - bash: sh ./scripts/bundle_python.sh
