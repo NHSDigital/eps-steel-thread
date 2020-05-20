@@ -32,26 +32,51 @@ rivets.formatters.nhsNumber = function (identifiers) {
     return nhsNumber.substring(0, 3) + " " + nhsNumber.substring(3, 6) + " " + nhsNumber.substring(6)
 }
 
+rivets.formatters.odsCode = function(identifiers) {
+    return identifiers.filter(identifier => identifier.system === "https://fhir.nhs.uk/Id/ods-organization-code")[0].value
+}
+
 rivets.formatters.titleCase = function(string) {
     //TODO length checks
     return string.substring(0, 1).toUpperCase() + string.substring(1)
 }
 
 rivets.formatters.fullName = function(name) {
-    let names = []
-    if (name.family) {
-        names = names.concat(name.family.toUpperCase())
+    return concatenateWithSpacesIfPresent([
+        name.family,
+        name.given,
+        surroundWithParenthesesIfPresent(name.prefix),
+        surroundWithParenthesesIfPresent(name.suffix)
+    ])
+}
+
+rivets.formatters.fullAddress = function (address) {
+    return concatenateWithSpacesIfPresent([
+        address.line,
+        address.city,
+        address.district,
+        address.state,
+        address.postalCode,
+        address.country
+    ])
+}
+
+function concatenateWithSpacesIfPresent(fields) {
+    let fieldValues = []
+    fields.forEach(field => {
+        if (field) {
+            fieldValues = fieldValues.concat(field)
+        }
+    })
+    return fieldValues.join(" ")
+}
+
+function surroundWithParenthesesIfPresent(fields) {
+    if (fields) {
+        return fields.map(field => "(" + field + ")")
+    } else {
+        return fields
     }
-    if (name.given) {
-        names = names.concat(name.given)
-    }
-    if (name.prefix) {
-        names = names.concat(name.prefix.map(prefix => "(" + prefix + ")"))
-    }
-    if (name.suffix) {
-        names = names.concat(name.suffix.map(suffix => "(" + suffix + ")"))
-    }
-    return names.join(" ")
 }
 
 function sendRequest() {
@@ -102,10 +127,20 @@ function addError(message) {
 }
 
 function getSummary(signRequest) {
+    const patient = getResourcesOfType(signRequest, "Patient")[0]
+    const practitioner = getResourcesOfType(signRequest, "Practitioner")[0]
+    const encounter = getResourcesOfType(signRequest, "Encounter")[0]
+    const organizations = getResourcesOfType(signRequest, "Organization")
+    const prescribingOrganization = organizations.filter(organization => "urn:uuid:" + organization.id === encounter.serviceProvider.reference)[0]
+    const parentOrganization = organizations.filter(organization => "urn:uuid:" + organization.id === prescribingOrganization.partOf.reference)[0]
+    const medicationRequests = getResourcesOfType(signRequest, "MedicationRequest")
     return {
-        patient: getResourcesOfType(signRequest, "Patient")[0],
-        practitioner: getResourcesOfType(signRequest, "Practitioner")[0],
-        medicationRequests: getResourcesOfType(signRequest, "MedicationRequest")
+        patient: patient,
+        practitioner: practitioner,
+        encounter: encounter,
+        prescribingOrganization: prescribingOrganization,
+        parentOrganization: parentOrganization,
+        medicationRequests: medicationRequests
     }
 }
 
