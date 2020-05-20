@@ -1,6 +1,6 @@
-VENV=$(python3 -m pipenv --venv)
+VENV=$(~/.local/bin/pipenv --venv)
 ls $VENV/lib
-SITE_PACKAGES=$VENV/lib/python3.6/site-packages
+SITE_PACKAGES=$VENV/lib/python3.8/site-packages
 echo "Library Location: $SITE_PACKAGES"
 DIR=$(pwd)
 

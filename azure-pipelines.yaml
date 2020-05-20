@@ -15,13 +15,18 @@ steps:
 - script: sudo apt install python3-setuptools
   displayName: 'Install setuptools'
 
-- script: pip3 install --user pipenv
-  displayName: 'install pipenv'
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '3.8' 
+    addToPath: true
 
-- script: python3 -m pipenv install --dev
+- script: pip install --user pipenv
+  displayName: 'Install pipenv' 
+
+- script: ~/.local/bin/pipenv --python 3.8 && ~/.local/bin/pipenv install --dev
   displayName: Install dependencies
 
-- script: python3 -m pipenv run pytest -v
+- script: ~/.local/bin/pipenv run pytest -v
   displayName: Run tests in python package
 
 - bash: sh ./scripts/bundle_python.sh
