@@ -1,5 +1,4 @@
-let signRequest = {}
-let mode = "sign"
+let payload = {}
 
 const requestAddress = "https://internal-dev.api.service.nhs.uk/eps-steel-thread/test/"
 
@@ -7,19 +6,20 @@ const pageData = {
     examples: [
         new Example("Single line item", EXAMPLE_PRESCRIPTION_SINGLE_LINE_ITEM),
         new Example("Multiple line items", EXAMPLE_PRESCRIPTION_MULTIPLE_LINE_ITEMS)
-    ]
+    ],
+    mode: "sign"
 }
 
 function Example(description, message) {
     this.description = description
     this.message = message
     this.select = function () {
-        changeMessage(message)
+        changePayload(message)
     }
 }
 
-function changeMessage(message) {
-    signRequest = message
+function changePayload(newPayload) {
+    payload = newPayload
     resetPageData()
 }
 
@@ -65,6 +65,14 @@ rivets.formatters.fullAddress = function (address) {
     ])
 }
 
+rivets.formatters.isSign = function (mode) {
+    return mode === "sign"
+}
+
+rivets.formatters.isVerify = function (mode) {
+    return mode === "verify"
+}
+
 function concatenateWithSpacesIfPresent(fields) {
     let fieldValues = []
     fields.forEach(field => {
@@ -88,7 +96,7 @@ function sendRequest() {
     xhr.onload = handleResponse
     xhr.onerror = handleError
     xhr.ontimeout = handleTimeout
-    xhr.open("POST", requestAddress+mode)
+    xhr.open("POST", requestAddress + pageData.mode)
     xhr.setRequestHeader("Content-Type", "application/json")
     if (pageData.bearerToken && pageData.bearerToken !== "") {
         xhr.setRequestHeader("Authorization", "Bearer " + pageData.bearerToken)
@@ -96,14 +104,17 @@ function sendRequest() {
     if (pageData.sessionUrid && pageData.sessionUrid !== "") {
         xhr.setRequestHeader("NHSD-Session-URID", pageData.sessionUrid)
     }
-    if (mode === "sign") {
-        xhr.send(JSON.stringify({"payload": btoa(JSON.stringify(signRequest))}))
-    }
-    else {
+    console.log(JSON.stringify(payload))
+    if (pageData.mode === "sign") {
+        const signRequest = {
+            "payload": btoa(JSON.stringify(payload))
+        }
+        xhr.send(JSON.stringify(signRequest))
+    } else {
         const verifyRequest = {
-            "payload": btoa(JSON.stringify(signRequest)),
+            "payload": btoa(JSON.stringify(payload)),
             "signature": document.getElementById("verify-signature-value").value
-        };
+        }
         xhr.send(JSON.stringify(verifyRequest))
     }
 }
@@ -168,7 +179,7 @@ function onLoad() {
 }
 
 function resetPageData() {
-    pageData.signRequestSummary = getSummary(signRequest)
+    pageData.signRequestSummary = getSummary(payload)
     pageData.signResponse = null
     pageData.errorList = null
     //pageData.bearerToken = null
@@ -180,43 +191,9 @@ function bind() {
 }
 
 function changeModeToVerify() {
-    updateSignElementsStyleDisplay("none")
-    updateVerifyElementsStyleDisplay("block")
-    const verifyButton = document.getElementById("verifyModeButton");
-    verifyButton.className = "nhsuk-button nhsuk-button--secondary"
-    const signingButton = document.getElementById("signingModeButton");
-    signingButton.className = "nhsuk-button"
-    mode = "verify"
+    pageData.mode = "verify"
 }
 
 function changeModeToSign() {
-    updateSignElementsStyleDisplay("block")
-    updateVerifyElementsStyleDisplay("none")
-    const verifyButton = document.getElementById("verifyModeButton");
-    verifyButton.className = "nhsuk-button"
-    const signingButton = document.getElementById("signingModeButton");
-    signingButton.className = "nhsuk-button nhsuk-button--secondary"
-    mode = "sign"
-}
-
-function updateVerifyElementsStyleDisplay(newDisplay){
-    const verifyFields = document.getElementById("verifyFields");
-    const verifyHeader = document.getElementById("verifyHeader");
-    const verifySubHeader = document.getElementById("verifySubHeader");
-    const verifyButtons = document.getElementById("verifyButtons");
-    verifyFields.style.display = newDisplay;
-    verifyHeader.style.display = newDisplay;
-    verifySubHeader.style.display = newDisplay;
-    verifyButtons.style.display = newDisplay;
-}
-
-function updateSignElementsStyleDisplay(newDisplay) {
-    const signingFields = document.getElementById("signingFields");
-    const signingHeader = document.getElementById("signingHeader");
-    const signingSubHeader = document.getElementById("signingSubHeader");
-    const signingButtons = document.getElementById("signingButtons");
-    signingFields.style.display = newDisplay;
-    signingHeader.style.display = newDisplay;
-    signingSubHeader.style.display = newDisplay;
-    signingButtons.style.display = newDisplay;
+    pageData.mode = "sign"
 }

@@ -32,8 +32,8 @@
     <main class="nhsuk-main-wrapper" id="main-content">
         <div class="nhsuk-grid-row">
             <div class="nhsuk-grid-column-two-thirds">
-                <button class="nhsuk-button nhsuk-button--secondary" id="signingModeButton" onclick="changeModeToSign()">Sign</button>
-                <button class="nhsuk-button" id="verifyModeButton" onclick="changeModeToVerify()">Verify</button>
+                <button class="nhsuk-button" rv-class-nhsuk-button--secondary="mode | isVerify" id="signingModeButton" onclick="changeModeToSign()">Sign</button>
+                <button class="nhsuk-button" rv-class-nhsuk-button--secondary="mode | isSign" id="verifyModeButton" onclick="changeModeToVerify()">Verify</button>
             </div>
         </div>
 
@@ -41,17 +41,17 @@
             <div class="nhsuk-grid-column-two-thirds">
                 <fieldset class="nhsuk-fieldset">
                     <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--xl">
-                        <div id="signingHeader" style="display: block">
+                        <div rv-show="mode | isSign">
                             <h1 class="nhsuk-fieldset__heading">Review and sign</h1>
                         </div>
-                        <div id="verifyHeader" style="display: none">
+                        <div rv-show="mode | isVerify">
                             <h1 class="nhsuk-fieldset__heading">Verify</h1>
                         </div>
                     </legend>
                 </fieldset>
             </div>
         </div>
-        <div id="signingFields">
+        <div rv-show="mode | isSign">
             <div class="nhsuk-grid-row">
                 <div class="nhsuk-grid-column-two-thirds">
                     <div class="nhsuk-form-group">
@@ -79,7 +79,7 @@
                 </div>
             </div>
         </div>
-        <div id="verifyFields" style="display: none">
+        <div rv-show="mode | isVerify">
             <div class="nhsuk-grid-row">
                 <div class="nhsuk-grid-column-two-thirds">
                     <div class="nhsuk-form-group">
@@ -96,10 +96,10 @@
             <div class="nhsuk-grid-column-two-thirds">
                 <div class="nhsuk-form-group">
                     <fieldset class="nhsuk-fieldset" aria-describedby="example-hint">
-                        <div id="signingSubHeader">
+                        <div rv-show="mode | isSign">
                             <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m">Select a prescription to sign</legend>
                         </div>
-                        <div id="verifySubHeader" style="display: none">
+                        <div rv-show="mode | isVerify">
                             <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m">Select a prescription to verify</legend>
                         </div>
                         <span class="nhsuk-hint" id="example-hint">Select from a list of predefined example prescriptions.</span>
@@ -194,7 +194,7 @@
                 </div>
             </div>
         </div>
-        <div id="signingButtons">
+        <div rv-show="mode | isSign">
             <div class="nhsuk-grid-row">
                 <div class="nhsuk-grid-column-two-thirds">
                     <button class="nhsuk-button" type="submit" onclick="sendRequest()">Sign prescription</button>
@@ -202,7 +202,7 @@
                 </div>
             </div>
         </div>
-        <div id="verifyButtons" style="display: none">
+        <div rv-show="mode | isVerify">
             <div class="nhsuk-grid-row">
                 <div class="nhsuk-grid-column-two-thirds">
                     <button class="nhsuk-button" type="submit" onclick="sendRequest()">Verify signature</button>
