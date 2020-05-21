@@ -29,31 +29,58 @@
     <main class="nhsuk-main-wrapper" id="main-content">
         <div class="nhsuk-grid-row">
             <div class="nhsuk-grid-column-two-thirds">
+                <button class="nhsuk-button nhsuk-button--secondary" id="signingModeButton" onclick="changeModeToSign()">Sign</button>
+                <button class="nhsuk-button" id="verifyModeButton" onclick="changeModeToVerify()">Verify</button>
+            </div>
+        </div>
+
+        <div class="nhsuk-grid-row">
+            <div class="nhsuk-grid-column-two-thirds">
                 <fieldset class="nhsuk-fieldset">
                     <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--xl">
-                        <h1 class="nhsuk-fieldset__heading">Review and sign</h1>
+                        <div id="signingHeader" style="display: block">
+                            <h1 class="nhsuk-fieldset__heading">Review and sign</h1>
+                        </div>
+                        <div id="verifyHeader" style="display: none">
+                            <h1 class="nhsuk-fieldset__heading">Verify</h1>
+                        </div>
                     </legend>
                 </fieldset>
             </div>
         </div>
         <div class="nhsuk-grid-row">
             <div class="nhsuk-grid-column-two-thirds">
-                <div class="nhsuk-form-group">
-                    <label class="nhsuk-label" for="session-urid">Session URID</label>
-                    <input class="nhsuk-input" id="session-urid" type="text" rv-value="sessionUrid">
+                <div id="signingFields" style="display: block">
+                    <div class="nhsuk-form-group">
+                        <label class="nhsuk-label" for="session-urid">Session URID</label>
+                        <input class="nhsuk-input" id="session-urid" type="text" rv-value="sessionUrid">
+                    </div>
+                    <div class="nhsuk-form-group">
+                        <label class="nhsuk-label" for="bearer-token">Bearer token</label>
+                        <span class="nhsuk-hint" id="bearer-token-hint">This is the access token returned upon authentication with Apigee.</span>
+                        <input class="nhsuk-input" id="bearer-token" type="text" aria-describedby="bearer-token-hint" rv-value="bearerToken">
+                    </div>
                 </div>
-                <div class="nhsuk-form-group">
-                    <label class="nhsuk-label" for="bearer-token">Bearer token</label>
-                    <span class="nhsuk-hint" id="bearer-token-hint">This is the access token returned upon authentication with Apigee.</span>
-                    <input class="nhsuk-input" id="bearer-token" type="text" aria-describedby="bearer-token-hint" rv-value="bearerToken">
+                <div id="verifyFields" style="display: none">
+                    <div class="nhsuk-form-group">
+                        <label class="nhsuk-label" for="verify-signature-value">Signature</label>
+                        <span class="nhsuk-hint" id="verify-signature-hint">This is the signature returned from the signing page</span>
+                        <input class="nhsuk-input" id="verify-signature-value" type="text" aria-describedby="verify-signature-hint" rv-value="verifySignature">
+                    </div>
                 </div>
             </div>
+
         </div>
         <div class="nhsuk-grid-row">
             <div class="nhsuk-grid-column-two-thirds">
                 <div class="nhsuk-form-group">
                     <fieldset class="nhsuk-fieldset" aria-describedby="example-hint">
-                        <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m">Select a prescription to sign</legend>
+                        <div id="signingSubHeader">
+                            <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m">Select a prescription to sign</legend>
+                        </div>
+                        <div id="verifySubHeader" style="display: none">
+                            <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m">Select a prescription to verify</legend>
+                        </div>
                         <span class="nhsuk-hint" id="example-hint">Select from a list of predefined example prescriptions.</span>
                         <ol class="nhsuk-contents-list__list">
                             <li class="nhsuk-contents-list__item" rv-each-example="examples">
@@ -146,10 +173,20 @@
                 </div>
             </div>
         </div>
-        <div class="nhsuk-grid-row">
-            <div class="nhsuk-grid-column-two-thirds">
-                <button class="nhsuk-button" type="submit" onclick="sendRequest()">Sign prescription</button>
-                <button class="nhsuk-button nhsuk-button--secondary" type="submit" onclick="resetPageData()">Reset</button>
+        <div id="signingButtons">
+            <div class="nhsuk-grid-row">
+                <div class="nhsuk-grid-column-two-thirds">
+                    <button class="nhsuk-button" type="submit" onclick="sendRequest()">Sign prescription</button>
+                    <button class="nhsuk-button nhsuk-button--secondary" type="submit" onclick="resetPageData()">Reset</button>
+                </div>
+            </div>
+        </div>
+        <div id="verifyButtons" style="display: none">
+            <div class="nhsuk-grid-row">
+                <div class="nhsuk-grid-column-two-thirds">
+                    <button class="nhsuk-button" type="submit" onclick="sendRequest()">Verify signature</button>
+                    <button class="nhsuk-button nhsuk-button--secondary" type="submit" onclick="resetPageData()">Reset</button>
+                </div>
             </div>
         </div>
         <div class="nhsuk-grid-row" rv-show="errorList">

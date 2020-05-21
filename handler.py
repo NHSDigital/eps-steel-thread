@@ -5,12 +5,14 @@ import base64
 import binascii
 app = Flask(__name__)
 
+
 @app.route('/', methods=['GET'])
 def hello_world():
     return {
         "statusCode": 200,
         "body": "Hello, world"
     }
+
 
 @app.route('/sign', methods=['POST'])
 def sign():
@@ -25,6 +27,7 @@ def sign():
     except binascii.Error:
         return {"statusCode": 400,
                 "error": "payload no base64 encoded"}
+
 
 @app.route('/verify', methods=['POST'])
 def verify():
@@ -41,13 +44,18 @@ def verify():
         return {"statusCode": 400,
                 "error": "payload no base64 encoded"}
 
+
 @app.after_request
 def set_access_control(response):
     response.headers["Access-Control-Allow-Origin"] = "*"
+    # todo remove before deploying
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type,Authorization'
     return response
+
 
 if __name__ == "__main__":
     app.run(debug=True)
+
 
 def main_handler(event, context):
     return serverless_wsgi.handle_request(app.wsgi_app, event, context)
