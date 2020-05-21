@@ -1,6 +1,5 @@
 let signRequest = {}
 let mode = "sign"
-let previousSignRequest = ""
 
 //const requestAddress = "https://internal-dev.api.service.nhs.uk/eps-steel-thread/test/sign"
 let requestAddress = "http://localhost:5000/"
@@ -100,15 +99,10 @@ function sendRequest() {
     }
     if (mode === "sign") {
         xhr.send(JSON.stringify({"payload": btoa(JSON.stringify(signRequest))}))
-        previousSignRequest = signRequest
     }
     else {
-        let dataToSend = signRequest
-        if (previousSignRequest !== "") {
-            dataToSend = previousSignRequest
-        }
         const verifyRequest = {
-            "payload": btoa(JSON.stringify(dataToSend)),
+            "payload": btoa(JSON.stringify(signRequest)),
             "signature": document.getElementById("verify-signature-value").value
         };
         xhr.send(JSON.stringify(verifyRequest))
