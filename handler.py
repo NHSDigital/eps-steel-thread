@@ -48,8 +48,6 @@ def verify():
 @app.after_request
 def set_access_control(response):
     response.headers["Access-Control-Allow-Origin"] = "*"
-    # todo remove before deploying
-    response.headers['Access-Control-Allow-Headers'] = 'Content-Type,Authorization'
     return response
 
 

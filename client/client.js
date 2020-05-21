@@ -1,8 +1,7 @@
 let signRequest = {}
 let mode = "sign"
 
-//const requestAddress = "https://internal-dev.api.service.nhs.uk/eps-steel-thread/test/sign"
-let requestAddress = "http://localhost:5000/"
+const requestAddress = "https://internal-dev.api.service.nhs.uk/eps-steel-thread/test/"
 
 const pageData = {
     examples: [
