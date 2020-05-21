@@ -24,7 +24,7 @@ APP_NAME = os.environ["APP_NAME"]
 def read_sign():
     return flask.render_template(
         "client.html",
-        signin_url=get_signin_url(),
+        signin_url=get_signin_url("sign"),
         page_mode="sign"
     )
 
@@ -50,7 +50,7 @@ def forward_sign():
 def read_verify():
     return flask.render_template(
         "client.html",
-        signin_url=get_signin_url(),
+        signin_url=get_signin_url("verify"),
         page_mode="verify"
     )
 
@@ -75,6 +75,7 @@ def forward_verify():
 @app.route("/callback", methods=["GET"])
 def do_callback():
     code = flask.request.args.get('code')
+    state = flask.request.args.get('state')
     response = httpx.post(
         OAUTH_SERVER_BASE_PATH + "token",
         data={
@@ -91,20 +92,20 @@ def do_callback():
     response = flask.make_response(
         flask.render_template(
             "client.html",
-            signin_url=get_signin_url(),
-            page_mode="sign"
+            signin_url=get_signin_url(state),
+            page_mode=state
         )
     )
     response.set_cookie("Session-Id", session_id, expires=None)
     return response
 
 
-def get_signin_url():
+def get_signin_url(state):
     query_params = {
         "client_id": CLIENT_ID,
         "redirect_uri": REDIRECT_URI,
         "response_type": "code",
-        "state": "1234567890",
+        "state": state,
     }
     return OAUTH_SERVER_BASE_PATH + "authorize?" + urlencode(query_params)
 
