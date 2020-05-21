@@ -9,7 +9,7 @@ const pageData = {
         new Example("Multiple line items", EXAMPLE_PRESCRIPTION_MULTIPLE_LINE_ITEMS)
     ],
     mode: "sign",
-    sessionId: window.localStorage.sessionId
+    sessionCookiePresent: document.cookie.includes("Session-Id")
 }
 
 function Example(description, message) {
@@ -186,9 +186,4 @@ function resetPageData() {
 
 function bind() {
     rivets.bind(document.querySelector('#main-content'), pageData)
-}
-
-function storeSessionId(sessionId) {
-    localStorage = window.localStorage
-    localStorage.sessionId = sessionId
 }

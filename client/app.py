@@ -25,16 +25,15 @@ def read_sign():
     return flask.render_template(
         "client.html",
         signin_url=get_signin_url(),
-        session_id=None,
         page_mode="sign"
     )
 
 
 @app.route("/sign", methods=["POST"])
 def forward_sign():
-    session_id = flask.request.headers.get("Session-Id")
+    session_id = flask.request.cookies.get("Session-Id")
     if session_id is None:
-        return {"error": "Session-Id header is required"}, 400
+        return {"error": "Session-Id cookie is required"}, 400
 
     response = httpx.post(
         REMOTE_SIGNING_SERVER_BASE_PATH + "sign",
@@ -52,16 +51,15 @@ def read_verify():
     return flask.render_template(
         "client.html",
         signin_url=get_signin_url(),
-        session_id=None,
         page_mode="verify"
     )
 
 
 @app.route("/verify", methods=["POST"])
 def forward_verify():
-    session_id = flask.request.headers.get("Session-Id")
+    session_id = flask.request.cookies.get("Session-Id")
     if session_id is None:
-        return {"error": "Session-Id header is required"}, 400
+        return {"error": "Session-Id cookie is required"}, 400
 
     response = httpx.post(
         REMOTE_SIGNING_SERVER_BASE_PATH + "verify",
@@ -90,12 +88,15 @@ def do_callback():
     response_json = response.json()
     session_id = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(32))
     access_tokens[session_id] = response_json["access_token"]
-    return flask.render_template(
-        "client.html",
-        signin_url=get_signin_url(),
-        session_id=session_id,
-        page_mode="sign"
+    response = flask.make_response(
+        flask.render_template(
+            "client.html",
+            signin_url=get_signin_url(),
+            page_mode="sign"
+        )
     )
+    response.set_cookie("Session-Id", session_id, expires=None)
+    return response
 
 
 def get_signin_url():
