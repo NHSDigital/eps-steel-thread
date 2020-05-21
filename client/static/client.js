@@ -1,6 +1,7 @@
 let payload = {}
 
-const requestAddress = "https://internal-dev.api.service.nhs.uk/eps-steel-thread/test/"
+// const requestAddress = "https://internal-dev.api.service.nhs.uk/eps-steel-thread/test/"
+const requestAddress = "/"
 
 const pageData = {
     examples: [
@@ -99,11 +100,8 @@ function sendRequest() {
     xhr.open("POST", requestAddress + pageData.mode)
 
     xhr.setRequestHeader("Content-Type", "application/json")
-    if (pageData.bearerToken && pageData.bearerToken !== "") {
-        xhr.setRequestHeader("Authorization", "Bearer " + pageData.bearerToken)
-    }
-    if (pageData.sessionUrid && pageData.sessionUrid !== "") {
-        xhr.setRequestHeader("NHSD-Session-URID", pageData.sessionUrid)
+    if (pageData.sessionId && pageData.sessionId !== "") {
+        xhr.setRequestHeader("Session-Id", pageData.sessionId)
     }
 
     if (pageData.mode === "sign") {
@@ -183,18 +181,8 @@ function resetPageData() {
     pageData.signRequestSummary = getSummary(payload)
     pageData.signResponse = null
     pageData.errorList = null
-    //pageData.bearerToken = null
-    //pageData.sessionUrid = null
 }
 
 function bind() {
     rivets.bind(document.querySelector('#main-content'), pageData)
-}
-
-function changeModeToVerify() {
-    pageData.mode = "verify"
-}
-
-function changeModeToSign() {
-    pageData.mode = "sign"
 }

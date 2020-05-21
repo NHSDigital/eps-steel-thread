@@ -7,8 +7,8 @@
     <script type="application/javascript" src="../static/rivets.bundled.min.js"></script>
     <script type="application/javascript" src="../static/example-prescriptions.js"></script>
     <script type="application/javascript" src="../static/client.js"></script>
-    {% if bearer_token is not none %}
-    <script type="application/javascript">pageData.bearerToken="{{bearer_token}}"</script>
+    {% if session_id is not none %}
+    <script type="application/javascript">pageData.sessionId="{{session_id}}"</script>
     {% endif %}
     {% if page_mode is not none %}
     <script type="application/javascript">pageData.mode="{{page_mode}}"</script>
@@ -72,20 +72,7 @@
             </div>
         </div>
         <div rv-show="mode | isSign">
-            <div class="nhsuk-grid-row">
-                <div class="nhsuk-grid-column-two-thirds">
-                    <div class="nhsuk-form-group">
-                        <label class="nhsuk-label" for="session-urid">Session URID</label>
-                        <input class="nhsuk-input" id="session-urid" type="text" rv-value="sessionUrid">
-                    </div>
-                    <div class="nhsuk-form-group">
-                        <label class="nhsuk-label" for="bearer-token">Access token</label>
-                        <span class="nhsuk-hint" id="bearer-token-hint">This is returned upon authentication with the identity server.</span>
-                        <input class="nhsuk-input" id="bearer-token" type="text" aria-describedby="bearer-token-hint" rv-value="bearerToken">
-                    </div>
-                </div>
-            </div>
-            <div class="nhsuk-grid-row" rv-hide="bearerToken">
+            <div class="nhsuk-grid-row" rv-hide="sessionId">
                 <div class="nhsuk-grid-column-two-thirds">
                     <div class="nhsuk-action-link">
                         <a class="nhsuk-action-link__link" href="{{signin_url}}">
