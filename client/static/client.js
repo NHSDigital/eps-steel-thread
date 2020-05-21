@@ -8,7 +8,8 @@ const pageData = {
         new Example("Single line item", EXAMPLE_PRESCRIPTION_SINGLE_LINE_ITEM),
         new Example("Multiple line items", EXAMPLE_PRESCRIPTION_MULTIPLE_LINE_ITEMS)
     ],
-    mode: "sign"
+    mode: "sign",
+    sessionId: window.localStorage.sessionId
 }
 
 function Example(description, message) {
@@ -185,4 +186,9 @@ function resetPageData() {
 
 function bind() {
     rivets.bind(document.querySelector('#main-content'), pageData)
+}
+
+function storeSessionId(sessionId) {
+    localStorage = window.localStorage
+    localStorage.sessionId = sessionId
 }

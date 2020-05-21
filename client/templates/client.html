@@ -8,7 +8,7 @@
     <script type="application/javascript" src="../static/example-prescriptions.js"></script>
     <script type="application/javascript" src="../static/client.js"></script>
     {% if session_id is not none %}
-    <script type="application/javascript">pageData.sessionId="{{session_id}}"</script>
+    <script type="application/javascript">storeSessionId("{{session_id}}")</script>
     {% endif %}
     {% if page_mode is not none %}
     <script type="application/javascript">pageData.mode="{{page_mode}}"</script>
