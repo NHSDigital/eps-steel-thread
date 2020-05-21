@@ -1,8 +1,4 @@
 let payload = {}
-
-// const requestAddress = "https://internal-dev.api.service.nhs.uk/eps-steel-thread/test/"
-const requestAddress = "/"
-
 const pageData = {
     examples: [
         new Example("Single line item", EXAMPLE_PRESCRIPTION_SINGLE_LINE_ITEM),
@@ -49,7 +45,7 @@ rivets.formatters.titleCase = function(string) {
 
 rivets.formatters.fullName = function(name) {
     return concatenateIfPresent([
-        name.family,
+        toUpperCaseIfPresent(name.family),
         name.given,
         surroundWithParenthesesIfPresent(name.prefix),
         surroundWithParenthesesIfPresent(name.suffix)
@@ -91,6 +87,14 @@ function surroundWithParenthesesIfPresent(fields) {
     }
 }
 
+function toUpperCaseIfPresent(field) {
+    if (field) {
+        return field.toUpperCase()
+    } else {
+        return field
+    }
+}
+
 function sendRequest() {
     const xhr = new XMLHttpRequest()
 
@@ -98,7 +102,7 @@ function sendRequest() {
     xhr.onerror = handleError
     xhr.ontimeout = handleTimeout
 
-    xhr.open("POST", requestAddress + pageData.mode)
+    xhr.open("POST", "/" + pageData.mode)
 
     xhr.setRequestHeader("Content-Type", "application/json")
     if (pageData.sessionId && pageData.sessionId !== "") {
