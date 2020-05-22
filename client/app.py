@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import datetime
 import os
-import time
 from urllib.parse import urlencode
 
 import flask
@@ -66,22 +65,19 @@ def render_client(page_mode):
 
 
 def forward_request(path):
+    headers = {
+        'Nhsd-Session-Urid': "1234"
+    }
+
     access_token_encrypted = flask.request.cookies.get("Access-Token")
-    if access_token_encrypted is None:
-        # Delay the response to work around a Heroku bug
-        time.sleep(1)
-        print("about to make 400 response")
-        error_response = flask.make_response({"error": "Access-Token cookie is required"}, 400)
-        print("about to return 400 response")
-        return error_response
-    access_token = fernet.decrypt(access_token_encrypted.encode('utf-8')).decode('utf-8')
+    if access_token_encrypted is not None:
+        access_token = fernet.decrypt(access_token_encrypted.encode('utf-8')).decode('utf-8')
+        headers['Authorization'] = "Bearer " + access_token
+
     response = httpx.post(
         REMOTE_SIGNING_SERVER_BASE_PATH + path,
         json=flask.request.json,
-        headers={
-            'Nhsd-Session-Urid': "1234",
-            'Authorization': "Bearer " + access_token
-        }
+        headers=headers
     )
     return response.content, response.status_code
 
