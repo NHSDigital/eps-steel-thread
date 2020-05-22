@@ -7,7 +7,6 @@ import flask
 import httpx
 from cryptography.fernet import Fernet
 
-# Configure
 OAUTH_SERVER_BASE_PATH = os.environ["OAUTH_SERVER_BASE_PATH"]
 REMOTE_SIGNING_SERVER_BASE_PATH = os.environ["REMOTE_SIGNING_SERVER_BASE_PATH"]
 REDIRECT_URI = os.environ["REDIRECT_URI"]
@@ -22,76 +21,31 @@ app = flask.Flask(__name__)
 
 @app.route("/", methods=["GET"])
 @app.route("/sign", methods=["GET"])
-def read_sign():
-    return flask.render_template(
-        "client.html",
-        signin_url=get_signin_url("sign"),
-        page_mode="sign"
-    )
+def get_sign():
+    return render_client("sign")
 
 
 @app.route("/sign", methods=["POST"])
-def forward_sign():
-    access_token_encrypted = flask.request.cookies.get("Access-Token")
-    if access_token_encrypted is None:
-        return {"error": "Access-Token cookie is required"}, 400
-    access_token = fernet.decrypt(access_token_encrypted.encode('utf-8')).decode('utf-8')
-
-    response = httpx.post(
-        REMOTE_SIGNING_SERVER_BASE_PATH + "sign",
-        json=flask.request.json,
-        headers={
-            'Nhsd-Session-Urid': "1234",
-            'Authorization': "Bearer " + access_token
-        }
-    )
-    return response.content
+def post_sign():
+    return forward_request("sign")
 
 
 @app.route("/verify", methods=["GET"])
-def read_verify():
-    return flask.render_template(
-        "client.html",
-        signin_url=get_signin_url("verify"),
-        page_mode="verify"
-    )
+def get_verify():
+    return render_client("verify")
 
 
 @app.route("/verify", methods=["POST"])
-def forward_verify():
-    access_token_encrypted = flask.request.cookies.get("Access-Token")
-    if access_token_encrypted is None:
-        return {"error": "Access-Token cookie is required"}, 400
-    access_token = fernet.decrypt(access_token_encrypted.encode('utf-8')).decode('utf-8')
-
-    response = httpx.post(
-        REMOTE_SIGNING_SERVER_BASE_PATH + "verify",
-        json=flask.request.json,
-        headers={
-            'Nhsd-Session-Urid': "1234",
-            'Authorization': "Bearer " + access_token
-        }
-    )
-    return response.content
+def post_verify():
+    return forward_request("verify")
 
 
 @app.route("/callback", methods=["GET"])
-def do_callback():
+def get_callback():
     code = flask.request.args.get('code')
     state = flask.request.args.get('state')
 
-    token_response = httpx.post(
-        OAUTH_SERVER_BASE_PATH + "token",
-        data={
-            "grant_type": "authorization_code",
-            "code": code,
-            "redirect_uri": REDIRECT_URI,
-            "client_id": CLIENT_ID,
-            "client_secret": CLIENT_SECRET,
-        }
-    )
-
-    token_response_json = token_response.json()
+    token_response_json = exchange_code_for_token(code)
     access_token = token_response_json["access_token"]
     expires_in = token_response_json["expires_in"]
     access_token_encrypted = fernet.encrypt(access_token.encode('utf-8')).decode('utf-8')
@@ -102,6 +56,30 @@ def do_callback():
     return callback_response
 
 
+def render_client(page_mode):
+    return flask.render_template(
+        "client.html",
+        signin_url=get_signin_url(page_mode),
+        page_mode=page_mode
+    )
+
+
+def forward_request(path):
+    access_token_encrypted = flask.request.cookies.get("Access-Token")
+    if access_token_encrypted is None:
+        return {"error": "Access-Token cookie is required"}, 400
+    access_token = fernet.decrypt(access_token_encrypted.encode('utf-8')).decode('utf-8')
+    response = httpx.post(
+        REMOTE_SIGNING_SERVER_BASE_PATH + path,
+        json=flask.request.json,
+        headers={
+            'Nhsd-Session-Urid': "1234",
+            'Authorization': "Bearer " + access_token
+        }
+    )
+    return response.content
+
+
 def get_signin_url(state):
     query_params = {
         "client_id": CLIENT_ID,
@@ -110,6 +88,20 @@ def get_signin_url(state):
         "state": state,
     }
     return OAUTH_SERVER_BASE_PATH + "authorize?" + urlencode(query_params)
+
+
+def exchange_code_for_token(code):
+    token_response = httpx.post(
+        OAUTH_SERVER_BASE_PATH + "token",
+        data={
+            "grant_type": "authorization_code",
+            "code": code,
+            "redirect_uri": REDIRECT_URI,
+            "client_id": CLIENT_ID,
+            "client_secret": CLIENT_SECRET,
+        }
+    )
+    return token_response.json()
 
 
 if __name__ == "__main__":
