@@ -67,7 +67,10 @@ def render_client(page_mode):
 def forward_request(path):
     access_token_encrypted = flask.request.cookies.get("Access-Token")
     if access_token_encrypted is None:
-        return {"error": "Access-Token cookie is required"}, 400
+        print("about to make 400 response")
+        error_response = flask.make_response({"error": "Access-Token cookie is required"}, 400)
+        print("about to return 400 response")
+        return error_response
     access_token = fernet.decrypt(access_token_encrypted.encode('utf-8')).decode('utf-8')
     response = httpx.post(
         REMOTE_SIGNING_SERVER_BASE_PATH + path,
