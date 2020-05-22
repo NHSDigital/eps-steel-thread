@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import datetime
 import os
+import time
 from urllib.parse import urlencode
 
 import flask
@@ -67,6 +68,8 @@ def render_client(page_mode):
 def forward_request(path):
     access_token_encrypted = flask.request.cookies.get("Access-Token")
     if access_token_encrypted is None:
+        # Delay the response to work around a Heroku bug
+        time.sleep(1)
         print("about to make 400 response")
         error_response = flask.make_response({"error": "Access-Token cookie is required"}, 400)
         print("about to return 400 response")
