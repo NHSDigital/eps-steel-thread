@@ -91,19 +91,13 @@ def do_callback():
         }
     )
 
-    callback_response = flask.make_response(
-        flask.render_template(
-            "client.html",
-            signin_url=get_signin_url(state),
-            page_mode=state
-        )
-    )
-
     token_response_json = token_response.json()
     access_token = token_response_json["access_token"]
     expires_in = token_response_json["expires_in"]
     access_token_encrypted = fernet.encrypt(access_token.encode('utf-8')).decode('utf-8')
     expires = datetime.datetime.utcnow() + datetime.timedelta(seconds=float(expires_in))
+
+    callback_response = flask.redirect("/" + state, 302)
     callback_response.set_cookie("Access-Token", access_token_encrypted, expires=expires)
     return callback_response
 
