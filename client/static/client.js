@@ -6,7 +6,7 @@ const pageData = {
     ],
     mode: "sign",
     signature: "",
-    sessionCookiePresent: document.cookie.includes("Access-Token")
+    loggedIn: document.cookie.includes("Access-Token")
 }
 
 function Example(description, message) {
@@ -74,6 +74,10 @@ rivets.formatters.isVerify = function (mode) {
 
 rivets.formatters.joinWithSpaces = function(strings) {
     return strings.join(" ")
+}
+
+rivets.formatters.appendPageMode = function (string) {
+    return string + pageData.mode
 }
 
 function concatenateIfPresent(fields) {

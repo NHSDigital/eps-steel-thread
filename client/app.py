@@ -40,10 +40,25 @@ def post_verify():
     return forward_request("verify")
 
 
+@app.route("/login", methods=["GET"])
+def get_login():
+    state = flask.request.args.get("state", "sign")
+    authorize_url = get_authorize_url(state)
+    return flask.redirect(authorize_url, 302)
+
+
+@app.route("/logout", methods=["GET"])
+def get_logout():
+    state = flask.request.args.get("state", "sign")
+    logout_response = flask.redirect(f"/{state}", 302)
+    logout_response.set_cookie("Access-Token", "", expires=0)
+    return logout_response
+
+
 @app.route("/callback", methods=["GET"])
 def get_callback():
-    code = flask.request.args.get('code')
-    state = flask.request.args.get('state')
+    code = flask.request.args.get("code")
+    state = flask.request.args.get("state")
 
     token_response_json = exchange_code_for_token(code)
     access_token = token_response_json["access_token"]
@@ -51,7 +66,7 @@ def get_callback():
     access_token_encrypted = fernet.encrypt(access_token.encode('utf-8')).decode('utf-8')
     expires = datetime.datetime.utcnow() + datetime.timedelta(seconds=float(expires_in))
 
-    callback_response = flask.redirect("/" + state, 302)
+    callback_response = flask.redirect(f"/{state}", 302)
     callback_response.set_cookie("Access-Token", access_token_encrypted, expires=expires)
     return callback_response
 
@@ -59,7 +74,6 @@ def get_callback():
 def render_client(page_mode):
     return flask.render_template(
         "client.html",
-        signin_url=get_signin_url(page_mode),
         page_mode=page_mode
     )
 
@@ -72,29 +86,29 @@ def forward_request(path):
     access_token_encrypted = flask.request.cookies.get("Access-Token")
     if access_token_encrypted is not None:
         access_token = fernet.decrypt(access_token_encrypted.encode('utf-8')).decode('utf-8')
-        headers['Authorization'] = "Bearer " + access_token
+        headers['Authorization'] = f"Bearer {access_token}"
 
     response = httpx.post(
-        REMOTE_SIGNING_SERVER_BASE_PATH + path,
+        f"{REMOTE_SIGNING_SERVER_BASE_PATH}{path}",
         json=flask.request.json,
         headers=headers
     )
     return response.content, response.status_code
 
 
-def get_signin_url(state):
+def get_authorize_url(state):
     query_params = {
         "client_id": CLIENT_ID,
         "redirect_uri": REDIRECT_URI,
         "response_type": "code",
         "state": state,
     }
-    return OAUTH_SERVER_BASE_PATH + "authorize?" + urlencode(query_params)
+    return f"{OAUTH_SERVER_BASE_PATH}authorize?{urlencode(query_params)}"
 
 
 def exchange_code_for_token(code):
     token_response = httpx.post(
-        OAUTH_SERVER_BASE_PATH + "token",
+        f"{OAUTH_SERVER_BASE_PATH}token",
         data={
             "grant_type": "authorization_code",
             "code": code,
