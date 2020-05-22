@@ -1,15 +1,11 @@
 #!/usr/bin/env python
 import datetime
 import os
-import random
-import string
 from urllib.parse import urlencode
 
 import flask
 import httpx
-
-app = flask.Flask(__name__)
-access_tokens = {}
+from cryptography.fernet import Fernet
 
 # Configure
 OAUTH_SERVER_BASE_PATH = os.environ["OAUTH_SERVER_BASE_PATH"]
@@ -18,6 +14,10 @@ REDIRECT_URI = os.environ["REDIRECT_URI"]
 CLIENT_ID = os.environ["CLIENT_ID"]
 CLIENT_SECRET = os.environ["CLIENT_SECRET"]
 APP_NAME = os.environ["APP_NAME"]
+SESSION_TOKEN_ENCRYPTION_KEY = os.environ["SESSION_TOKEN_ENCRYPTION_KEY"]
+
+fernet = Fernet(SESSION_TOKEN_ENCRYPTION_KEY.encode('utf-8'))
+app = flask.Flask(__name__)
 
 
 @app.route("/", methods=["GET"])
@@ -32,16 +32,17 @@ def read_sign():
 
 @app.route("/sign", methods=["POST"])
 def forward_sign():
-    session_id = flask.request.cookies.get("Session-Id")
-    if session_id is None:
-        return {"error": "Session-Id cookie is required"}, 400
+    access_token_encrypted = flask.request.cookies.get("Access-Token")
+    if access_token_encrypted is None:
+        return {"error": "Access-Token cookie is required"}, 400
+    access_token = fernet.decrypt(access_token_encrypted.encode('utf-8')).decode('utf-8')
 
     response = httpx.post(
         REMOTE_SIGNING_SERVER_BASE_PATH + "sign",
         json=flask.request.json,
         headers={
             'Nhsd-Session-Urid': "1234",
-            'Authorization': "Bearer " + access_tokens[session_id]
+            'Authorization': "Bearer " + access_token
         }
     )
     return response.content
@@ -58,16 +59,17 @@ def read_verify():
 
 @app.route("/verify", methods=["POST"])
 def forward_verify():
-    session_id = flask.request.cookies.get("Session-Id")
-    if session_id is None:
-        return {"error": "Session-Id cookie is required"}, 400
+    access_token_encrypted = flask.request.cookies.get("Access-Token")
+    if access_token_encrypted is None:
+        return {"error": "Access-Token cookie is required"}, 400
+    access_token = fernet.decrypt(access_token_encrypted.encode('utf-8')).decode('utf-8')
 
     response = httpx.post(
         REMOTE_SIGNING_SERVER_BASE_PATH + "verify",
         json=flask.request.json,
         headers={
             'Nhsd-Session-Urid': "1234",
-            'Authorization': "Bearer " + access_tokens[session_id]
+            'Authorization': "Bearer " + access_token
         }
     )
     return response.content
@@ -88,7 +90,6 @@ def do_callback():
             "client_secret": CLIENT_SECRET,
         }
     )
-    token_response_json = token_response.json()
 
     callback_response = flask.make_response(
         flask.render_template(
@@ -98,11 +99,12 @@ def do_callback():
         )
     )
 
-    session_id = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(32))
-    access_tokens[session_id] = token_response_json["access_token"]
+    token_response_json = token_response.json()
+    access_token = token_response_json["access_token"]
     expires_in = token_response_json["expires_in"]
+    access_token_encrypted = fernet.encrypt(access_token.encode('utf-8')).decode('utf-8')
     expires = datetime.datetime.utcnow() + datetime.timedelta(seconds=float(expires_in))
-    callback_response.set_cookie("Session-Id", session_id, expires=expires)
+    callback_response.set_cookie("Access-Token", access_token_encrypted, expires=expires)
     return callback_response
 
 

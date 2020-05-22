@@ -5,7 +5,7 @@ const pageData = {
         new Example("Multiple line items", EXAMPLE_PRESCRIPTION_MULTIPLE_LINE_ITEMS)
     ],
     mode: "sign",
-    sessionCookiePresent: document.cookie.includes("Session-Id")
+    sessionCookiePresent: document.cookie.includes("Access-Token")
 }
 
 function Example(description, message) {
