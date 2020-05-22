@@ -77,7 +77,7 @@ def forward_request(path):
             'Authorization': "Bearer " + access_token
         }
     )
-    return response.content
+    return response.content, response.status_code
 
 
 def get_signin_url(state):
