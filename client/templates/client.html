@@ -112,11 +112,12 @@
                             <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m">Select a prescription to verify</legend>
                         </div>
                         <span class="nhsuk-hint" id="example-hint">Select from a list of predefined example prescriptions.</span>
-                        <ol class="nhsuk-contents-list__list">
-                            <li class="nhsuk-contents-list__item" rv-each-example="examples">
-                                <a class="nhsuk-contents-list__link" rv-on-click="example.select">{example.description}</a>
-                            </li>
-                        </ol>
+                        <div class="nhsuk-radios">
+                            <div class="nhsuk-radios__item" rv-each-example="examples">
+                                <input class="nhsuk-radios__input" rv-id="example.id" type="radio" name="example" rv-value="example.id" rv-checked="selectedExampleId" rv-on-click="example.select">
+                                <label class="nhsuk-label nhsuk-radios__label" rv-for="example.id">{example.description}</label>
+                            </div>
+                        </div>
                     </fieldset>
                 </div>
             </div>

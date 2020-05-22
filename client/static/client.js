@@ -1,25 +1,21 @@
-let payload = {}
 const pageData = {
     examples: [
-        new Example("Single line item", EXAMPLE_PRESCRIPTION_SINGLE_LINE_ITEM),
-        new Example("Multiple line items", EXAMPLE_PRESCRIPTION_MULTIPLE_LINE_ITEMS)
+        new Example("example-1", "Single line item", EXAMPLE_PRESCRIPTION_SINGLE_LINE_ITEM),
+        new Example("example-2", "Multiple line items", EXAMPLE_PRESCRIPTION_MULTIPLE_LINE_ITEMS)
     ],
     mode: "sign",
     signature: "",
     loggedIn: document.cookie.includes("Access-Token")
 }
 
-function Example(description, message) {
+function Example(id, description, message) {
+    this.id = id
     this.description = description
     this.message = message
     this.select = function () {
-        changePayload(message)
+        pageData.selectedExampleId = id
+        resetPageData()
     }
-}
-
-function changePayload(newPayload) {
-    payload = newPayload
-    resetPageData()
 }
 
 rivets.formatters.snomedCode = function(codings) {
@@ -114,14 +110,15 @@ function sendRequest() {
         xhr.setRequestHeader("Session-Id", pageData.sessionId)
     }
 
+    const payload = JSON.stringify(getPayload())
     if (pageData.mode === "sign") {
         const signRequest = {
-            "payload": btoa(JSON.stringify(payload))
+            "payload": btoa(payload)
         }
         xhr.send(JSON.stringify(signRequest))
     } else {
         const verifyRequest = {
-            "payload": btoa(JSON.stringify(payload)),
+            "payload": btoa(payload),
             "signature": pageData.signature
         }
         xhr.send(JSON.stringify(verifyRequest))
@@ -177,6 +174,10 @@ function getSummary(payload) {
     }
 }
 
+function getPayload() {
+    return pageData.examples.filter(example => example.id === pageData.selectedExampleId)[0].message
+}
+
 function getResourcesOfType(prescriptionBundle, resourceType) {
     const resources = prescriptionBundle.entry.map(entry => entry.resource)
     return resources.filter(resource => resource.resourceType === resourceType);
@@ -188,7 +189,7 @@ function onLoad() {
 }
 
 function resetPageData() {
-    pageData.signRequestSummary = getSummary(payload)
+    pageData.signRequestSummary = getSummary(getPayload())
     pageData.signResponse = null
     pageData.errorList = null
 }
