@@ -15,29 +15,31 @@ CLIENT_SECRET = os.environ["CLIENT_SECRET"]
 APP_NAME = os.environ["APP_NAME"]
 SESSION_TOKEN_ENCRYPTION_KEY = os.environ["SESSION_TOKEN_ENCRYPTION_KEY"]
 
-REDIRECT_URL_FOR_STATE = {"sign": "/sign", "verify": "/verify"}
+SIGN_URL = "/sign"
+VERIFY_URL = "/verify"
+REDIRECT_URL_FOR_STATE = {"sign": SIGN_URL, "verify": VERIFY_URL}
 
 fernet = Fernet(SESSION_TOKEN_ENCRYPTION_KEY.encode('utf-8'))
 app = flask.Flask(__name__)
 
 
 @app.route("/", methods=["GET"])
-@app.route("/sign", methods=["GET"])
+@app.route(SIGN_URL, methods=["GET"])
 def get_sign():
     return render_client("sign")
 
 
-@app.route("/sign", methods=["POST"])
+@app.route(SIGN_URL, methods=["POST"])
 def post_sign():
     return forward_request("sign")
 
 
-@app.route("/verify", methods=["GET"])
+@app.route(VERIFY_URL, methods=["GET"])
 def get_verify():
     return render_client("verify")
 
 
-@app.route("/verify", methods=["POST"])
+@app.route(VERIFY_URL, methods=["POST"])
 def post_verify():
     return forward_request("verify")
 
