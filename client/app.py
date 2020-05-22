@@ -14,6 +14,7 @@ CLIENT_ID = os.environ["CLIENT_ID"]
 CLIENT_SECRET = os.environ["CLIENT_SECRET"]
 APP_NAME = os.environ["APP_NAME"]
 SESSION_TOKEN_ENCRYPTION_KEY = os.environ["SESSION_TOKEN_ENCRYPTION_KEY"]
+DEV_MODE = os.environ.get("DEV_MODE", False)
 
 SIGN_URL = "/sign"
 VERIFY_URL = "/verify"
@@ -54,26 +55,27 @@ def get_login():
 @app.route("/logout", methods=["GET"])
 def get_logout():
     state = flask.request.args.get("state", "sign")
-    redirect_url = REDIRECT_URL_FOR_STATE.get(state, "sign")
-    logout_response = flask.redirect(redirect_url)
-    logout_response.set_cookie("Access-Token", "", expires=0)
-    return logout_response
+    return redirect_and_set_cookies(state, "", 0)
 
 
 @app.route("/callback", methods=["GET"])
 def get_callback():
+    state = flask.request.args.get("state", "sign")
     code = flask.request.args.get("code")
-    state = flask.request.args.get("state")
-
     token_response_json = exchange_code_for_token(code)
     access_token = token_response_json["access_token"]
     expires_in = token_response_json["expires_in"]
     access_token_encrypted = fernet.encrypt(access_token.encode('utf-8')).decode('utf-8')
     expires = datetime.datetime.utcnow() + datetime.timedelta(seconds=float(expires_in))
+    return redirect_and_set_cookies(state, access_token_encrypted, expires)
 
+
+def redirect_and_set_cookies(state, access_token_encrypted, cookie_expiry):
     redirect_url = REDIRECT_URL_FOR_STATE.get(state, "sign")
     callback_response = flask.redirect(redirect_url)
-    callback_response.set_cookie("Access-Token", access_token_encrypted, expires=expires)
+    secure_flag = not DEV_MODE
+    callback_response.set_cookie("Access-Token", access_token_encrypted, expires=cookie_expiry, secure=secure_flag, httponly=True)
+    callback_response.set_cookie("Access-Token-Set", "true", expires=cookie_expiry, secure=secure_flag)
     return callback_response
 
 
@@ -127,4 +129,4 @@ def exchange_code_for_token(code):
 
 
 if __name__ == "__main__":
-    app.run(port=5000, debug=True)
+    app.run(port=5000, debug=DEV_MODE)
