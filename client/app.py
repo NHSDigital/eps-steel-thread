@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import datetime
 import os
 import random
 import string
@@ -43,7 +44,7 @@ def forward_sign():
             'Authorization': "Bearer " + access_tokens[session_id]
         }
     )
-    return response.json()
+    return response.content
 
 
 @app.route("/verify", methods=["GET"])
@@ -69,14 +70,15 @@ def forward_verify():
             'Authorization': "Bearer " + access_tokens[session_id]
         }
     )
-    return response.json()
+    return response.content
 
 
 @app.route("/callback", methods=["GET"])
 def do_callback():
     code = flask.request.args.get('code')
     state = flask.request.args.get('state')
-    response = httpx.post(
+
+    token_response = httpx.post(
         OAUTH_SERVER_BASE_PATH + "token",
         data={
             "grant_type": "authorization_code",
@@ -86,18 +88,22 @@ def do_callback():
             "client_secret": CLIENT_SECRET,
         }
     )
-    response_json = response.json()
-    session_id = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(32))
-    access_tokens[session_id] = response_json["access_token"]
-    response = flask.make_response(
+    token_response_json = token_response.json()
+
+    callback_response = flask.make_response(
         flask.render_template(
             "client.html",
             signin_url=get_signin_url(state),
             page_mode=state
         )
     )
-    response.set_cookie("Session-Id", session_id, expires=None)
-    return response
+
+    session_id = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(32))
+    access_tokens[session_id] = token_response_json["access_token"]
+    expires_in = token_response_json["expires_in"]
+    expires = datetime.datetime.utcnow() + datetime.timedelta(seconds=float(expires_in))
+    callback_response.set_cookie("Session-Id", session_id, expires=expires)
+    return callback_response
 
 
 def get_signin_url(state):
