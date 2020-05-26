@@ -104,11 +104,7 @@ function sendRequest() {
     xhr.ontimeout = handleTimeout
 
     xhr.open("POST", "/" + pageData.mode)
-
     xhr.setRequestHeader("Content-Type", "application/json")
-    if (pageData.sessionId && pageData.sessionId !== "") {
-        xhr.setRequestHeader("Session-Id", pageData.sessionId)
-    }
 
     const payload = JSON.stringify(getPayload())
     if (pageData.mode === "sign") {
