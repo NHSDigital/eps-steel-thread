@@ -72,17 +72,24 @@ def post_sign():
     )
 
     prepare_prescription_response_body = prepare_prescription_response.json()
-
     message_digest = prepare_prescription_response_body['parameter'][0]['valueString']
+    # todo: stop base64 encoding once the EPS FHIR API does this
+    message_digest_encoded = base64.b64encode(message_digest.encode()).decode()
     # todo: replace with human readable format mapped from eps prepare response where (parameter.name == message-display).valueString (prepare_prescription_response_body['parameter'][1]['valueString'])
     message_display = "####Patient\r\n\r\n**NHS Number**: 945 374 0586\r\n\r\n**Name**: PENSON, HEADLEY TED (Mr)\r\n\r\n**Date of Birth**: 1977-03-27\r\n\r\n**Address (Home)**:  \r\n10 CRECY CLOSE,  \r\nDERBY,  \r\nDE22 3JU\r\n\r\n####Author\r\n\r\n**Name**: CHANDLER, ANDREW\r\n\r\n**Telecom (Work)**: 01945700223\r\n\r\n####Organisation\r\n\r\n**Name**: PARSON DROVE SURGERY\r\n\r\n**Telecom (Work)**: 01945700223\r\n\r\n**Address (Work)**:  \r\n240 MAIN ROAD,  \r\nPARSON DROVE,  \r\nWISBECH,  \r\nCAMBRIDGESHIRE,  \r\nPE13 4JA\r\n\r\n####Medication Requested\r\n\r\n|Name|Dose|Quantity|Unit|\r\n|----|----|--------|----|\r\n|Microgynon 30 tablets (Bayer Plc)|As Directed|63|tablet\r\n\r\netc."
+    # todo: stop base64 encoding once the EPS FHIR API does this
+    message_display_encoded = base64.b64encode(message_display.encode()).decode()
 
     headers = {
         'x-nhsd-signing-app-id': SIGNING_CLIENT_ID,
         'x-nhsd-signing-app-secret': SIGNING_CLIENT_SECRET
     }
 
-    signRequestString = json.dumps({ 'payload': message_digest, 'display': message_display, 'algorithm': "SHA-256" })
+    signRequestString = json.dumps({
+        'payload': message_digest_encoded,
+        'display': message_display_encoded,
+        'algorithm': "RS1"
+    })
     signRequest = json.loads(signRequestString)
 
     sign_response = httpx.post(
