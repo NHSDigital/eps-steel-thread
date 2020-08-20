@@ -110,17 +110,30 @@ def get_send():
         'x-nhsd-signing-app-secret': SIGNING_CLIENT_SECRET
     }
 
-    response = httpx.get(
+    payload_response = httpx.get(
+        f"{REMOTE_SIGNING_SERVER_BASE_PATH}/csc/v1/signatures/SignHash?token={token}",
+        headers=headers
+    )
+
+    payload = payload_response.json()['payload']
+    payload_decoded = base64.b64decode(payload.encode()).decode()
+
+    signature_response = httpx.get(
         f"{REMOTE_SIGNING_SERVER_BASE_PATH}/csc/v1/Signature?token={token}",
         headers=headers
     )
 
-    signatureBytes = response.json()['signature'].encode()
-    signatureBase64Bytes = base64.b64encode(signatureBytes)
-    signature = signatureBase64Bytes.decode()
+    signature = signature_response.json()['signature']
+    certificate = signature_response.json()['certificate']
+
+    xml_dsig = f"<Signature xmlns=\"http://www.w3.org/2000/09/xmldsig#\">{payload_decoded}" \
+               f"<SignatureValue>{signature}</SignatureValue>" \
+               f"<KeyInfo><X509Data><X509Certificate>{certificate}</X509Certificate></X509Data></KeyInfo>" \
+               f"</Signature>"
+    xml_dsig_encoded = base64.b64encode(xml_dsig.encode()).decode()
 
     return render_client('send', sign_response={
-        'signature': signature
+        'signature': xml_dsig_encoded
     })
 
 @app.route(SEND_URL, methods=["POST"])
