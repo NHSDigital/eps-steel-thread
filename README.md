@@ -12,7 +12,8 @@ The site is hosted in heroku and has a development and production version
 | Production       | epsat            | https://nhsd-epsat.herokuapp.com     | commit-id: 16234ba571482a1718773299b5437a3f384d01e1 |
 
 
-Smartcard auth is enabled by default so on hitting any of the above URLs you will be redirected to authenticate with a smartcard
+Smartcard auth is enabled by default so on hitting any of the above URLs you will be redirected to authenticate with a smartcard.
+
 If you don't have a smartcard you can navigate to `/login` to select simulated auth instead
 
 ## Backend
