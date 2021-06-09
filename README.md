@@ -9,7 +9,7 @@ The site is hosted in heroku and has a development and production version
 | Environment      | Heroku App Name  | Url                                  | Version                                             |
 | ---------------- | ---------------- | ------------------------------------ | --------------------------------------------------- |
 | Development      | epsat-dev        | https://nhsd-epsat-dev.herokuapp.com | branch: migrate-to-eps-assurance-tool               |
-| Production       | epsat            | https://nhsd-epsat.herokuapp.com     | commit-id: 16234ba571482a1718773299b5437a3f384d01e1 |
+| Production       | epsat            | https://nhsd-epsat.herokuapp.com     | branch: migrate-to-eps-assurance-tool               |
 
 
 Smartcard auth is enabled by default so on hitting any of the above URLs you will be redirected to authenticate with a smartcard.
