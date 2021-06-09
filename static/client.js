@@ -221,7 +221,7 @@ function sendDispenseNominatedPharmacyReleaseRequest() {
                     const originalShortFormId = getMedicationRequests(bundle)[0].groupIdentifier.value
                     return {id: originalShortFormId}
                     })
-                : []
+                : null
         pageData.releaseResponse.statusCode = response.status_code
     } catch(e) {
         console.log(e)
