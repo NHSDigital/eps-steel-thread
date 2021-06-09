@@ -289,6 +289,11 @@
                 </div>
             </div>
             <div class="nhsuk-grid-column-full">
+                <div class="nhsuk-summary-list">
+                    <code>{releaseResponse.body | safe}</code>
+                </div>
+            </div>
+            <div class="nhsuk-grid-column-full">
                 <table class="table table-bordered results-table dataTable no-footer" id="resultstable" role="grid" aria-describedby="resultstable_info">
                     <thead>
                         <tr role="row">
@@ -300,7 +305,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="results-table-row odd" role="row">
+                        <tr class="results-table-row odd" role="row" rv-each-pharmacy="releaseResponse.prescriptions">
                             <td><input name="selectedId" title="Select Prescription" class="selectedId" onclick="resetSelectAll();" type="checkbox" value="240A67-A99968-428DBL.1" resetstate="ToBeDispensed"></td>
                             <td id="240A67-A99968-428DBL">
                                 <a name="prescriptionIdLink" title="Prescription Details" onclick="resetSelectAll()">240A67-A99968-428DBL</a>

@@ -211,12 +211,10 @@ function sendDispenseNominatedPharmacyReleaseRequest() {
             odsCode: getOdsCode()
         }
         const response = makeRequest("POST", "/dispense/release-nominated-pharmacy", JSON.stringify(request))
-        // todo: use example function to render prescription
-        // add arrows to switch back and forth between prescriptions
-        // (up to 25)
         pageData.showCustomPharmacyInput = false
         pageData.releaseResponse = {}
         pageData.releaseResponse.body = response.body
+        pageData.releaseResponse.prescriptions = response.body.entry
         pageData.releaseResponse.statusCode = response.status_code
     } catch(e) {
         console.log(e)
