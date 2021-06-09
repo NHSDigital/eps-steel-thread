@@ -1,16 +1,16 @@
 const pageData = {
     examples: [
-        // todo: commented out examples either add missing example or fix issues in send
-        new Example("example-1", "Primary Care - Acute (nominated)", PRIMARY_CARE_ACUTE_NOMINATED),
-        //new Example("example-2", "Primary Care - Repeat Dispensing (nominated)", PRIMARY_CARE_REPEAT_DISPENSING_NOMINATED),
-        new Example("example-3", "Primary Care - Repeat Prescribing (nominated)", PRIMARY_CARE_REPEAT_PRESCRIBING_NOMINATED),
-        new Example("example-4", "Secondary Care - Acute (nominated)", SECONDARY_CARE_COMMUNITY_ACUTE_NOMINATED),
-        //new Example("example-5", "Secondary Care - Repeat Dispensing (nominated)", SECONDARY_CARE_REPEAT_DISPENSING_NOMINATED),
-        //new Example("example-6", "Secondary Care - Repeat Prescribing (nominated)", SECONDARY_CARE_REPEAT_PRESCRIBING_NOMINATED),
-        new Example("example-7", "Homecare - Acute (nominated)", HOMECARE_ACUTE_NOMINATED),
-        //new Example("example-8", "Homecare - Repeat Dispensing (nominated)", HOMECARE_REPEAT_DISPENSING_NOMINATED),
-        //new Example("example-9", "Homecare - Repeat Prescribing (nominated)", HOMECARE_REPEAT_PRESCRIBING_NOMINATED),
-        new Example("custom", "Custom", null)
+        // todo: commented out prescriptions either add missing prescription or fix issues in send
+        new Prescription("1", "Primary Care - Acute (nominated)", PRIMARY_CARE_ACUTE_NOMINATED),
+        //new Prescription("2", "Primary Care - Repeat Dispensing (nominated)", PRIMARY_CARE_REPEAT_DISPENSING_NOMINATED),
+        new Prescription("3", "Primary Care - Repeat Prescribing (nominated)", PRIMARY_CARE_REPEAT_PRESCRIBING_NOMINATED),
+        new Prescription("4", "Secondary Care - Acute (nominated)", SECONDARY_CARE_COMMUNITY_ACUTE_NOMINATED),
+        //new Prescription("5", "Secondary Care - Repeat Dispensing (nominated)", SECONDARY_CARE_REPEAT_DISPENSING_NOMINATED),
+        //new Prescription("6", "Secondary Care - Repeat Prescribing (nominated)", SECONDARY_CARE_REPEAT_PRESCRIBING_NOMINATED),
+        new Prescription("7", "Homecare - Acute (nominated)", HOMECARE_ACUTE_NOMINATED),
+        //new Prescription("8", "Homecare - Repeat Dispensing (nominated)", HOMECARE_REPEAT_DISPENSING_NOMINATED),
+        //new Prescription("9", "Homecare - Repeat Prescribing (nominated)", HOMECARE_REPEAT_PRESCRIBING_NOMINATED),
+        new Prescription("custom", "Custom", null)
     ],
     pharmacies: [
         new Pharmacy("VNFKT", "FIVE STAR HOMECARE LEEDS LTD"),
@@ -24,7 +24,7 @@ const pageData = {
     showCustomPharmacyInput: false
 }
 
-function Example(id, description, message) {
+function Prescription(id, description, message) {
     this.id = id
     this.description = description
     this.message = message

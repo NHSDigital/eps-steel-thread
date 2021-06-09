@@ -7,7 +7,7 @@
     <link href="https://nhsuk.github.io/nhsuk-frontend/assets/nhsuk.css" rel="stylesheet">
     <script type="application/javascript" src="../static/rivets.bundled.min.js"></script>
     <script type="application/javascript" src="../static/js.cookie-2.2.1.min.js"></script>
-    <script type="application/javascript" src="../static/examples.js"></script>
+    <script type="application/javascript" src="../static/prescriptions.js"></script>
     <script type="application/javascript" src="../static/client.js"></script>
     <script type="application/javascript">
         pageData.mode="{{page_mode}}"
@@ -289,9 +289,28 @@
                 </div>
             </div>
             <div class="nhsuk-grid-column-full">
-                <div class="nhsuk-summary-list">
-                    <code>{releaseResponse.body | safe}</code>
-                </div>
+                <table class="table table-bordered results-table dataTable no-footer" id="resultstable" role="grid" aria-describedby="resultstable_info">
+                    <thead>
+                        <tr role="row">
+                            <th rowspan="1" colspan="1"><input title="Select All" id="selectall" onclick="selectAll();" type="checkbox"></th>
+                            <th tabindex="0" id="prescriptionId" rowspan="1" colspan="1">Prescription ID</th>
+                            <th tabindex="0" id="status" rowspan="1" colspan="1">Status</th>
+                            <th tabindex="0" id="issueDate" rowspan="1" colspan="1">Issue Date</th>
+                            <th tabindex="0" id="instanceNo" rowspan="1" colspan="1">Prescription Treatment Type</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="results-table-row odd" role="row">
+                            <td><input name="selectedId" title="Select Prescription" class="selectedId" onclick="resetSelectAll();" type="checkbox" value="240A67-A99968-428DBL.1" resetstate="ToBeDispensed"></td>
+                            <td id="240A67-A99968-428DBL">
+                                <a name="prescriptionIdLink" title="Prescription Details" onclick="resetSelectAll()">240A67-A99968-428DBL</a>
+                            </td>
+                            <td name="prescriptionStatus">To be dispensed<br></td>
+                            <td>09-Jun-2021 17:00:28</td>
+                            <td>Acute Prescription (0001)</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
         <div class="nhsuk-grid-row" rv-show="errorList">
