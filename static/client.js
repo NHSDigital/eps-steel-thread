@@ -215,6 +215,7 @@ function sendDispenseNominatedPharmacyReleaseRequest() {
         pageData.releaseResponse = {}
         pageData.releaseResponse.body = response.body
         pageData.releaseResponse.prescriptions = response.body.entry
+        console.log(response.body.entry)
         pageData.releaseResponse.statusCode = response.status_code
     } catch(e) {
         console.log(e)

@@ -305,10 +305,10 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="results-table-row odd" role="row" rv-each-pharmacy="releaseResponse.prescriptions">
-                            <td><input name="selectedId" title="Select Prescription" class="selectedId" onclick="resetSelectAll();" type="checkbox" value="240A67-A99968-428DBL.1" resetstate="ToBeDispensed"></td>
-                            <td id="240A67-A99968-428DBL">
-                                <a name="prescriptionIdLink" title="Prescription Details" onclick="resetSelectAll()">240A67-A99968-428DBL</a>
+                        <tr class="results-table-row odd" role="row" rv-each-prescription="releaseResponse.prescriptions">
+                            <td><input name="selectedId" title="Select Prescription" class="selectedId" onclick="resetSelectAll();" type="checkbox" rv-value="prescription.id"></td>
+                            <td rv-id="prescription.id">
+                                <a name="prescriptionIdLink" title="Prescription Details" onclick="resetSelectAll()">{prescription.id}</a>
                             </td>
                             <td name="prescriptionStatus">To be dispensed<br></td>
                             <td>09-Jun-2021 17:00:28</td>
