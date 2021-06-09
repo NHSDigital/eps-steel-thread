@@ -293,7 +293,7 @@
                     <code>{releaseResponse.body | safe}</code>
                 </div>
             </div>
-            <div class="nhsuk-grid-column-full">
+            <div class="nhsuk-grid-column-full" rv-show="releaseResponse.prescriptions">
                 <table class="table table-bordered results-table dataTable no-footer" id="resultstable" role="grid" aria-describedby="resultstable_info">
                     <thead>
                         <tr role="row">
