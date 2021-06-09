@@ -1,4 +1,0 @@
-<APIProxy name="eps-steel-thread">
-  <!-- This is the root of the application -->
-  <Description>Proxy to eps-steel-thread app on AWS</Description>
-</APIProxy>
