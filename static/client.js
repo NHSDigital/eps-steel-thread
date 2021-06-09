@@ -214,7 +214,10 @@ function sendDispenseNominatedPharmacyReleaseRequest() {
         pageData.showCustomPharmacyInput = false
         pageData.releaseResponse = {}
         pageData.releaseResponse.body = response.body
-        pageData.releaseResponse.prescriptions = response.body.entry
+        pageData.releaseResponse.prescriptions = JSON.parse(response.body).entry.map(function(e) {
+            const originalShortFormId = getMedicationRequests(bundle)[0].groupIdentifier.value
+            return {id: originalShortFormId}
+        })
         console.log(response.body.entry)
         pageData.releaseResponse.statusCode = response.status_code
     } catch(e) {

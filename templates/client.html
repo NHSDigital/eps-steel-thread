@@ -299,20 +299,14 @@
                         <tr role="row">
                             <th rowspan="1" colspan="1"><input title="Select All" id="selectall" onclick="selectAll();" type="checkbox"></th>
                             <th tabindex="0" id="prescriptionId" rowspan="1" colspan="1">Prescription ID</th>
-                            <th tabindex="0" id="status" rowspan="1" colspan="1">Status</th>
-                            <th tabindex="0" id="issueDate" rowspan="1" colspan="1">Issue Date</th>
-                            <th tabindex="0" id="instanceNo" rowspan="1" colspan="1">Prescription Treatment Type</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr class="results-table-row odd" role="row" rv-each-prescription="releaseResponse.prescriptions">
-                            <td><input name="selectedId" title="Select Prescription" class="selectedId" onclick="resetSelectAll();" type="checkbox" rv-value="prescription.id"></td>
+                            <td><input name="releasedPrescriptionId" title="Select Prescription" class="releasedPrescriptionId" onclick="resetSelectAll();" type="checkbox" rv-value="prescription.id"></td>
                             <td rv-id="prescription.id">
-                                <a name="prescriptionIdLink" title="Prescription Details" onclick="resetSelectAll()">{prescription.id}</a>
+                                <a name="releasedPrescriptionId" title="Prescription Details" onclick="resetSelectAll()">{prescription.id}</a>
                             </td>
-                            <td name="prescriptionStatus">To be dispensed<br></td>
-                            <td>09-Jun-2021 17:00:28</td>
-                            <td>Acute Prescription (0001)</td>
                         </tr>
                     </tbody>
                 </table>
