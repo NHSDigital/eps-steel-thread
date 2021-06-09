@@ -213,13 +213,15 @@ function sendDispenseNominatedPharmacyReleaseRequest() {
         const response = makeRequest("POST", "/dispense/release-nominated-pharmacy", JSON.stringify(request))
         pageData.showCustomPharmacyInput = false
         pageData.releaseResponse = {}
-        pageData.releaseResponse.body = response.body
-        pageData.releaseResponse.prescriptions = JSON.parse(response.body).entry.map(function(entry) {
-            const bundle = entry.resource
-            const originalShortFormId = getMedicationRequests(bundle)[0].groupIdentifier.value
-            return {id: originalShortFormId}
-        })
-        console.log(response.body.entry)
+        pageData.releaseResponse.body = response.status_code !== 200 ? response.body : ""
+        pageData.releaseResponse.prescriptions =
+            response.status_code === 200
+                ? JSON.parse(response.body).entry.map(function(entry) {
+                    const bundle = entry.resource
+                    const originalShortFormId = getMedicationRequests(bundle)[0].groupIdentifier.value
+                    return {id: originalShortFormId}
+                    })
+                : []
         pageData.releaseResponse.statusCode = response.status_code
     } catch(e) {
         console.log(e)
