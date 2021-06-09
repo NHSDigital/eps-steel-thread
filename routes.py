@@ -49,8 +49,7 @@ OAUTH_REDIRECT_URI = os.environ["OAUTH_REDIRECT_URI"]
 LOAD_URL = "/prescribe/load"
 EDIT_URL = "/prescribe/edit"
 SIGN_URL = "/prescribe/sign"
-# todo: update to /prescribe/send -> need to update apigee callbackurl in int app
-SEND_URL = "/send"
+SEND_URL = "/prescribe/send"
 DISPENSE_RELEASE_NOMINATED_PHARMACY_URL = "/dispense/release-nominated-pharmacy"
 
 

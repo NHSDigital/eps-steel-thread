@@ -194,7 +194,7 @@ function sendSignRequest() {
 function sendPrescriptionRequest() {
     try {
         // todo: change callback url to /prescribe/send
-        const response = makeRequest("POST", "/send", {})
+        const response = makeRequest("POST", "/prescribe/send", {})
         pageData.signResponse = null
         pageData.sendResponse = {}
         pageData.sendResponse.prescriptionId = response.prescription_id
