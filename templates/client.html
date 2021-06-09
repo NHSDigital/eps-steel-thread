@@ -297,15 +297,13 @@
                 <table class="table table-bordered results-table dataTable no-footer" id="resultstable" role="grid" aria-describedby="resultstable_info">
                     <thead>
                         <tr role="row">
-                            <th rowspan="1" colspan="1"><input title="Select All" id="selectall" onclick="selectAll();" type="checkbox"></th>
                             <th tabindex="0" id="prescriptionId" rowspan="1" colspan="1">Prescription ID</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr class="results-table-row odd" role="row" rv-each-prescription="releaseResponse.prescriptions">
-                            <td><input name="releasedPrescriptionId" title="Select Prescription" class="releasedPrescriptionId" onclick="resetSelectAll();" type="checkbox" rv-value="prescription.id"></td>
                             <td rv-id="prescription.id">
-                                <a name="releasedPrescriptionId" title="Prescription Details" onclick="resetSelectAll()">{prescription.id}</a>
+                                <div name="releasedPrescriptionId">{prescription.id}</a>
                             </td>
                         </tr>
                     </tbody>
