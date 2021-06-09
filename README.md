@@ -1,6 +1,6 @@
 # Electronic Prescription Service Assurance Tool
 
-This is a frontend site to assist with testing and tracking implemented features for the *Electronic Prescription Service FHIR® API*.
+This is a hosted site to assist with testing and tracking implemented features for the *Electronic Prescription Service FHIR® API*.
 
 ## Environments
 
