@@ -214,7 +214,8 @@ function sendDispenseNominatedPharmacyReleaseRequest() {
         pageData.showCustomPharmacyInput = false
         pageData.releaseResponse = {}
         pageData.releaseResponse.body = response.body
-        pageData.releaseResponse.prescriptions = JSON.parse(response.body).entry.map(function(bundle) {
+        pageData.releaseResponse.prescriptions = JSON.parse(response.body).entry.map(function(entry) {
+            const bundle = entry.resource
             const originalShortFormId = getMedicationRequests(bundle)[0].groupIdentifier.value
             return {id: originalShortFormId}
         })
