@@ -13,7 +13,10 @@ SIGNING_BASE_PATH = os.environ["SIGNING_BASE_PATH"]
 # patch for RSS support whilst requirements for local signing and RSS are different
 # todo: use same private key for remote and local signing
 DEMO_APP_LOCAL_SIGNING_PRIVATE_KEY = os.environ["DEMO_APP_PRIVATE_KEY"]
-DEMO_APP_REMOTE_SIGNING_PRIVATE_KEY = ""
+DEMO_APP_REMOTE_SIGNING_PRIVATE_KEY = os.environ["RSS_JWT_PRIVATE_KEY"]
+DEMO_APP_REMOTE_SIGNING_SUBJECT = os.environ["RSS_JWT_SUBJECT"]
+DEMO_APP_REMOTE_SIGNING_ISSUER = os.environ["RSS_JWT_ISSUER"]
+DEMO_APP_REMOTE_SIGNING_KID = os.environ["RSS_JWT_KID"]
 
 
 def make_eps_api_prepare_request(access_token, body):
@@ -66,9 +69,24 @@ def make_sign_api_signature_upload_request(auth_method, access_token, digest, al
                 'kid': DEMO_APP_KEY_ID
             }
         )
-    else: # always 'simulated'
+    else: # always 'simulated' atm this switch will only support simulated auth for RSS (Windows Hello or IOS, not smartcard)
         signing_key = jwk_from_pem(DEMO_APP_REMOTE_SIGNING_PRIVATE_KEY.encode("utf-8"))
-        # todo: build jwt for remote signing
+        jwt_request = jwt_client.encode(
+            {
+                'sub': DEMO_APP_REMOTE_SIGNING_SUBJECT,
+                'iss': DEMO_APP_REMOTE_SIGNING_ISSUER,
+                'aud': SIGNING_BASE_PATH,
+                'iat': time.time(),
+                'exp': time.time() + 600,
+                'payload': digest,
+                'algorithm': algorithm
+            },
+            signing_key,
+            alg ="RS512",
+            optional_headers = {
+                'kid': DEMO_APP_REMOTE_SIGNING_KID
+            }
+        )
 
     signing_base_url = get_signing_base_path(auth_method)
     return httpx.post(
