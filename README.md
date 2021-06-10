@@ -7,9 +7,9 @@ This is a hosted site to assist with testing and tracking implemented features f
 The site is hosted in heroku and has a development and production version
 
 | Environment      | Heroku App Name  | Url                                  | Version                                             |
-| ---------------- | ---------------- | ------------------------------------ | --------------------------------------------------- |
-| Development      | epsat-dev        | https://nhsd-epsat-dev.herokuapp.com | branch: migrate-to-eps-assurance-tool               |
-| Production       | epsat            | https://nhsd-epsat.herokuapp.com     | branch: migrate-to-eps-assurance-tool               |
+| ---------------- | ---------------- | ------------------------------------ | --------------- |
+| Development      | epsat-dev        | https://nhsd-epsat-dev.herokuapp.com | branch: develop |
+| Production       | epsat            | https://nhsd-epsat.herokuapp.com     | branch: master  |
 
 
 Smartcard auth is enabled by default so on hitting any of the above URLs you will be redirected to authenticate with a smartcard.
