@@ -1,13 +1,3 @@
-.terraform
-handler.zip
-*.tfstate.*
-.backend-config
-.backend.config
-.idea
-package
-.vscode
-.envrc
-.vscode
-.venv
-client/.env
-__pycache__
+.vscode/
+get-pip.py
+*.pyc
