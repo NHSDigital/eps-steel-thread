@@ -8,40 +8,13 @@ trigger:
     include:
       - v*
 
-pr:
-  branches:
-    include: ['*']
-
 variables:
   - group: epsat
 
 steps:
   - bash: |
-      set -euo pipefail
-      #ls -R $(Pipeline.Workspace)
-      ls -R $(Build.Repository.LocalPath)
-      export SERVICE_ARTIFACT_NAME=`ls $(Pipeline.Workspace)/s`
-      echo "##vso[task.setvariable variable=SERVICE_ARTIFACT_NAME]$SERVICE_ARTIFACT_NAME"
-      echo "Set Artifact Name of: $SERVICE_ARTIFACT_NAME"
-    displayName: 'Set SERVICE_ARTIFACT_NAME'
-
-  - bash: |
-      if [ -n "$(System.PullRequest.SourceBranch)" ]; then
-        export SOURCE_BRANCH="$(System.PullRequest.SourceBranch)"
-      else
-        export SOURCE_BRANCH=`echo $(SERVICE_ARTIFACT_NAME) | cut -d'+' -f1 | sed -e "s/Electronic-Prescription-Service-Assurance-Tool-Pipeline//"`
-      fi
-      echo "##vso[task.setvariable variable=BRANCH_NAME]`echo $SOURCE_BRANCH | sed -r 's/[/|\\@":<>?*]+/-/g'`"
-    displayName: Set and replace invalid characters in branch name
-
-  - bash: 'echo "##vso[build.updatebuildnumber]Electronic-Prescription-Service-Assurance-Tool-Pipeline-$(BRANCH_NAME)+$(Build.BuildID)"'
-    condition: eq(variables['Build.SourceBranchName'], 'merge')
-    displayName: Update build ID if this is a pull request
-
-  - bash: |
-      if [[ $(SERVICE_ARTIFACT_NAME) == v* ]]; then
-        export HEROKU_API_KEY=$(HEROKU_API_KEY)
-        heroku git:remote -a nhsd-epsat
-        git push heroku master:master
-      fi
-    displayName: Deploy (master only)
+      cd $(Build.Repository.LocalPath)
+      export HEROKU_API_KEY=$(HEROKU_API_KEY)
+      heroku git:remote -a nhsd-epsat
+      git push heroku master:master
+    displayName: Build & Deploy
