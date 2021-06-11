@@ -13,7 +13,7 @@ variables:
 
 
 jobs:
-  - job: build-and-deploy
+  - job: epsat_build_and_deploy
     displayName: Build & Deploy
     timeoutInMinutes: 30
     pool:
