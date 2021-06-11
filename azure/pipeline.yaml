@@ -13,6 +13,15 @@ variables:
 
 steps:
   - bash: |
+      sudo apt-get -yq install heroku
+    displayName: Install Heroku
+  - bash: |
+      cd $(Build.Repository.LocalPath)
+      export HEROKU_API_KEY=$(HEROKU_API_KEY)
+      heroku git:remote -a nhsd-epsat
+      git push heroku master:master
+    displayName: Build & Deploy
+  - bash: |
       cd $(Build.Repository.LocalPath)
       export HEROKU_API_KEY=$(HEROKU_API_KEY)
       heroku git:remote -a nhsd-epsat
