@@ -17,6 +17,7 @@ DEMO_APP_REMOTE_SIGNING_PRIVATE_KEY = os.environ["RSS_JWT_PRIVATE_KEY"]
 DEMO_APP_REMOTE_SIGNING_SUBJECT = os.environ["RSS_JWT_SUBJECT"]
 DEMO_APP_REMOTE_SIGNING_ISSUER = os.environ["RSS_JWT_ISSUER"]
 DEMO_APP_REMOTE_SIGNING_KID = os.environ["RSS_JWT_KID"]
+DEMO_APP_REMOTE_SIGNING_AUDIENCE = os.environ["RSS_JWT_AUDIENCE"]
 
 
 def make_eps_api_prepare_request(access_token, body):
@@ -75,7 +76,7 @@ def make_sign_api_signature_upload_request(auth_method, access_token, digest, al
             {
                 'sub': DEMO_APP_REMOTE_SIGNING_SUBJECT,
                 'iss': DEMO_APP_REMOTE_SIGNING_ISSUER,
-                'aud': SIGNING_BASE_PATH,
+                'aud': DEMO_APP_REMOTE_SIGNING_AUDIENCE,
                 'iat': time.time(),
                 'exp': time.time() + 600,
                 'payload': digest,
