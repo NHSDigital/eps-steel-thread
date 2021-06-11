@@ -18,8 +18,9 @@ variables:
 steps:
   - bash: |
       set -euo pipefail
-      ls -R $(Pipeline.Workspace)
-      export SERVICE_ARTIFACT_NAME=`ls $(Pipeline.Workspace)/s/$(Build.DefinitionName)`
+      #ls -R $(Pipeline.Workspace)
+      ls -R $(Build.Repository.LocalPath)
+      export SERVICE_ARTIFACT_NAME=`ls $(Pipeline.Workspace)/s`
       echo "##vso[task.setvariable variable=SERVICE_ARTIFACT_NAME]$SERVICE_ARTIFACT_NAME"
       echo "Set Artifact Name of: $SERVICE_ARTIFACT_NAME"
     displayName: 'Set SERVICE_ARTIFACT_NAME'
