@@ -11,19 +11,29 @@ trigger:
 variables:
   - group: epsat
 
-steps:
-  - bash: |
-      sudo apt-get -yq install heroku
-    displayName: Install Heroku
-  - bash: |
-      cd $(Build.Repository.LocalPath)
-      export HEROKU_API_KEY=$(HEROKU_API_KEY)
-      heroku git:remote -a nhsd-epsat
-      git push heroku master:master
+
+jobs:
+  - job: build-and-deploy
     displayName: Build & Deploy
-  - bash: |
-      cd $(Build.Repository.LocalPath)
-      export HEROKU_API_KEY=$(HEROKU_API_KEY)
-      heroku git:remote -a nhsd-epsat
-      git push heroku master:master
-    displayName: Build & Deploy
+    timeoutInMinutes: 30
+    pool:
+      name: 'AWS-ECS'
+    workspace:
+      clean: all
+    steps:
+      - bash: |
+          sudo apt-get -yq install heroku
+        displayName: Install Heroku
+      - bash: |
+          cd $(Build.Repository.LocalPath)
+          export HEROKU_API_KEY=$(HEROKU_API_KEY)
+          heroku git:remote -a nhsd-epsat
+          git push heroku master:master
+        displayName: Build & Deploy
+      - bash: |
+          cd $(Build.Repository.LocalPath)
+          export HEROKU_API_KEY=$(HEROKU_API_KEY)
+          heroku git:remote -a nhsd-epsat
+          git push heroku master:master
+        displayName: Build & Deploy
+
