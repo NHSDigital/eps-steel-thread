@@ -59,8 +59,7 @@ def make_sign_api_signature_upload_request(auth_method, access_token, digest, al
         iss = DEMO_APP_CLIENT_ID
         aud = signing_base_url
         kid = DEMO_APP_KEY_ID
-    else: # always 'simulated', RSS should only be used for Windows/IOS but we don't know if smartcard was chosen
-        # at this point, so see work-around below to get correct signing-service flow
+    else: # always 'simulated' (this will only support RSS Windows/IOS, smartcard simulated auth will fail as JWTs are different)
         pem = DEMO_APP_REMOTE_SIGNING_PRIVATE_KEY.encode("utf-8")
         sub = DEMO_APP_REMOTE_SIGNING_SUBJECT
         iss = DEMO_APP_REMOTE_SIGNING_ISSUER
@@ -85,40 +84,15 @@ def make_sign_api_signature_upload_request(auth_method, access_token, digest, al
         }
     )
 
-
-    try:
-        response = httpx.post(
-            f"{signing_base_url}/signaturerequest",
-            headers={
-                'Content-Type': 'text/plain',
-                'Authorization': f"Bearer {access_token}"
-            },
-            data=jwt_request,
-            verify=False
-        ).json()
-    except:
-        # work-around for smartcard simulated auth, if smartcard simulated auth selected
-        # the above call will fail as local and RSS JWTs are currently different and we have
-        # no way of knowing this was chosen. So fail the attempt to use RSS jwt in local signing
-        # and retry with local signing
-        # todo: remove this work-around when RSS and local signing JWTs align
-        if auth_method == "simulated": # (and most likely smartcard as it has failed)
-            pem = DEMO_APP_LOCAL_SIGNING_PRIVATE_KEY.encode("utf-8")
-            sub = DEMO_APP_CLIENT_ID
-            iss = DEMO_APP_CLIENT_ID
-            aud = signing_base_url
-            kid = DEMO_APP_KEY_ID
-            response = httpx.post(
-                f"{signing_base_url}/signaturerequest",
-                headers={
-                    'Content-Type': 'text/plain',
-                    'Authorization': f"Bearer {access_token}"
-                },
-                data=jwt_request,
-                verify=False
-            ).json()
-
-    return response
+    return httpx.post(
+        f"{signing_base_url}/signaturerequest",
+        headers={
+            'Content-Type': 'text/plain',
+            'Authorization': f"Bearer {access_token}"
+        },
+        data=jwt_request,
+        verify=False
+    ).json()
 
 
 def make_sign_api_signature_download_request(auth_method, access_token, token):
