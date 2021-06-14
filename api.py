@@ -49,6 +49,7 @@ def make_eps_api_request(path, access_token, body):
 
 def make_sign_api_signature_upload_request(auth_method, access_token, digest, algorithm):
     jwt_client = JWT()
+    signing_base_url = get_signing_base_path(auth_method)
 
     # patch for RSS support whilst requirements for local signing and RSS are different
     # todo: remove this logic once they are aligned
@@ -56,14 +57,14 @@ def make_sign_api_signature_upload_request(auth_method, access_token, digest, al
         pem = DEMO_APP_LOCAL_SIGNING_PRIVATE_KEY.encode("utf-8")
         sub = DEMO_APP_CLIENT_ID
         iss = DEMO_APP_CLIENT_ID
-        aud = SIGNING_BASE_PATH
+        aud = signing_base_url
         kid = DEMO_APP_KEY_ID
     else: # always 'simulated', RSS should only be used for Windows/IOS but we don't know if smartcard was chosen
         # at this point, so see work-around below to get correct signing-service flow
         pem = DEMO_APP_REMOTE_SIGNING_PRIVATE_KEY.encode("utf-8")
         sub = DEMO_APP_REMOTE_SIGNING_SUBJECT
         iss = DEMO_APP_REMOTE_SIGNING_ISSUER
-        aud = DEMO_APP_REMOTE_SIGNING_AUDIENCE
+        aud = DEMO_APP_REMOTE_SIGNING_AUDIENCE # todo: replace with signing_base_url and delete config when RSS have added audiences for int
         kid = DEMO_APP_REMOTE_SIGNING_KID
 
     signing_key = jwk_from_pem(pem)
@@ -84,7 +85,7 @@ def make_sign_api_signature_upload_request(auth_method, access_token, digest, al
         }
     )
 
-    signing_base_url = get_signing_base_path(auth_method)
+
     try:
         response = httpx.post(
             f"{signing_base_url}/signaturerequest",
@@ -105,7 +106,7 @@ def make_sign_api_signature_upload_request(auth_method, access_token, digest, al
             pem = DEMO_APP_LOCAL_SIGNING_PRIVATE_KEY.encode("utf-8")
             sub = DEMO_APP_CLIENT_ID
             iss = DEMO_APP_CLIENT_ID
-            aud = SIGNING_BASE_PATH
+            aud = signing_base_url
             kid = DEMO_APP_KEY_ID
             response = httpx.post(
                 f"{signing_base_url}/signaturerequest",
