@@ -409,7 +409,7 @@ function bind() {
             for (var i = 0; i < files.length; i++) {
                 let reader = new FileReader();
                 reader.onload = (event) => {
-                    payloads.push(event.target.result)
+                    pageData.payloads.push(event.target.result)
                 }
                 reader.readAsText(files[i])
             }
