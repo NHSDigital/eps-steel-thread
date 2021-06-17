@@ -391,7 +391,6 @@ function resetPageData(pageMode) {
         ? pageData.showCustomPharmacyInput
         : false
     pageData.releaseResponse = null
-    pageData.showPharmacyList = pageMode === 'edit' || pageMode === 'release-nominated-pharmacy'
 }
 
 function bind() {

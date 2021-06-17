@@ -11,6 +11,7 @@
     <script type="application/javascript" src="../static/client.js"></script>
     <script type="application/javascript">
         pageData.mode="{{page_mode}}"
+        pageData.showPharmacyList='"{{page_mode}}" === "edit" || "{{page_mode}}" === "release-nominated-pharmacy"'
     </script>
     {% if sign_response is not none %}
     <script type="text/javascript">
