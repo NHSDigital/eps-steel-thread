@@ -23,7 +23,8 @@ const pageData = {
     showCustomExampleInput: false,
     showCustomPharmacyInput: false,
     selectedExampleId: "1",
-    selectedPharmacy: "VNFKT"
+    selectedPharmacy: "VNFKT",
+    showPharmacyList: mode === 'edit' || mode === 'release-nominated-pharmacy'
 }
 
 function Prescription(id, description, message) {
@@ -118,7 +119,6 @@ rivets.formatters.isSign = function(mode){ return mode === 'sign' }
 rivets.formatters.isVerify = function(mode){ return mode === 'verify' }
 rivets.formatters.isSend = function(mode){ return mode === 'send' }
 rivets.formatters.isReleaseNominatedPharmacy = function(mode){ return mode === 'release-nominated-pharmacy' }
-rivets.formatters.showPharmacyList = function(mode){ return mode === 'edit' || (mode === 'release-nominated-pharmacy' && !pageData.releaseResponse) }
 
 
 rivets.formatters.joinWithSpaces = function(strings) {
@@ -198,6 +198,7 @@ function sendPrescriptionRequest() {
     try {
         // todo: change callback url to /prescribe/send
         const response = makeRequest("POST", "/prescribe/send", {})
+        pageData.showPharmacyList = false
         pageData.signResponse = null
         pageData.sendResponse = {}
         pageData.sendResponse.prescriptionId = response.prescription_id
