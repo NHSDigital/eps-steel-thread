@@ -106,17 +106,23 @@
             <div class="nhsuk-grid-column-full">
               <fieldset class="nhsuk-fieldset">
                 <div class="nhsuk-form-group">
-                  <div class="nhsuk-hint" id="prescription-input-hint">
-                     Paste a FHIR prescription...
+                  <div class="nhsuk-label" id="prescription-input-hint">
+                     Paste a FHIR prescription
                   </div>
-                  <textarea class="nhsuk-textarea" id="prescription-textarea" name="prescription-textarea" rows="10" aria-describedby="key-textarea-hint"></textarea>
-                  <div class="nhsuk-hint" id="prescription-files-hint">
-                    Or upload FHIR prescription files
-                  </div>
-                  <input class="nhsuk-input" multiple id="prescription-files" type="file" accept="application/json" />
+                  <textarea class="nhsuk-textarea" id="prescription-textarea" style="height:100px" name="prescription-textarea" rows="10" aria-describedby="key-textarea-hint"></textarea>
                 </div>
               </fieldset>
             </div>
+            <div class="nhsuk-grid-column-full">
+                <fieldset class="nhsuk-fieldset">
+                  <div class="nhsuk-form-group">
+                    <div class="nhsuk-label" id="prescription-files-hint">
+                      Upload FHIR prescription files
+                    </div>
+                    <input class="nhsuk-input" multiple id="prescription-files" type="file" accept="application/json" />
+                  </div>
+                </fieldset>
+              </div>
         </div>
         <div class="nhsuk-grid-row" rv-show="mode | showPharmacyList">
             <div class="nhsuk-grid-column-full" rv-hide="releaseResponse">

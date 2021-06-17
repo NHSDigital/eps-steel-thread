@@ -21,7 +21,8 @@ from auth import exchange_code_for_token, get_access_token, redirect_and_set_coo
 from bundle import get_prescription_id, create_provenance
 from cookies import (
     get_prescription_id_from_cookie,
-    set_prescription_id_cookie,
+    set_current_prescription_id_cookie,
+    set_prescription_ids_cookie,
     get_auth_method_from_cookie,
     set_auth_method_cookie
 )
@@ -147,11 +148,17 @@ def get_load():
 
 @app.route(EDIT_URL, methods=["POST"])
 def post_edit():
-    prepare_request = flask.request.json
-    short_prescription_id = get_prescription_id(prepare_request)
-    response = app.make_response({})
-    set_prescription_id_cookie(response, short_prescription_id)
-    add_prepare_request(short_prescription_id, prepare_request)
+    request_bundles = flask.request.json
+    short_prescription_ids = []
+    for bundle in request_bundles:
+        short_prescription_id = get_prescription_id(bundle)
+        short_prescription_ids.append(short_prescription_id)
+        add_prepare_request(short_prescription_id, bundle)
+    first_bundle = request_bundles[0]
+    current_short_prescription_id = get_prescription_id(first_bundle)
+    response = app.make_response(first_bundle)
+    set_prescription_ids_cookie(response, short_prescription_ids)
+    set_current_prescription_id_cookie(response, current_short_prescription_id)
     return response
 
 

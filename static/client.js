@@ -23,7 +23,8 @@ const pageData = {
     showCustomExampleInput: false,
     showCustomPharmacyInput: false,
     selectedExampleId: "1",
-    selectedPharmacy: "VNFKT"
+    selectedPharmacy: "VNFKT",
+    payloads: []
 }
 
 function Prescription(id, description, message) {
@@ -172,12 +173,14 @@ function makeRequest(method, url, body) {
 
 function sendEditRequest() {
     try {
-        const bundle = getPayload()
-        updateBundleIds(bundle)
-        updateNominatedPharmacy(bundle, getOdsCode())
-        makeRequest("POST", "/prescribe/edit", JSON.stringify(bundle))
+        const bundles = getPayloads()
+        bundles.forEach(bundle => {
+            updateBundleIds(bundle)
+            updateNominatedPharmacy(bundle, getOdsCode())
+        })
+        const response = makeRequest("POST", "/prescribe/edit", JSON.stringify(bundles))
         resetPageData("sign")
-
+        pageData.signRequestSummary = getSummary(response)
     } catch (e) {
         console.log(e)
         addError('Communication error')
@@ -344,15 +347,17 @@ function getSummary(payload) {
     }
 }
 
-function getPayload() {
+function getPayloads() {
     const isCustom = pageData.selectedExampleId == "custom"
-    const customPayload = document.getElementById("prescription-textarea").value
-    if (isCustom && !customPayload) {
-        addError("Unable to parse custom prescription")
+    const filePayloads = [pageData.payloads]
+    const textPayloads = [document.getElementById("prescription-textarea").value]
+    const payloads = filePayloads.concat(textPayloads)
+    if (isCustom && (!textPayloads || !filePayloads)) {
+        addError("Unable to parse custom prescription(s)")
     }
     return isCustom
-        ? JSON.parse(customPayload)
-        : pageData.examples.filter(function (example) { return example.id === pageData.selectedExampleId })[0].message
+        ? JSON.parse(payloads)
+        : [pageData.examples.filter(function (example) { return example.id === pageData.selectedExampleId })[0].message]
 }
 
 function getOdsCode() {
@@ -378,9 +383,9 @@ function onLoad() {
 // IE compat, no default values for function args
 function resetPageData(pageMode) {
     pageData.mode = pageMode
-    pageData.signRequestSummary = pageMode === "sign"
-        ? getSummary(getPayload())
-        : null
+    // pageData.signRequestSummary = pageMode === "sign"
+    //     ? getSummary(getPayloads())
+    //     : null
     pageData.errorList = null
     pageData.sendResponse = null
     pageData.signResponse = null
@@ -404,7 +409,7 @@ function bind() {
             for (var i = 0; i < files.length; i++) {
                 let reader = new FileReader();
                 reader.onload = (event) => {
-                    console.log('FILE CONTENT', event.target.result)
+                    payloads.push(event.target.result)
                 }
                 reader.readAsText(files[i])
             }

@@ -9,10 +9,20 @@ def get_prescription_id_from_cookie():
     return flask.request.cookies.get("Current-Prescription-Id")
 
 
-def set_prescription_id_cookie(response, short_prescription_id):
+def set_current_prescription_id_cookie(response, short_prescription_id):
     response.set_cookie(
         "Current-Prescription-Id",
         short_prescription_id,
+        expires=datetime.datetime.utcnow() + datetime.timedelta(seconds=float(600)),
+        secure=not DEV_MODE,
+        httponly=True)
+
+
+def set_prescription_ids_cookie(response, prescription_ids):
+    separator = ','
+    response.set_cookie(
+        "Prescription-Ids",
+        separator.join(prescription_ids),
         expires=datetime.datetime.utcnow() + datetime.timedelta(seconds=float(600)),
         secure=not DEV_MODE,
         httponly=True)
