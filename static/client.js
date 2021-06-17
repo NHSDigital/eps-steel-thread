@@ -162,11 +162,16 @@ function updateAuthMethod(authMethod) {
 
 // IE compatibility
 function makeRequest(method, url, body) {
-    var xhr = new XMLHttpRequest()
-    xhr.withCredentials = true
-    xhr.open(method, url, false)
-    xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8")
-    xhr.send(body)
+    try{
+        var xhr = new XMLHttpRequest()
+        xhr.withCredentials = true
+        xhr.open(method, url, false)
+        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8")
+        xhr.send(body)
+    } catch {
+        // if we get an undetecable cors error caused by oauth triggering on a post, then redirect to login
+        window.location.href = "/login"
+    }
     return JSON.parse(xhr.responseText)
 }
 
