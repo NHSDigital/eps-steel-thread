@@ -23,8 +23,7 @@ const pageData = {
     showCustomExampleInput: false,
     showCustomPharmacyInput: false,
     selectedExampleId: "1",
-    selectedPharmacy: "VNFKT",
-    showPharmacyList: this.mode === 'edit' || this.mode === 'release-nominated-pharmacy'
+    selectedPharmacy: "VNFKT"
 }
 
 function Prescription(id, description, message) {
@@ -392,6 +391,7 @@ function resetPageData(pageMode) {
         ? pageData.showCustomPharmacyInput
         : false
     pageData.releaseResponse = null
+    pageData.showPharmacyList = pageMode === 'edit' || pageMode === 'release-nominated-pharmacy'
 }
 
 function bind() {
