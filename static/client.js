@@ -23,7 +23,6 @@ const pageData = {
     showCustomExampleInput: false,
     showCustomPharmacyInput: false,
     selectedExampleId: "1",
-    selectedPharmacy: "VNFKT",
     payloads: []
 }
 
@@ -257,7 +256,7 @@ function updateNominatedPharmacy(bundle, odsCode) {
         messageHeader.destination.forEach(function (destination) { destination.receiver.identifier.value = odsCode })
     })
     getMedicationRequests(bundle).forEach(function (medicationRequest) {
-        medicationRequest.dispenseRequest.performer?.identifier?.value = odsCode
+        medicationRequest.dispenseRequest.performer.identifier.value = odsCode
     })
 }
 
@@ -396,6 +395,9 @@ function resetPageData(pageMode) {
         ? pageData.selectedPharmacy === "custom"
         : false
     pageData.releaseResponse = null
+    pageData.selectedPharmacy = pageMode === "edit"
+        ? pageData.selectedPharmacy ?? "VNFKT"
+        : null
 }
 
 function bind() {
