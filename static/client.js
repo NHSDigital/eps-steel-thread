@@ -175,8 +175,9 @@ function sendEditRequest() {
     try {
         const bundles = getPayloads()
         bundles.forEach(bundle => {
-            updateBundleIds(bundle)
-            updateNominatedPharmacy(bundle, getOdsCode())
+            const json = JSON.parse(bundle)
+            updateBundleIds(json)
+            updateNominatedPharmacy(json, getOdsCode())
         })
         const response = makeRequest("POST", "/prescribe/edit", JSON.stringify(bundles))
         resetPageData("sign")
@@ -356,7 +357,7 @@ function getPayloads() {
         addError("Unable to parse custom prescription(s)")
     }
     return isCustom
-        ? JSON.parse(payloads)
+        ? payloads
         : [pageData.examples.filter(function (example) { return example.id === pageData.selectedExampleId })[0].message]
 }
 
