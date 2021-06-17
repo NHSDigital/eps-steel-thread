@@ -21,8 +21,13 @@ from auth import exchange_code_for_token, get_access_token, redirect_and_set_coo
 from bundle import get_prescription_id, create_provenance
 from cookies import (
     get_prescription_id_from_cookie,
+    set_previous_prescription_id_cookie,
     set_current_prescription_id_cookie,
+    set_next_prescription_id_cookie,
+    reset_previous_prescription_id_cookie,
+    reset_next_prescription_id_cookie,
     set_prescription_ids_cookie,
+    get_prescription_ids_from_cookie,
     get_auth_method_from_cookie,
     set_auth_method_cookie
 )
@@ -151,6 +156,17 @@ def get_edit():
     current_short_prescription_id = flask.request.args.get("prescription_id")
     bundle = load_prepare_request(current_short_prescription_id)
     response = app.make_response(bundle)
+    short_prescription_ids = get_prescription_ids_from_cookie()
+    previous_short_prescription_id_index = short_prescription_ids.index(current_short_prescription_id) - 1
+    next_short_prescription_id_index = previous_short_prescription_id_index + 2
+    if previous_short_prescription_id_index >= 0:
+        set_previous_prescription_id_cookie(response, short_prescription_ids[previous_short_prescription_id_index])
+    else:
+        reset_previous_prescription_id_cookie(response)
+    if next_short_prescription_id_index < len(short_prescription_ids):
+        set_next_prescription_id_cookie(response, short_prescription_ids[next_short_prescription_id_index])
+    else:
+        reset_next_prescription_id_cookie(response)
     set_current_prescription_id_cookie(response, current_short_prescription_id)
     return response
 

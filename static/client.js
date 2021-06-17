@@ -23,7 +23,9 @@ const pageData = {
     showCustomExampleInput: false,
     showCustomPharmacyInput: false,
     selectedExampleId: "1",
-    payloads: []
+    payloads: [],
+    previous_prescription_id: Cookies.get("Previous-Presciption-Id"),
+    next_prescription_id: Cookies.get("Next-Presciption-Id")
 }
 
 function Prescription(id, description, message) {

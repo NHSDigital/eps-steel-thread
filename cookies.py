@@ -9,11 +9,47 @@ def get_prescription_id_from_cookie():
     return flask.request.cookies.get("Current-Prescription-Id")
 
 
+def set_previous_prescription_id_cookie(response, short_prescription_id):
+    response.set_cookie(
+        "Previous-Presciption-Id",
+        short_prescription_id,
+        expires=datetime.datetime.utcnow() + datetime.timedelta(seconds=float(600)),
+        secure=not DEV_MODE,
+        httponly=True)
+
+
+def reset_previous_prescription_id_cookie(response, short_prescription_id):
+    response.set_cookie(
+        "Previous-Presciption-Id",
+        None,
+        expires=0,
+        secure=not DEV_MODE,
+        httponly=True)
+
+
 def set_current_prescription_id_cookie(response, short_prescription_id):
     response.set_cookie(
         "Current-Prescription-Id",
         short_prescription_id,
         expires=datetime.datetime.utcnow() + datetime.timedelta(seconds=float(600)),
+        secure=not DEV_MODE,
+        httponly=True)
+
+
+def set_next_prescription_id_cookie(response, short_prescription_id):
+    response.set_cookie(
+        "Next-Presciption-Id",
+        short_prescription_id,
+        expires=datetime.datetime.utcnow() + datetime.timedelta(seconds=float(600)),
+        secure=not DEV_MODE,
+        httponly=True)
+
+
+def reset_next_prescription_id_cookie(response, short_prescription_id):
+    response.set_cookie(
+        "Next-Presciption-Id",
+        None,
+        expires=0,
         secure=not DEV_MODE,
         httponly=True)
 
@@ -26,6 +62,10 @@ def set_prescription_ids_cookie(response, prescription_ids):
         expires=datetime.datetime.utcnow() + datetime.timedelta(seconds=float(600)),
         secure=not DEV_MODE,
         httponly=True)
+
+
+def get_prescription_ids_from_cookie():
+    return flask.request.cookies.get("Prescription-Ids", "").split(",")
 
 
 def get_auth_method_from_cookie():
