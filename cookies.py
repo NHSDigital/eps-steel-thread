@@ -21,7 +21,7 @@ def set_previous_prescription_id_cookie(response, short_prescription_id):
 def reset_previous_prescription_id_cookie(response):
     response.set_cookie(
         "Previous-Presciption-Id",
-        None,
+        "",
         expires=0,
         secure=not DEV_MODE,
         httponly=True)
@@ -48,7 +48,7 @@ def set_next_prescription_id_cookie(response, short_prescription_id):
 def reset_next_prescription_id_cookie(response):
     response.set_cookie(
         "Next-Presciption-Id",
-        None,
+        "",
         expires=0,
         secure=not DEV_MODE,
         httponly=True)
