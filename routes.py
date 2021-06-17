@@ -153,6 +153,7 @@ def get_load():
 
 def update_pagination(response, current_short_prescription_id):
     short_prescription_ids = get_prescription_ids_from_cookie()
+    print(short_prescription_ids)
     previous_short_prescription_id_index = short_prescription_ids.index(current_short_prescription_id) - 1
     next_short_prescription_id_index = previous_short_prescription_id_index + 2
     if previous_short_prescription_id_index >= 0:
@@ -187,7 +188,6 @@ def post_edit():
     current_short_prescription_id = get_prescription_id(first_bundle)
     response = app.make_response(first_bundle)
     set_prescription_ids_cookie(response, short_prescription_ids)
-    set_current_prescription_id_cookie(response, current_short_prescription_id)
     update_pagination(response, current_short_prescription_id)
     return response
 
