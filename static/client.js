@@ -53,40 +53,40 @@ function Pharmacy(id, description) {
 
 // handle cases when no data is present without using "?." operator for IE compatibility
 // handle filter with function as IE will not accept "=>" operator
-rivets.formatters.snomedCode = function(codings) {
+rivets.formatters.snomedCode = function (codings) {
     return codings
-        ? codings.filter(function(coding){ return coding.system === "http://snomed.info/sct" })[0].code
+        ? codings.filter(function (coding) { return coding.system === "http://snomed.info/sct" })[0].code
         : ""
 }
 
-rivets.formatters.snomedCodeDescription = function(codings) {
+rivets.formatters.snomedCodeDescription = function (codings) {
     return codings
-        ? codings.filter(function(coding){ return coding.system === "http://snomed.info/sct" })[0].display
+        ? codings.filter(function (coding) { return coding.system === "http://snomed.info/sct" })[0].display
         : ""
 }
 
-rivets.formatters.nhsNumber = function(identifiers) {
+rivets.formatters.nhsNumber = function (identifiers) {
     if (!identifiers) {
         return ""
     }
-    const nhsNumber = identifiers.filter(function(identifier) { return identifier.system === "https://fhir.nhs.uk/Id/nhs-number" })[0].value
+    const nhsNumber = identifiers.filter(function (identifier) { return identifier.system === "https://fhir.nhs.uk/Id/nhs-number" })[0].value
     return nhsNumber.substring(0, 3) + " " + nhsNumber.substring(3, 6) + " " + nhsNumber.substring(6)
 }
 
-rivets.formatters.odsCode = function(identifiers) {
+rivets.formatters.odsCode = function (identifiers) {
     return identifiers
-     ? identifiers.filter(function(identifier) { return identifier.system === "https://fhir.nhs.uk/Id/ods-organization-code" })[0].value
-     : ""
+        ? identifiers.filter(function (identifier) { return identifier.system === "https://fhir.nhs.uk/Id/ods-organization-code" })[0].value
+        : ""
 }
 
-rivets.formatters.titleCase = function(string) {
+rivets.formatters.titleCase = function (string) {
     //TODO length checks
     return string
         ? string.substring(0, 1).toUpperCase() + string.substring(1)
         : ""
 }
 
-rivets.formatters.fullName = function(name) {
+rivets.formatters.fullName = function (name) {
     if (!name) {
         return ""
     }
@@ -98,7 +98,7 @@ rivets.formatters.fullName = function(name) {
     ])
 }
 
-rivets.formatters.fullAddress = function(address) {
+rivets.formatters.fullAddress = function (address) {
     return concatenateIfPresent([
         address.line,
         address.city,
@@ -110,18 +110,18 @@ rivets.formatters.fullAddress = function(address) {
 }
 
 // IE compatibility, unable to use "=>" operator
-rivets.formatters.isLogin = function(mode){ return mode === 'login' }
-rivets.formatters.isHome = function(mode){ return mode === 'home' }
-rivets.formatters.isLoad = function(mode){ return mode === 'load' }
-rivets.formatters.isEdit = function(mode){ return mode === 'edit' }
-rivets.formatters.isSign = function(mode){ return mode === 'sign' }
-rivets.formatters.isVerify = function(mode){ return mode === 'verify' }
-rivets.formatters.isSend = function(mode){ return mode === 'send' }
-rivets.formatters.isReleaseNominatedPharmacy = function(mode){ return mode === 'release-nominated-pharmacy' }
-rivets.formatters.showPharmacyList = function(mode){ return mode === 'edit' || mode === 'release-nominated-pharmacy' }
+rivets.formatters.isLogin = function (mode) { return mode === 'login' }
+rivets.formatters.isHome = function (mode) { return mode === 'home' }
+rivets.formatters.isLoad = function (mode) { return mode === 'load' }
+rivets.formatters.isEdit = function (mode) { return mode === 'edit' }
+rivets.formatters.isSign = function (mode) { return mode === 'sign' }
+rivets.formatters.isVerify = function (mode) { return mode === 'verify' }
+rivets.formatters.isSend = function (mode) { return mode === 'send' }
+rivets.formatters.isReleaseNominatedPharmacy = function (mode) { return mode === 'release-nominated-pharmacy' }
+rivets.formatters.showPharmacyList = function (mode) { return mode === 'edit' || mode === 'release-nominated-pharmacy' }
 
 
-rivets.formatters.joinWithSpaces = function(strings) {
+rivets.formatters.joinWithSpaces = function (strings) {
     return strings.join(" ")
 }
 
@@ -132,12 +132,12 @@ rivets.formatters.appendPageMode = function (string) {
 function concatenateIfPresent(fields) {
     return fields
         .filter(Boolean)
-        .reduce(function(currentValues, valuesToAdd) { return currentValues.concat(valuesToAdd) }, [])
+        .reduce(function (currentValues, valuesToAdd) { return currentValues.concat(valuesToAdd) }, [])
 }
 
 function surroundWithParenthesesIfPresent(fields) {
     if (fields) {
-        return fields.map(function(field) { return "(" + field + ")" })
+        return fields.map(function (field) { return "(" + field + ")" })
     } else {
         return fields
     }
@@ -156,7 +156,7 @@ function sendLoadRequest() {
 }
 
 function updateAuthMethod(authMethod) {
-    const response = makeRequest("POST", "/login", JSON.stringify({"authMethod": authMethod}))
+    const response = makeRequest("POST", "/login", JSON.stringify({ "authMethod": authMethod }))
     window.location.href = response.redirectUri
 }
 
@@ -178,7 +178,7 @@ function sendEditRequest() {
         makeRequest("POST", "/prescribe/edit", JSON.stringify(bundle))
         resetPageData("sign")
 
-    } catch(e) {
+    } catch (e) {
         console.log(e)
         addError('Communication error')
     }
@@ -188,7 +188,7 @@ function sendSignRequest() {
     try {
         const response = makeRequest("POST", "/prescribe/sign", {})
         window.location.href = response.redirectUri
-    } catch(e) {
+    } catch (e) {
         console.log(e)
         addError('Communication error')
     }
@@ -202,7 +202,7 @@ function sendPrescriptionRequest() {
         pageData.sendResponse = {}
         pageData.sendResponse.prescriptionId = response.prescription_id
         pageData.sendResponse.status = response.status
-    } catch(e) {
+    } catch (e) {
         console.log(e)
         addError('Communication error')
     }
@@ -219,14 +219,14 @@ function sendDispenseNominatedPharmacyReleaseRequest() {
         pageData.releaseResponse.body = response.status === "Failure" ? response.body : ""
         pageData.releaseResponse.prescriptions =
             response.status === "Success"
-                ? JSON.parse(response.body).entry.map(function(entry) {
+                ? JSON.parse(response.body).entry.map(function (entry) {
                     const bundle = entry.resource
                     const originalShortFormId = getMedicationRequests(bundle)[0].groupIdentifier.value
-                    return {id: originalShortFormId}
-                    })
+                    return { id: originalShortFormId }
+                })
                 : null
         pageData.releaseResponse.status = response.status
-    } catch(e) {
+    } catch (e) {
         console.log(e)
         addError('Communication error')
     }
@@ -250,43 +250,43 @@ function updateNominatedPharmacy(bundle, odsCode) {
     if (!odsCode) {
         return
     }
-    getMessageHeaders(bundle).forEach(function(messageHeader) {
-        messageHeader.destination.forEach(function(destination) { destination.receiver.identifier.value = odsCode })
+    getMessageHeaders(bundle).forEach(function (messageHeader) {
+        messageHeader.destination.forEach(function (destination) { destination.receiver.identifier.value = odsCode })
     })
-    getMedicationRequests(bundle).forEach(function(medicationRequest) {
+    getMedicationRequests(bundle).forEach(function (medicationRequest) {
         medicationRequest.dispenseRequest.performer.identifier.value = odsCode
     })
 }
 
 function uuidv4() {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-      var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-      return v.toString(16);
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
     });
 }
 
 function generateShortFormId(originalShortFormId) {
     const _PRESC_CHECKDIGIT_VALUES = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ+"
     const hexString = (uuidv4()).replace(/-/g, "").toUpperCase()
-    let prescriptionID = hexString.substring(0, 6) + "-" + originalShortFormId.substring(7,13) + "-" + hexString.substring(12, 17)
+    let prescriptionID = hexString.substring(0, 6) + "-" + originalShortFormId.substring(7, 13) + "-" + hexString.substring(12, 17)
     const prscID = prescriptionID.replace(/-/g, "")
     const prscIDLength = prscID.length
     let runningTotal = 0
     let checkValue
     const strings = prscID.split("")
-    strings.forEach(function(character, index) {
+    strings.forEach(function (character, index) {
         // IE compatibility cannot use **, have to use Math.pow
-      runningTotal = runningTotal + parseInt(character, 36) * (Math.pow(2, (prscIDLength - index)))
+        runningTotal = runningTotal + parseInt(character, 36) * (Math.pow(2, (prscIDLength - index)))
     })
     checkValue = (38 - runningTotal % 37) % 37
-    checkValue = _PRESC_CHECKDIGIT_VALUES.substring(checkValue, checkValue+1)
+    checkValue = _PRESC_CHECKDIGIT_VALUES.substring(checkValue, checkValue + 1)
     prescriptionID += checkValue
     return prescriptionID
 }
 
 function setPrescriptionIds(bundle, newBundleIdentifier, newShortFormId, newLongFormId) {
     bundle.identifier.value = newBundleIdentifier
-    getMedicationRequests(bundle).forEach(function(medicationRequest) {
+    getMedicationRequests(bundle).forEach(function (medicationRequest) {
         const groupIdentifier = medicationRequest.groupIdentifier
         groupIdentifier.value = newShortFormId
         getLongFormIdExtension(groupIdentifier.extension).valueIdentifier.value = newLongFormId
@@ -295,23 +295,23 @@ function setPrescriptionIds(bundle, newBundleIdentifier, newShortFormId, newLong
 
 function getMessageHeaders(bundle) {
     return bundle.entry
-        .map(function(entry) { return entry.resource })
-        .filter(function(resource) { return resource.resourceType === "MessageHeader" })
+        .map(function (entry) { return entry.resource })
+        .filter(function (resource) { return resource.resourceType === "MessageHeader" })
 }
 
 function getMedicationRequests(bundle) {
     return bundle.entry
-        .map(function(entry) { return entry.resource })
-        .filter(function(resource) { return resource.resourceType === "MedicationRequest" })
+        .map(function (entry) { return entry.resource })
+        .filter(function (resource) { return resource.resourceType === "MedicationRequest" })
 }
 
 function getLongFormIdExtension(extensions) {
     return extensions.filter(
-      function(extension) { return extension.url === "https://fhir.nhs.uk/StructureDefinition/Extension-DM-PrescriptionId" }
+        function (extension) { return extension.url === "https://fhir.nhs.uk/StructureDefinition/Extension-DM-PrescriptionId" }
     )[0]
 }
 
-window.onerror = function(msg, url, line, col, error) {
+window.onerror = function (msg, url, line, col, error) {
     addError("Unhandled error: " + msg + " at " + url + ":" + line + " col " + col);
     return true;
 }
@@ -352,7 +352,7 @@ function getPayload() {
     }
     return isCustom
         ? JSON.parse(customPayload)
-        : pageData.examples.filter(function(example) { return example.id === pageData.selectedExampleId })[0].message
+        : pageData.examples.filter(function (example) { return example.id === pageData.selectedExampleId })[0].message
 }
 
 function getOdsCode() {
@@ -367,8 +367,8 @@ function getOdsCode() {
 }
 
 function getResourcesOfType(prescriptionBundle, resourceType) {
-    const resources = prescriptionBundle.entry.map(function(entry) { return entry.resource })
-    return resources.filter(function(resource) { return resource.resourceType === resourceType })
+    const resources = prescriptionBundle.entry.map(function (entry) { return entry.resource })
+    return resources.filter(function (resource) { return resource.resourceType === resourceType })
 }
 
 function onLoad() {
@@ -395,7 +395,7 @@ function resetPageData(pageMode) {
 
 function bind() {
     rivets.bind(document.querySelector('#main-content'), pageData)
-    document.getElementById('contentFile').onchange = function(evt) {
+    document.getElementById('contentFile').onchange = function (evt) {
         try {
             let files = evt.target.files
             if (!files.length) {
@@ -406,7 +406,9 @@ function bind() {
             reader.onload = (event) => {
                 console.log('FILE CONTENT', event.target.result);
             }
-            files.forEach(file => reader.readAsText(file))
+            for (var index = 0, file; file = files[index]; index++) {
+                reader.readAsText(file)
+            }
         } catch (err) {
             console.error(err)
         }
