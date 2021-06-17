@@ -151,9 +151,9 @@ def get_load():
     return render_client("load")
 
 
-def update_pagination(response, current_short_prescription_id):
-    short_prescription_ids = get_prescription_ids_from_cookie()
+def update_pagination(response, short_prescription_ids, current_short_prescription_id):
     print(short_prescription_ids)
+    print(current_short_prescription_id)
     previous_short_prescription_id_index = short_prescription_ids.index(current_short_prescription_id) - 1
     next_short_prescription_id_index = previous_short_prescription_id_index + 2
     if previous_short_prescription_id_index >= 0:
@@ -172,7 +172,8 @@ def get_edit():
     current_short_prescription_id = flask.request.args.get("prescription_id")
     bundle = load_prepare_request(current_short_prescription_id)
     response = app.make_response(bundle)
-    update_pagination(response, current_short_prescription_id)
+    short_prescription_ids = get_prescription_ids_from_cookie()
+    update_pagination(response, short_prescription_ids, current_short_prescription_id)
     return response
 
 
@@ -188,7 +189,7 @@ def post_edit():
     current_short_prescription_id = get_prescription_id(first_bundle)
     response = app.make_response(first_bundle)
     set_prescription_ids_cookie(response, short_prescription_ids)
-    update_pagination(response, current_short_prescription_id)
+    update_pagination(response, short_prescription_ids, current_short_prescription_id)
     return response
 
 
