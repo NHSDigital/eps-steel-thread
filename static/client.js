@@ -349,7 +349,7 @@ function getSummary(payload) {
 
 function getPayloads() {
     const isCustom = pageData.selectedExampleId == "custom"
-    const filePayloads = [pageData.payloads]
+    const filePayloads = pageData.payloads
     const textPayloads = [document.getElementById("prescription-textarea").value]
     const payloads = filePayloads.concat(textPayloads)
     if (isCustom && (!textPayloads || !filePayloads)) {
