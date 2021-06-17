@@ -402,13 +402,11 @@ function bind() {
                 return
             }
             for (var i = 0; i < files.length; i++) {
-                (function(file) {
-                    let reader = new FileReader();
-                    reader.onload = (event) => {
-                        console.log('FILE CONTENT', event.target.result);
-                    }
-                    reader.readAsText(file)
-                })
+                let reader = new FileReader();
+                reader.onload = (event) => {
+                    console.log('FILE CONTENT', event.target.result);
+                }
+                reader.readAsText(files[i])
             }
         } catch (err) {
             console.error(err)
