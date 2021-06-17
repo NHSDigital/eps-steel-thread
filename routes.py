@@ -212,9 +212,13 @@ def post_send():
     print(send_request)
     print("Send Response from EPS...")
     print(send_prescription_response.json())
+    if send_prescription_response.status_code == 200:
+        status = "Success"
+    else:
+        status = "Failure"
     return  {
         'prescription_id': short_prescription_id,
-        'status_code': send_prescription_response.status_code
+        'status': status
     }
 
 

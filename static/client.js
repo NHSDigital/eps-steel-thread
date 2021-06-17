@@ -216,16 +216,16 @@ function sendDispenseNominatedPharmacyReleaseRequest() {
         const response = makeRequest("POST", "/dispense/release-nominated-pharmacy", JSON.stringify(request))
         pageData.showCustomPharmacyInput = false
         pageData.releaseResponse = {}
-        pageData.releaseResponse.body = response.status_code !== 200 ? response.body : ""
+        pageData.releaseResponse.body = response.status === "Failure" ? response.body : ""
         pageData.releaseResponse.prescriptions =
-            response.status_code === 200
+            response.status === "Success"
                 ? JSON.parse(response.body).entry.map(function(entry) {
                     const bundle = entry.resource
                     const originalShortFormId = getMedicationRequests(bundle)[0].groupIdentifier.value
                     return {id: originalShortFormId}
                     })
                 : null
-        pageData.releaseResponse.statusCode = response.status_code
+        pageData.releaseResponse.status = response.status
     } catch(e) {
         console.log(e)
         addError('Communication error')
