@@ -29,16 +29,25 @@ class SendRequest(db.Model):
 
 
 def add_prepare_request(short_prescription_id, prepare_request):
+    if (PrepareRequest.query.get(short_prescription_id) != None):
+        return
+
     db.session.add(PrepareRequest(id=short_prescription_id,body=prepare_request))
     db.session.commit()
 
 
 def add_prepare_response(short_prescription_id, prepare_response):
+    if (PrepareResponse.query.get(short_prescription_id) != None):
+        return
+
     db.session.add(PrepareResponse(id=short_prescription_id,body=prepare_response))
     db.session.commit()
 
 
 def add_send_request(short_prescription_id, send_request):
+    if (SendRequest.query.get(short_prescription_id) != None):
+        return
+
     db.session.add(SendRequest(id=short_prescription_id,body=send_request))
     db.session.commit()
 
