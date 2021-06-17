@@ -317,7 +317,6 @@
         <div rv-show="mode | isHome">
             <div class="nhsuk-grid-row">
                 <div class="nhsuk-grid-column-full">
-                    <a href="/assure/load" class="nhsuk-button nhsuk-button--secondary">Assure</a>
                     <a href="/prescribe/load" class="nhsuk-button">Prescribe</a>
                     <a href="/dispense/release-nominated-pharmacy" class="nhsuk-button">Dispense</a>
                 </div>
@@ -326,7 +325,8 @@
         <div rv-show="mode | isLoad">
             <div class="nhsuk-grid-row">
                 <div class="nhsuk-grid-column-full">
-                    <button class="nhsuk-button" type="submit" onclick="sendLoadRequest()">Load prescription</button>
+                    <button class="nhsuk-button" type="submit" onclick="sendEditRequest()">View</button>
+                    <button class="nhsuk-button nhsuk-button--reverse" type="submit" onclick="sendLoadRequest()">Edit</button>
                     <button class="nhsuk-button nhsuk-button--secondary" type="submit" onclick="resetPageData('home');">Reset</button>
                 </div>
             </div>
