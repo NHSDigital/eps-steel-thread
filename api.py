@@ -17,7 +17,6 @@ DEMO_APP_REMOTE_SIGNING_PRIVATE_KEY = os.environ["RSS_JWT_PRIVATE_KEY"]
 DEMO_APP_REMOTE_SIGNING_SUBJECT = os.environ["RSS_JWT_SUBJECT"]
 DEMO_APP_REMOTE_SIGNING_ISSUER = os.environ["RSS_JWT_ISSUER"]
 DEMO_APP_REMOTE_SIGNING_KID = os.environ["RSS_JWT_KID"]
-DEMO_APP_REMOTE_SIGNING_AUDIENCE = os.environ["RSS_JWT_AUDIENCE"]
 
 
 def make_eps_api_prepare_request(access_token, body):
@@ -57,13 +56,11 @@ def make_sign_api_signature_upload_request(auth_method, access_token, digest, al
         pem = DEMO_APP_LOCAL_SIGNING_PRIVATE_KEY.encode("utf-8")
         sub = DEMO_APP_CLIENT_ID
         iss = DEMO_APP_CLIENT_ID
-        aud = signing_base_url
         kid = DEMO_APP_KEY_ID
     else: # always 'simulated' (this will only support RSS Windows/IOS, smartcard simulated auth will fail as JWTs are different)
         pem = DEMO_APP_REMOTE_SIGNING_PRIVATE_KEY.encode("utf-8")
         sub = DEMO_APP_REMOTE_SIGNING_SUBJECT
         iss = DEMO_APP_REMOTE_SIGNING_ISSUER
-        aud = DEMO_APP_REMOTE_SIGNING_AUDIENCE # todo: replace with signing_base_url and delete config when RSS have added audiences for int
         kid = DEMO_APP_REMOTE_SIGNING_KID
 
     signing_key = jwk_from_pem(pem)
@@ -71,7 +68,7 @@ def make_sign_api_signature_upload_request(auth_method, access_token, digest, al
         {
             'sub': sub,
             'iss': iss,
-            'aud': aud,
+            'aud': signing_base_url,
             'iat': time.time(),
             'exp': time.time() + 600,
             'payload': digest,
