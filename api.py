@@ -81,6 +81,9 @@ def make_sign_api_signature_upload_request(auth_method, access_token, digest, al
         }
     )
 
+    print("Sending Signing Service signature upload request...")
+    print(jwt_request)
+
     return httpx.post(
         f"{signing_base_url}/signaturerequest",
         headers={
