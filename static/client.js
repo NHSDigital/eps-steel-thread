@@ -175,9 +175,8 @@ function sendEditRequest() {
     try {
         const bundles = getPayloads()
         bundles.forEach(bundle => {
-            const json = JSON.parse(bundle)
-            updateBundleIds(json)
-            updateNominatedPharmacy(json, getOdsCode())
+            updateBundleIds(bundle)
+            updateNominatedPharmacy(bundle, getOdsCode())
         })
         const response = makeRequest("POST", "/prescribe/edit", JSON.stringify(bundles))
         resetPageData("sign")
