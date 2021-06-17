@@ -351,7 +351,7 @@ function getPayloads() {
     const isCustom = pageData.selectedExampleId == "custom"
     const filePayloads = pageData.payloads
     const textPayloads = [document.getElementById("prescription-textarea").value]
-    const payloads = filePayloads.concat(textPayloads).map(payload => JSON.parse(payload))
+    const payloads = filePayloads.concat(textPayloads).filter(Boolean).map(payload => JSON.parse(payload))
     if (isCustom && !payloads) {
         addError("Unable to parse custom prescription(s)")
     }
