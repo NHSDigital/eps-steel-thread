@@ -247,9 +247,13 @@ def post_nominated_pharmacy():
             ]
         }
     )
+    if response.status_code == 200:
+        status = "Success"
+    else:
+        status = "Failure"
     return {
         "body": json.dumps(response.json()),
-        "status_code": response.status_code
+        "status": status
     }
 
 

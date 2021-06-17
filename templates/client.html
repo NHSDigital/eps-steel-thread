@@ -61,7 +61,7 @@
                             <h1 class="nhsuk-fieldset__heading">Edit prescription</h1>
                         </div>
                         <div rv-show="mode | isSign">
-                            <h1 class="nhsuk-fieldset__heading">Sign prescription</h1>
+                            <h1 class="nhsuk-fieldset__heading">Prescription</h1>
                         </div>
                         <div rv-show="mode | isSend">
                             <h1 class="nhsuk-fieldset__heading">Send prescription</h1>
@@ -235,14 +235,13 @@
         </div>
         <div class="nhsuk-grid-row" rv-show="sendResponse">
             <div class="nhsuk-grid-column-full">
-                <div class="nhsuk-panel-with-label">
-                    <h3 class="nhsuk-panel-with-label__label">API Response</h3>
+                <div class="nhsuk-panel">
                     <dl class="nhsuk-summary-list">
                         <div class="nhsuk-summary-list__row">
                             <dt class="nhsuk-summary-list__key">Prescription</dt>
                             <dd class="nhsuk-summary-list__value">{sendResponse.prescriptionId}</dd>
-                            <dt class="nhsuk-summary-list__key">Status code</dt>
-                            <dd class="nhsuk-summary-list__value">{sendResponse.statusCode}</dd>
+                            <dt class="nhsuk-summary-list__key">Status</dt>
+                            <dd class="nhsuk-summary-list__value">{sendResponse.status}</dd>
                         </div>
                     </dl>
                 </div>
@@ -334,7 +333,7 @@
         <div rv-show="mode | isEdit">
             <div class="nhsuk-grid-row">
                 <div class="nhsuk-grid-column-full">
-                    <button class="nhsuk-button" type="submit" onclick="sendEditRequest()">Update prescription</button>
+                    <button class="nhsuk-button" type="submit" onclick="sendEditRequest()">Update</button>
                     <button class="nhsuk-button nhsuk-button--secondary" type="submit" onclick="resetPageData('home');">Reset</button>
                 </div>
             </div>
@@ -342,7 +341,7 @@
         <div rv-show="mode | isSign">
             <div class="nhsuk-grid-row">
                 <div class="nhsuk-grid-column-full">
-                    <button class="nhsuk-button" type="submit" onclick="sendSignRequest()">Sign prescription</button>
+                    <button class="nhsuk-button" type="submit" onclick="sendSignRequest()">Sign</button>
                     <button class="nhsuk-button nhsuk-button--secondary" type="submit" onclick="resetPageData('home');">Reset</button>
                 </div>
             </div>
@@ -350,7 +349,7 @@
         <div rv-show="mode | isSend">
             <div class="nhsuk-grid-row">
                 <div class="nhsuk-grid-column-full">
-                    <button class="nhsuk-button" type="submit" rv-hide="sendResponse" onclick="sendPrescriptionRequest()">Send prescription</button>
+                    <button class="nhsuk-button" type="submit" rv-hide="sendResponse" onclick="sendPrescriptionRequest()">Send</button>
                     <button class="nhsuk-button nhsuk-button--secondary" type="submit" onclick="resetPageData('home');">Reset</button>
                 </div>
             </div>
@@ -358,7 +357,7 @@
         <div rv-show="mode | isReleaseNominatedPharmacy">
             <div class="nhsuk-grid-row">
                 <div class="nhsuk-grid-column-full">
-                    <button class="nhsuk-button" type="submit" rv-hide="releaseResponse" onclick="sendDispenseNominatedPharmacyReleaseRequest()">Release prescriptions</button>
+                    <button class="nhsuk-button" type="submit" rv-hide="releaseResponse" onclick="sendDispenseNominatedPharmacyReleaseRequest()">Release</button>
                     <button class="nhsuk-button nhsuk-button--secondary" type="submit" onclick="resetPageData('home');">Reset</button>
                 </div>
             </div>
