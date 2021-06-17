@@ -148,7 +148,7 @@ def get_load():
 
 @app.route(EDIT_URL, methods=["POST"])
 def post_edit():
-    request_bundles = flask.request.json
+    request_bundles = json.loads(flask.request.json)
     short_prescription_ids = []
     for bundle in request_bundles:
         short_prescription_id = get_prescription_id(bundle)
