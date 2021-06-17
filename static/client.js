@@ -116,6 +116,7 @@ rivets.formatters.isSign = function(mode){ return mode === 'sign' }
 rivets.formatters.isVerify = function(mode){ return mode === 'verify' }
 rivets.formatters.isSend = function(mode){ return mode === 'send' }
 rivets.formatters.isReleaseNominatedPharmacy = function(mode){ return mode === 'release-nominated-pharmacy' }
+rivets.formatters.showPharmacyList = function(mode){ return mode === 'edit' || mode === 'release-nominated-pharmacy' }
 
 
 rivets.formatters.joinWithSpaces = function(strings) {
