@@ -385,10 +385,10 @@ function resetPageData(pageMode) {
     pageData.sendResponse = null
     pageData.signResponse = null
     pageData.showCustomExampleInput = pageMode === "load"
-        ? pageData.showCustomExampleInput
+        ? pageData.selectedExampleId === "custom"
         : false
     pageData.showCustomPharmacyInput = (pageMode === "edit" || pageMode === "release-nominated-pharmacy")
-        ? pageData.showCustomPharmacyInput
+        ? pageData.selectedPharmacy === "custom"
         : false
     pageData.releaseResponse = null
 }
