@@ -257,7 +257,7 @@ function updateNominatedPharmacy(bundle, odsCode) {
         messageHeader.destination.forEach(function (destination) { destination.receiver.identifier.value = odsCode })
     })
     getMedicationRequests(bundle).forEach(function (medicationRequest) {
-        medicationRequest.dispenseRequest.performer.identifier.value = odsCode
+        medicationRequest.dispenseRequest.performer?.identifier?.value = odsCode
     })
 }
 
