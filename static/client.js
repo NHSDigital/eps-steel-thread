@@ -401,13 +401,14 @@ function bind() {
             if (!files.length) {
                 return
             }
-            let reader = new FileReader();
-            const self = this
-            reader.onload = (event) => {
-                console.log('FILE CONTENT', event.target.result);
-            }
-            for (var index = 0, file; file = files[index]; index++) {
-                reader.readAsText(file)
+            for (var i = 0; i < files.length; i++) {
+                (function(file) {
+                    let reader = new FileReader();
+                    reader.onload = (event) => {
+                        console.log('FILE CONTENT', event.target.result);
+                    }
+                    reader.readAsText(file)
+                })
             }
         } catch (err) {
             console.error(err)
