@@ -106,11 +106,14 @@
             <div class="nhsuk-grid-column-full">
               <fieldset class="nhsuk-fieldset">
                 <div class="nhsuk-form-group">
-                  <!-- <div class="nhsuk-hint" id="prescription-input-hint">
-                     Paste a FHIR $prepare prescription
+                  <div class="nhsuk-hint" id="prescription-input-hint">
+                     Paste a FHIR prescription...
                   </div>
-                  <textarea class="nhsuk-textarea" id="prescription-textarea" name="prescription-textarea" rows="10" aria-describedby="key-textarea-hint"></textarea> -->
-                  <input multiple id="contentFile" type="file" accept="application/json" />
+                  <textarea class="nhsuk-textarea" id="prescription-textarea" name="prescription-textarea" rows="10" aria-describedby="key-textarea-hint"></textarea>
+                  <div class="nhsuk-hint" id="prescription-files-hint">
+                    Or upload FHIR prescription files
+                  </div>
+                  <input class="nhsuk-input" multiple id="prescription-files" type="file" accept="application/json" />
                 </div>
               </fieldset>
             </div>

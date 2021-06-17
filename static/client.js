@@ -395,7 +395,7 @@ function resetPageData(pageMode) {
 
 function bind() {
     rivets.bind(document.querySelector('#main-content'), pageData)
-    document.getElementById('contentFile').onchange = function (evt) {
+    document.getElementById('prescription-files').onchange = function (evt) {
         try {
             let files = evt.target.files
             if (!files.length) {
@@ -404,7 +404,7 @@ function bind() {
             for (var i = 0; i < files.length; i++) {
                 let reader = new FileReader();
                 reader.onload = (event) => {
-                    console.log('FILE CONTENT', event.target.result);
+                    console.log('FILE CONTENT', event.target.result)
                 }
                 reader.readAsText(files[i])
             }
