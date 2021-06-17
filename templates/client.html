@@ -5,6 +5,7 @@
     <title>EPS Assurance Tool</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <link href="https://nhsuk.github.io/nhsuk-frontend/assets/nhsuk.css" rel="stylesheet">
+    <!-- <script type="text/javascript" src="../xlsx-0.13.5.min.js"></script> -->
     <script type="application/javascript" src="../static/rivets.bundled.min.js"></script>
     <script type="application/javascript" src="../static/js.cookie-2.2.1.min.js"></script>
     <script type="application/javascript" src="../static/prescriptions.js"></script>
@@ -105,10 +106,11 @@
             <div class="nhsuk-grid-column-full">
               <fieldset class="nhsuk-fieldset">
                 <div class="nhsuk-form-group">
-                  <div class="nhsuk-hint" id="prescription-input-hint">
+                  <!-- <div class="nhsuk-hint" id="prescription-input-hint">
                      Paste a FHIR $prepare prescription
                   </div>
-                  <textarea class="nhsuk-textarea" id="prescription-textarea" name="prescription-textarea" rows="10" aria-describedby="key-textarea-hint"></textarea>
+                  <textarea class="nhsuk-textarea" id="prescription-textarea" name="prescription-textarea" rows="10" aria-describedby="key-textarea-hint"></textarea> -->
+                  <input id="contentFile" type="file" accept="application/json" />
                 </div>
               </fieldset>
             </div>

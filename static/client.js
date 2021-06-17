@@ -395,4 +395,22 @@ function resetPageData(pageMode) {
 
 function bind() {
     rivets.bind(document.querySelector('#main-content'), pageData)
+    document.getElementById('contentFile').onchange = function(evt) {
+        try {
+            let files = evt.target.files;
+            if (!files.length) {
+                alert('No file selected!');
+                return;
+            }
+            let file = files[0];
+            let reader = new FileReader();
+            const self = this;
+            reader.onload = (event) => {
+                console.log('FILE CONTENT', event.target.result);
+            };
+            reader.readAsText(file);
+        } catch (err) {
+            console.error(err);
+        }
+    }
 }
