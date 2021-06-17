@@ -146,6 +146,15 @@ def get_load():
     return render_client("load")
 
 
+@app.route(EDIT_URL, methods=["GET"])
+def get_edit():
+    current_short_prescription_id = flask.request.args.get("prescription_id")
+    bundle = load_prepare_request(current_short_prescription_id)
+    response = app.make_response(bundle)
+    set_current_prescription_id_cookie(response, current_short_prescription_id)
+    return response
+
+
 @app.route(EDIT_URL, methods=["POST"])
 def post_edit():
     request_bundles = flask.request.json
