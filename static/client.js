@@ -21,7 +21,9 @@ const pageData = {
     signature: "",
     loggedIn: Cookies.get("Access-Token-Set") === "true",
     showCustomExampleInput: false,
-    showCustomPharmacyInput: false
+    showCustomPharmacyInput: false,
+    selectedExampleId: "1",
+    selectedPharmacy: "VNFKT"
 }
 
 function Prescription(id, description, message) {
