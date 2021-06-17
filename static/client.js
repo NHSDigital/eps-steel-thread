@@ -24,7 +24,7 @@ const pageData = {
     showCustomPharmacyInput: false,
     selectedExampleId: "1",
     selectedPharmacy: "VNFKT",
-    showPharmacyList: mode === 'edit' || mode === 'release-nominated-pharmacy'
+    showPharmacyList: this.mode === 'edit' || this.mode === 'release-nominated-pharmacy'
 }
 
 function Prescription(id, description, message) {
