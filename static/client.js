@@ -53,10 +53,6 @@ function Pharmacy(id, description) {
 
 // handle cases when no data is present without using "?." operator for IE compatibility
 // handle filter with function as IE will not accept "=>" operator
-rivets.formatters.editLink = function (prescriptionId) {
-    return `/prescribe/edit?prescription_id=${prescriptionId}`
-}
-
 rivets.formatters.snomedCode = function (codings) {
     return codings
         ? codings.filter(function (coding) { return coding.system === "http://snomed.info/sct" })[0].code
@@ -178,6 +174,19 @@ function makeRequest(method, url, body) {
     }
     return JSON.parse(xhr.responseText)
 }
+
+
+function getEditRequest(prescriptionId) {
+    try {
+        const response = makeRequest("GET", `/prescribe/edit?prescription_id=${prescriptionId}`)
+        resetPageData("sign")
+        pageData.signRequestSummary = getSummary(response)
+    } catch (e) {
+        console.log(e)
+        addError('Communication error')
+    }
+}
+
 
 function sendEditRequest() {
     try {

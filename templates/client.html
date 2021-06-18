@@ -169,7 +169,7 @@
                 <nav class="nhsuk-pagination" role="navigation" aria-label="Pagination">
                     <ul class="nhsuk-list nhsuk-pagination__list">
                         <li class="nhsuk-pagination-item--previous" rv-show="previous_prescription_id">
-                            <a class="nhsuk-pagination__link nhsuk-pagination__link--prev" rv-href="previous_prescription_id | editLink">
+                            <a class="nhsuk-pagination__link nhsuk-pagination__link--prev" onclick="getEditRequest({previous_prescription_id})">
                                 <span class="nhsuk-pagination__title">Previous</span>
                                 <span class="nhsuk-u-visually-hidden">:</span>
                                 <span class="nhsuk-pagination__page"></span>
@@ -182,7 +182,7 @@
                             </a>
                         </li>
                         <li class="nhsuk-pagination-item--next" rv-show="next_prescription_id">
-                            <a class="nhsuk-pagination__link nhsuk-pagination__link--next" rv-href="next_prescription_id | editLink">
+                            <a class="nhsuk-pagination__link nhsuk-pagination__link--next" onclick="getEditRequest({previous_prescription_id})">
                                 <span class="nhsuk-pagination__title">Next</span>
                                 <span class="nhsuk-u-visually-hidden">:</span>
                                 <span class="nhsuk-pagination__page"></span>
