@@ -240,7 +240,7 @@
                   <tr class="nhsuk-table__row" rv-each-medication="signRequestSummary.medicationRequests">
                     <td class="nhsuk-table__cell">{medication.medicationCodeableConcept.coding | snomedCode}</td>
                     <td class="nhsuk-table__cell ">
-                      <div class="nhsuk-label nhsuk-label--m">{medication.medicationCodeableConcept.coding | snomedCodeDescription}</div>
+                      <div class="nhsuk-label nhsuk-label--s">{medication.medicationCodeableConcept.coding | snomedCodeDescription}</div>
                       <div rv-show="medication.extension | prescriptionEndorsements">Endorsements: {medication.extension | prescriptionEndorsements}</div>
                     </td>
                     <td class="nhsuk-table__cell ">{medication.dispenseRequest.quantity.value}</td>
