@@ -300,7 +300,7 @@ function sendPrescriptionRequest() {
     pageData.signResponse = null;
     pageData.sendResponse = {};
     pageData.sendResponse.prescriptionId = response.prescription_id;
-    pageData.sendResponse.status = response.status;
+    pageData.sendResponse.success = response.success;
   } catch (e) {
     console.log(e);
     addError("Communication error");
