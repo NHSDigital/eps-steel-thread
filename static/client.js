@@ -53,6 +53,9 @@ function Pharmacy(id, description) {
 
 // handle cases when no data is present without using "?." operator for IE compatibility
 // handle filter with function as IE will not accept "=>" operator
+rivets.formatters.editLink = function (prescriptionId) {
+    return `/prescribe/edit?prescription_id=${prescriptionId}`
+
 rivets.formatters.snomedCode = function (codings) {
     return codings
         ? codings.filter(function (coding) { return coding.system === "http://snomed.info/sct" })[0].code
