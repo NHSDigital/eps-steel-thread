@@ -23,9 +23,7 @@ const pageData = {
     showCustomExampleInput: false,
     showCustomPharmacyInput: false,
     selectedExampleId: "1",
-    payloads: [],
-    previous_prescription_id: Cookies.get("Previous-Presciption-Id"),
-    next_prescription_id: Cookies.get("Next-Presciption-Id")
+    payloads: []
 }
 
 function Prescription(id, description, message) {
@@ -389,9 +387,6 @@ function onLoad() {
 // IE compat, no default values for function args
 function resetPageData(pageMode) {
     pageData.mode = pageMode
-    // pageData.signRequestSummary = pageMode === "sign"
-    //     ? getSummary(getPayloads())
-    //     : null
     pageData.errorList = null
     pageData.sendResponse = null
     pageData.signResponse = null
@@ -405,6 +400,10 @@ function resetPageData(pageMode) {
     pageData.selectedPharmacy = pageMode === "edit"
         ? pageData.selectedPharmacy ?? "VNFKT"
         : null
+    if (pageData.mode == "sign") {
+        pageData.previous_prescription_id = Cookies.get("Previous-Prescription-Id")
+        pageData.next_prescription_id = Cookies.get("Next-Prescription-Id")
+    }
 }
 
 function bind() {

@@ -11,7 +11,7 @@ def get_prescription_id_from_cookie():
 
 def set_previous_prescription_id_cookie(response, short_prescription_id):
     response.set_cookie(
-        "Previous-Presciption-Id",
+        "Previous-Prescription-Id",
         short_prescription_id,
         expires=datetime.datetime.utcnow() + datetime.timedelta(seconds=float(600)),
         secure=not DEV_MODE,
@@ -20,7 +20,7 @@ def set_previous_prescription_id_cookie(response, short_prescription_id):
 
 def reset_previous_prescription_id_cookie(response):
     response.set_cookie(
-        "Previous-Presciption-Id",
+        "Previous-Prescription-Id",
         "",
         expires=0,
         secure=not DEV_MODE,
@@ -38,7 +38,7 @@ def set_current_prescription_id_cookie(response, short_prescription_id):
 
 def set_next_prescription_id_cookie(response, short_prescription_id):
     response.set_cookie(
-        "Next-Presciption-Id",
+        "Next-Prescription-Id",
         short_prescription_id,
         expires=datetime.datetime.utcnow() + datetime.timedelta(seconds=float(600)),
         secure=not DEV_MODE,
@@ -47,7 +47,7 @@ def set_next_prescription_id_cookie(response, short_prescription_id):
 
 def reset_next_prescription_id_cookie(response):
     response.set_cookie(
-        "Next-Presciption-Id",
+        "Next-Prescription-Id",
         "",
         expires=0,
         secure=not DEV_MODE,
