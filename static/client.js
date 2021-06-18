@@ -413,7 +413,7 @@ function resetPageData(pageMode) {
         ? pageData.selectedPharmacy === "custom"
         : false
     pageData.releaseResponse = null
-    pageData.selectedPharmacy = pageMode === "edit"
+    pageData.selectedPharmacy = (pageMode === "edit" || pageMode === "release-nominated-pharmacy")
         ? pageData.selectedPharmacy ?? "VNFKT"
         : null
     if (pageData.mode == "sign") {
