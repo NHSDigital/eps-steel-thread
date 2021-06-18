@@ -83,6 +83,16 @@ rivets.formatters.snomedCodeDescription = function (codings) {
     : "";
 };
 
+rivets.formatters.prescriptionEndorsements = function (extensions) {
+  return extensions
+    ? extensions.filter(function (extension) {
+        return extension.url === "https://fhir.nhs.uk/StructureDefinition/Extension-DM-PrescriptionEndorsement";
+      }).map(prescriptionEndorsement => prescriptionEndorsement.valueCodeableConcept.coding)
+        .flatMap(coding => coding.display)
+        .join(", ")
+    : "";
+};
+
 rivets.formatters.nhsNumber = function (identifiers) {
   if (!identifiers) {
     return "";
