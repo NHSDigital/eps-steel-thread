@@ -55,6 +55,7 @@ function Pharmacy(id, description) {
 // handle filter with function as IE will not accept "=>" operator
 rivets.formatters.editLink = function (prescriptionId) {
     return `/prescribe/edit?prescription_id=${prescriptionId}`
+}
 
 rivets.formatters.snomedCode = function (codings) {
     return codings
