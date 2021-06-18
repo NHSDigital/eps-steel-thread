@@ -238,10 +238,11 @@
                 </thead>
                 <tbody class="nhsuk-table__body">
                   <tr class="nhsuk-table__row" rv-each-medication="signRequestSummary.medicationRequests">
-                    <td class="nhsuk-table__cell">{medication.medicationCodeableConcept.coding |
-                      snomedCode}</td>
-                    <td class="nhsuk-table__cell ">{medication.medicationCodeableConcept.coding |
-                      snomedCodeDescription}</td>
+                    <td class="nhsuk-table__cell">{medication.medicationCodeableConcept.coding | snomedCode}</td>
+                    <td class="nhsuk-table__cell ">
+                      <div class="nhsuk-label nhsuk-label--s">{medication.medicationCodeableConcept.coding | snomedCodeDescription}</div>
+                      <div>Endorsements: Contraceptive, Sexual Health</div>
+                    </td>
                     <td class="nhsuk-table__cell ">{medication.dispenseRequest.quantity.value}</td>
                     <td class="nhsuk-table__cell ">{medication.dispenseRequest.quantity.unit}</td>
                   </tr>
