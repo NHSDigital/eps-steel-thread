@@ -262,8 +262,11 @@ function updateBundleIds(bundle) {
     const newBundleIdentifier = uuidv4()
 
     const originalShortFormId = firstGroupIdentifier.value
-    const newShortFormId = generateShortFormId(originalShortFormId)
-
+    var newShortFormId = generateShortFormId(originalShortFormId)
+    // + character reeks havoc on sqlalcamy postgress
+    while (newShortFormId.includes("+")) {
+        newShortFormId = generateShortFormId(originalShortFormId)
+    }
     const newLongFormId = uuidv4()
 
     setPrescriptionIds(bundle, newBundleIdentifier, newShortFormId, newLongFormId)

@@ -29,7 +29,6 @@ class SendRequest(db.Model):
 
 
 def add_prepare_request(short_prescription_id, prepare_request):
-    short_prescription_id.replace("+", "00000")
     if (PrepareRequest.query.get(short_prescription_id) != None):
         return
 
@@ -54,7 +53,6 @@ def add_send_request(short_prescription_id, send_request):
 
 
 def load_prepare_request(short_prescription_id):
-    short_prescription_id.replace("00000", "")
     return PrepareRequest.query.get(short_prescription_id).body
 
 
