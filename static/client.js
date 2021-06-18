@@ -478,7 +478,7 @@ function getSummary(payload) {
   const medicationRequests = getResourcesOfType(payload, "MedicationRequest");
   const startDate =
     medicationRequests[0].dispenseRequest.validityPeriod?.start ??
-    payload.author.time;
+    new Date().toISOString().slice(0, 10);
   return {
     author: {
       startDate: startDate,
