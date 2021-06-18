@@ -14,7 +14,7 @@ from api import (
     make_eps_api_send_request,
     make_eps_api_release_nominated_pharmacy_request,
     make_sign_api_signature_upload_request,
-    make_sign_api_signature_download_request
+    make_sign_api_signature_download_request,
 )
 from app import app, db, fernet
 from auth import exchange_code_for_token, get_access_token, redirect_and_set_cookies
@@ -29,7 +29,7 @@ from cookies import (
     set_prescription_ids_cookie,
     get_prescription_ids_from_cookie,
     get_auth_method_from_cookie,
-    set_auth_method_cookie
+    set_auth_method_cookie,
 )
 from client import render_client
 from database import (
@@ -40,7 +40,7 @@ from database import (
     add_send_request,
     load_prepare_request,
     load_prepare_response,
-    load_send_request
+    load_send_request,
 )
 
 DEV_MODE = os.environ.get("DEV_MODE", False)
@@ -66,7 +66,9 @@ def exclude_from_auth(*args, **kw):
         @wraps(endpoint_method)
         def wrapped(*endpoint_args, **endpoint_kw):
             return endpoint_method(*endpoint_args, **endpoint_kw)
+
         return wrapped
+
     return wrapper
 
 
@@ -79,13 +81,13 @@ def auth_check():
 
     if flask.request.endpoint in app.view_functions:
         view_func = app.view_functions[flask.request.endpoint]
-        flask.g.skip_auth = hasattr(view_func, '_exclude_from_auth')
+        flask.g.skip_auth = hasattr(view_func, "_exclude_from_auth")
 
     if not flask.g.skip_auth:
         access_token_encrypted = flask.request.cookies.get("Access-Token")
         if access_token_encrypted is not None:
             try:
-                fernet.decrypt(access_token_encrypted.encode('utf-8')).decode('utf-8')
+                fernet.decrypt(access_token_encrypted.encode("utf-8")).decode("utf-8")
             except:
                 return login()
         else:
@@ -114,7 +116,7 @@ def get_authorize_url(state, auth_method):
         "client_id": DEMO_APP_CLIENT_ID,
         "redirect_uri": OAUTH_REDIRECT_URI,
         "response_type": "code",
-        "state": state
+        "state": state,
     }
     return f"{oauth_base_path}/authorize?{urlencode(query_params)}"
 
@@ -130,9 +132,7 @@ def get_login():
 def post_login():
     login_request = flask.request.json
     auth_method = login_request["authMethod"]
-    response = app.make_response({
-        "redirectUri": "/"
-    })
+    response = app.make_response({"redirectUri": "/"})
     secure_flag = not DEV_MODE
     set_auth_method_cookie(response, auth_method)
     response.set_cookie("Access-Token", "", expires=0, secure=secure_flag, httponly=True)
@@ -203,13 +203,11 @@ def post_sign():
     prepare_response = make_eps_api_prepare_request(get_access_token(), prepare_request)
     auth_method = get_auth_method_from_cookie()
     sign_response = make_sign_api_signature_upload_request(
-        auth_method,
-        get_access_token(),
-        prepare_response['digest'],
-        prepare_response['algorithm'])
+        auth_method, get_access_token(), prepare_response["digest"], prepare_response["algorithm"]
+    )
     print("Response from Signing Service signature upload request...")
     print(json.dumps(sign_response))
-    response = app.make_response({'redirectUri': sign_response['redirectUri']})
+    response = app.make_response({"redirectUri": sign_response["redirectUri"]})
     add_prepare_response(short_prescription_id, prepare_response)
     return response
 
@@ -217,26 +215,32 @@ def post_sign():
 @app.route(SEND_URL, methods=["GET"])
 def get_send():
     auth_method = get_auth_method_from_cookie()
-    signature_response_json = make_sign_api_signature_download_request(auth_method, get_access_token(), flask.request.args.get("token"))
+    signature_response_json = make_sign_api_signature_download_request(
+        auth_method, get_access_token(), flask.request.args.get("token")
+    )
     short_prescription_id = get_prescription_id_from_cookie()
     prepare_response = load_prepare_response(short_prescription_id)
     payload = prepare_response["digest"]
     signature = signature_response_json["signature"]
     certifcate = signature_response_json["certificate"]
-    payload_decoded = base64.b64decode(payload).decode("utf-8").replace("<SignedInfo xmlns=\"http://www.w3.org/2000/09/xmldsig#\">", "<SignedInfo>")
-    xml_dsig = f"<Signature xmlns=\"http://www.w3.org/2000/09/xmldsig#\">{payload_decoded}" \
-               f"<SignatureValue>{signature}</SignatureValue>" \
-               f"<KeyInfo><X509Data><X509Certificate>{certifcate}</X509Certificate></X509Data></KeyInfo>" \
-               f"</Signature>"
+    payload_decoded = (
+        base64.b64decode(payload)
+        .decode("utf-8")
+        .replace('<SignedInfo xmlns="http://www.w3.org/2000/09/xmldsig#">', "<SignedInfo>")
+    )
+    xml_dsig = (
+        f'<Signature xmlns="http://www.w3.org/2000/09/xmldsig#">{payload_decoded}'
+        f"<SignatureValue>{signature}</SignatureValue>"
+        f"<KeyInfo><X509Data><X509Certificate>{certifcate}</X509Certificate></X509Data></KeyInfo>"
+        f"</Signature>"
+    )
     xml_dsig_encoded = base64.b64encode(xml_dsig.encode()).decode()
     prepare_request = load_prepare_request(short_prescription_id)
     provenance = create_provenance(prepare_response["timestamp"], xml_dsig_encoded)
-    prepare_request['entry'].append(provenance)
+    prepare_request["entry"].append(provenance)
     send_request = prepare_request
     add_send_request(short_prescription_id, send_request)
-    return render_client('send', sign_response={
-        'signature': xml_dsig_encoded
-    })
+    return render_client("send", sign_response={"signature": xml_dsig_encoded})
 
 
 @app.route(SEND_URL, methods=["POST"])
@@ -252,10 +256,7 @@ def post_send():
         status = "Success"
     else:
         status = "Failure"
-    return  {
-        'prescription_id': short_prescription_id,
-        'status': status
-    }
+    return {"prescription_id": short_prescription_id, "status": status}
 
 
 @app.route(DISPENSE_RELEASE_NOMINATED_PHARMACY_URL, methods=["GET"])
@@ -272,29 +273,20 @@ def post_nominated_pharmacy():
         {
             "resourceType": "Parameters",
             "id": str(uuid.uuid4()),
-            "parameter":  [
+            "parameter": [
                 {
                     "name": "owner",
-                    "valueIdentifier": {
-                        "system": "https://fhir.nhs.uk/Id/ods-organization-code",
-                        "value": ods_code
-                    }
+                    "valueIdentifier": {"system": "https://fhir.nhs.uk/Id/ods-organization-code", "value": ods_code},
                 },
-                {
-                    "name": "status",
-                    "valueCode": "accepted"
-                }
-            ]
-        }
+                {"name": "status", "valueCode": "accepted"},
+            ],
+        },
     )
     if response.status_code == 200:
         status = "Success"
     else:
         status = "Failure"
-    return {
-        "body": json.dumps(response.json()),
-        "status": status
-    }
+    return {"body": json.dumps(response.json()), "status": status}
 
 
 @app.route("/logout", methods=["GET"])
@@ -311,6 +303,6 @@ def get_callback():
     token_response_json = exchange_code_for_token(code, auth_method)
     access_token = token_response_json["access_token"]
     expires_in = token_response_json["expires_in"]
-    access_token_encrypted = fernet.encrypt(access_token.encode('utf-8')).decode('utf-8')
+    access_token_encrypted = fernet.encrypt(access_token.encode("utf-8")).decode("utf-8")
     expires = datetime.datetime.utcnow() + datetime.timedelta(seconds=float(expires_in))
     return redirect_and_set_cookies(state, access_token_encrypted, expires)

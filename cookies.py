@@ -15,16 +15,12 @@ def set_previous_prescription_id_cookie(response, short_prescription_id):
         short_prescription_id,
         expires=datetime.datetime.utcnow() + datetime.timedelta(seconds=float(600)),
         secure=not DEV_MODE,
-        httponly=False)
+        httponly=False,
+    )
 
 
 def reset_previous_prescription_id_cookie(response):
-    response.set_cookie(
-        "Previous-Prescription-Id",
-        "",
-        expires=0,
-        secure=not DEV_MODE,
-        httponly=True)
+    response.set_cookie("Previous-Prescription-Id", "", expires=0, secure=not DEV_MODE, httponly=True)
 
 
 def set_current_prescription_id_cookie(response, short_prescription_id):
@@ -33,7 +29,8 @@ def set_current_prescription_id_cookie(response, short_prescription_id):
         short_prescription_id,
         expires=datetime.datetime.utcnow() + datetime.timedelta(seconds=float(600)),
         secure=not DEV_MODE,
-        httponly=True)
+        httponly=True,
+    )
 
 
 def set_next_prescription_id_cookie(response, short_prescription_id):
@@ -42,26 +39,23 @@ def set_next_prescription_id_cookie(response, short_prescription_id):
         short_prescription_id,
         expires=datetime.datetime.utcnow() + datetime.timedelta(seconds=float(600)),
         secure=not DEV_MODE,
-        httponly=False)
+        httponly=False,
+    )
 
 
 def reset_next_prescription_id_cookie(response):
-    response.set_cookie(
-        "Next-Prescription-Id",
-        "",
-        expires=0,
-        secure=not DEV_MODE,
-        httponly=True)
+    response.set_cookie("Next-Prescription-Id", "", expires=0, secure=not DEV_MODE, httponly=True)
 
 
 def set_prescription_ids_cookie(response, prescription_ids):
-    separator = ','
+    separator = ","
     response.set_cookie(
         "Prescription-Ids",
         separator.join(prescription_ids),
         expires=datetime.datetime.utcnow() + datetime.timedelta(seconds=float(600)),
         secure=not DEV_MODE,
-        httponly=True)
+        httponly=True,
+    )
 
 
 def get_prescription_ids_from_cookie():
@@ -78,4 +72,5 @@ def set_auth_method_cookie(response, auth_method):
         auth_method,
         expires=datetime.datetime.utcnow() + datetime.timedelta(seconds=float(600)),
         secure=not DEV_MODE,
-        httponly=True)
+        httponly=True,
+    )
