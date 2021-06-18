@@ -181,7 +181,7 @@ function getEditRequest(previousOrNext) {
         const prescriptionId = previousOrNext === "previous"
             ? pageData.previous_prescription_id
             : pageData.next_prescription_id
-        const response = makeRequest("GET", `/prescribe/edit?prescription_id=${prescriptionId}`)
+        const response = makeRequest("GET", encodeURI(`/prescribe/edit?prescription_id=${prescriptionId}`))
         resetPageData("sign")
         pageData.signRequestSummary = getSummary(response)
     } catch (e) {
