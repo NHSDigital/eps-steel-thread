@@ -152,8 +152,7 @@ def get_load():
 
 
 def update_pagination(response, short_prescription_ids, current_short_prescription_id):
-    print(short_prescription_ids)
-    print(current_short_prescription_id)
+    set_prescription_ids_cookie(response, short_prescription_ids)
     previous_short_prescription_id_index = short_prescription_ids.index(current_short_prescription_id) - 1
     next_short_prescription_id_index = previous_short_prescription_id_index + 2
     if previous_short_prescription_id_index >= 0:
@@ -188,7 +187,6 @@ def post_edit():
     first_bundle = request_bundles[0]
     current_short_prescription_id = get_prescription_id(first_bundle)
     response = app.make_response(first_bundle)
-    set_prescription_ids_cookie(response, short_prescription_ids)
     update_pagination(response, short_prescription_ids, current_short_prescription_id)
     return response
 
