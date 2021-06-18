@@ -86,9 +86,16 @@ rivets.formatters.snomedCodeDescription = function (codings) {
 rivets.formatters.prescriptionEndorsements = function (extensions) {
   return extensions
     ? extensions
-        .filter(extension => extension.url === "https://fhir.nhs.uk/StructureDefinition/Extension-DM-PrescriptionEndorsement")
-        .flatMap(prescriptionEndorsement => prescriptionEndorsement.valueCodeableConcept.coding)
-        .map(coding => coding.display)
+        .filter(
+          (extension) =>
+            extension.url ===
+            "https://fhir.nhs.uk/StructureDefinition/Extension-DM-PrescriptionEndorsement"
+        )
+        .flatMap(
+          (prescriptionEndorsement) =>
+            prescriptionEndorsement.valueCodeableConcept.coding
+        )
+        .map((coding) => coding.display)
         .join(", ")
     : "";
 };
@@ -462,9 +469,6 @@ function addError(message) {
 }
 
 function getSummary(payload) {
-  const startDate =
-    medicationRequests[0].dispenseRequest.validityPeriod?.start ??
-    payload.author.time;
   const patient = getResourcesOfType(payload, "Patient")[0];
   const practitioner = getResourcesOfType(payload, "Practitioner")[0];
   const encounter = getResourcesOfType(payload, "Encounter")[0];
@@ -472,6 +476,9 @@ function getSummary(payload) {
   const prescribingOrganization = organizations[0]; // todo: add logic to handle primary/secondary-care
   const parentOrganization = organizations[0];
   const medicationRequests = getResourcesOfType(payload, "MedicationRequest");
+  const startDate =
+    medicationRequests[0].dispenseRequest.validityPeriod?.start ??
+    payload.author.time;
   return {
     author: {
       startDate: startDate,
