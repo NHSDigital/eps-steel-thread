@@ -615,9 +615,9 @@ function createCancellation(bundle) {
   messageHeader.eventCoding.code = "prescription-order-update"
   messageHeader.eventCoding.display = "Prescription Order Update"
   const medicationRequests = bundle.entry.filter(entry => entry.resource.resourceType === "MedicationRequest")
-  const medicationRequest = JSON.parse(JSON.stringify(medicationRequests[0]))
-  medicationRequest.status = "cancelled"
-  medicationRequest.statusReason = {
+  const clonedMedicationRequest = JSON.parse(JSON.stringify(medicationRequests[0]))
+  clonedMedicationRequest.status = "cancelled"
+  clonedMedicationRequest.statusReason = {
     "coding": [
       {
         "system": "https://fhir.nhs.uk/CodeSystem/medicationrequest-status-reason",
@@ -626,8 +626,8 @@ function createCancellation(bundle) {
       }
     ]
   }
-  delete medicationRequests
-  bundle.entry.push(medicationRequest)
+  bundle.entry = bundle.entry.filter(entry => entry.resource.resourceType !== "MedicationRequest")
+  bundle.entry.push(clonedMedicationRequest)
   const medicationRequestsCheck = bundle.entry.filter(entry => entry.resource.resourceType === "MedicationRequest")
   console.log(`Cancellation bundle has ${medicationRequestsCheck.length} MedicationRequest(s)`)
   console.log(medicationRequestsCheck.map(entry => entry.resource))
