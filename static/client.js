@@ -218,7 +218,18 @@ function toUpperCaseIfPresent(field) {
 }
 
 function sendLoadRequest() {
-  resetPageData("edit");
+  const isCustom = pageData.selectedExampleId == "custom";
+  const filePayloads = pageData.payloads;
+  const textPayloads = [document.getElementById("prescription-textarea").value];
+  const payloads = filePayloads
+    .concat(textPayloads)
+    .filter(Boolean)
+    .map((payload) => JSON.parse(payload));
+  if (isCustom && !payloads) {
+    addError("Unable to parse custom prescription(s)");
+  } else {
+    resetPageData("edit");
+  }
 }
 
 function updateAuthMethod(authMethod) {
