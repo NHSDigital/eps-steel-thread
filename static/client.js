@@ -360,13 +360,13 @@ function sendCancelRequest() {
       "GET",
       `/prescribe/edit?prescription_id=${prescriptionId}`
     );
-    resetPageData("sign");
+    resetPageData("cancel");
     const cancellation = getCancellation(prescription);
     const response = makeRequest("POST", "/prescribe/cancel", cancellation);
     pageData.cancelResponse = {};
     pageData.cancelResponse.prescriptionId = response.prescription_id;
     pageData.cancelResponse.success = response.success;
-    pageData.cancelResponse.body = response.body;
+    pageData.cancelResponse.body = JSON.stringify(response.body);
   } catch (e) {
     console.log(e);
     addError("Communication error");
