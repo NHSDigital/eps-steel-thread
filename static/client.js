@@ -614,19 +614,20 @@ function createCancellation(bundle) {
   const messageHeader = getResourcesOfType(bundle, "MessageHeader")[0]
   messageHeader.eventCoding.code = "prescription-order-update"
   messageHeader.eventCoding.display = "Prescription Order Update"
-  const medicationRequests = getResourcesOfType(bundle, "MedicationRequest")
-  medicationRequests.forEach(medicationRequest => {
-    medicationRequest.status = "cancelled"
-    medicationRequest.statusReason = {
-      "coding": [
-        {
-          "system": "https://fhir.nhs.uk/CodeSystem/medicationrequest-status-reason",
-          "code": "0001",
-          "display": "Prescribing Error"
-        }
-      ]
-    }
-  })
+  const medicationRequests = bundle.entry.filter(entry.resource.resourceType === "MedicationRequest")
+  const medicationRequest = JSON.parse(JSON.stringify(medicationRequests[0]))
+  medicationRequest.status = "cancelled"
+  medicationRequest.statusReason = {
+    "coding": [
+      {
+        "system": "https://fhir.nhs.uk/CodeSystem/medicationrequest-status-reason",
+        "code": "0001",
+        "display": "Prescribing Error"
+      }
+    ]
+  }
+  delete medicationRequests
+  bundle.entry.push(medicationRequest)
   console.log(JSON.stringify(bundle))
   return bundle;
 }
