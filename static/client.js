@@ -93,8 +93,8 @@ function CancellationReason(id, description) {
   this.description = description;
   this.select = function () {
     pageData.selectedCancellationReasonId = id;
+    pageData.selectedCancellationDisplay = description;
     resetPageData(pageData.mode);
-    console.log(`Selected cancellation reason: ${description}`);
   };
 }
 
@@ -611,6 +611,7 @@ function doPrescriptionAction(select) {
 }
 
 function createCancellation(bundle) {
+  console.log(JSON.stringify(bundle, null, 4));
   updateBundleIds(bundle);
   const messageHeader = getResourcesOfType(bundle, "MessageHeader")[0];
   messageHeader.eventCoding.code = "prescription-order-update";
@@ -628,8 +629,8 @@ function createCancellation(bundle) {
       {
         system:
           "https://fhir.nhs.uk/CodeSystem/medicationrequest-status-reason",
-        code: "0001",
-        display: "Prescribing Error",
+        code: pageData.selectedCancellationReasonId,
+        display: pageData.selectedCancellationDisplay,
       },
     ],
   };
@@ -637,6 +638,7 @@ function createCancellation(bundle) {
     (entry) => entry.resource.resourceType !== "MedicationRequest"
   );
   bundle.entry.push(clonedMedicationRequestEntry);
+  console.log(JSON.stringify(bundle, null, 4));
   return bundle;
 }
 
