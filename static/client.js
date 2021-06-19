@@ -580,7 +580,7 @@ function doPrescriptionAction(select) {
   const prescriptionId = Cookies.get("Current-Prescription-Id");
   switch (value) {
     case "cancel":
-      window.location.href = `/prescribe/cancel/edit?prescription_id=${prescriptionId}`;
+      window.location.href = `/prescribe/cancel?prescription_id=${prescriptionId}`;
     default:
       return;
   }
