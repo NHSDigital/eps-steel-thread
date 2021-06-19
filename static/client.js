@@ -53,9 +53,22 @@ const pageData = {
   ],
   cancellers: [
     new Canceller(
+      "same-as-original-author",
+      "",
+      "Use original author",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ),
+    new Canceller(
       "R8006",
       "Admin",
       "Medical Secetary Access Role",
+      "212304192555",
       "555086718101",
       "https://fhir.hl7.org.uk/Id/professional-code",
       "unknown",
@@ -115,6 +128,7 @@ function Canceller(
   id,
   type,
   display,
+  sdsRoleProfileId,
   sdsUserId,
   professionalCodeSystem,
   professionalCodeValue,
@@ -125,13 +139,14 @@ function Canceller(
   this.id = id;
   this.type = type;
   this.display = display;
+  this.sdsRoleProfileId = sdsRoleProfileId;
   this.sdsUserId = sdsUserId;
   this.professionalCodeSystem = professionalCodeSystem;
   this.professionalCodeValue = professionalCodeValue;
   this.title = title;
   this.firstName = firstName;
   this.lastName = lastName;
-  this.description = `${type} - ${display}`;
+  this.description = id === "" ? display : `${type} - ${display}`;
   this.select = function () {
     pageData.selectedCancellerId = id;
     resetPageData(pageData.mode);
@@ -651,7 +666,7 @@ function doPrescriptionAction(select) {
 }
 
 function createCancellation(bundle) {
-  console.log(JSON.stringify(bundle, null, 2))
+  console.log(JSON.stringify(bundle, null, 2));
   // Fixes duplicate hl7v3 identifier error
   // this is not an obvious error for a supplier to resolve as
   // there is no mention of the fhir field it relates to
@@ -689,40 +704,80 @@ function createCancellation(bundle) {
     (entry) => entry.resource.resourceType !== "MedicationRequest"
   );
   bundle.entry.push(clonedMedicationRequestEntry);
-  const practitionerRole = getResourcesOfType(bundle, "PractitionerRole")[0];
+
   const canceller = pageData.cancellers.filter(
     (canceller) => canceller.id === pageData.selectedCancellerId
   )[0];
-  practitionerRole.code.forEach((code) =>
-    code.coding
-      .filter(
-        (coding) =>
-          coding.system ===
-          "https://fhir.hl7.org.uk/CodeSystem/UKCore-SDSJobRoleName"
-      )
-      .forEach((coding) => {
-        (coding.code = canceller.id), (coding.display = canceller.display);
-      })
-  );
-  const practitioner = getResourcesOfType(bundle, "Practitioner")[0];
-  practitioner.identifier = [
-    {
-      system: "https://fhir.nhs.uk/Id/sds-user-id",
-      value: canceller.sdsUserId,
-    },
-    {
-      system: canceller.professionalCodeSystem,
-      value: canceller.professionalCodeValue,
-    },
-  ];
-  practitioner.name = [
-    {
-      family: canceller.lastName,
-      given: [canceller.firstName],
-      prefix: [canceller.title],
-    },
-  ];
-  console.log(JSON.stringify(bundle, null, 2))
+
+  if (canceller.id !== "same-as-original-author") {
+    const cancelPractitionerRoleIdentifier = uuidv4();
+    const cancelPractitionerIdentifier = uuidv4();
+
+    medicationRequest.extension.push(
+      {
+        "url": "https://fhir.nhs.uk/StructureDefinition/Extension-DM-ResponsiblePractitioner",
+        "valueReference": `urn:uuid:${cancelPractitionerIdentifier}`
+      }
+    )
+
+    const practitionerRoleEntry = bundle.entry.filter(
+      (entry) => entry.resource.resourceType === "PractitionerRole"
+    )[0];
+    const cancelPractitionerRoleEntry = JSON.parse(
+      JSON.stringify(practitionerRoleEntry)
+    );
+
+    cancelPractitionerRoleEntry.fullUrl = `urn:uuid:${cancelPractitionerRoleIdentifier}`;
+    const cancelPractitionerRole = cancelPractitionerRoleEntry.resource;
+    cancelPractitionerRole.practitioner.reference = `urn:uuid:${cancelPractitionerIdentifier}`;
+    cancelPractitionerRole.identifier = [
+      {
+        system: "https://fhir.nhs.uk/Id/sds-role-profile-id",
+        value: canceller.sdsRoleProfileId,
+      },
+    ];
+    cancelPractitionerRole.code = [
+      {
+        coding: [
+          {
+            system: "https://fhir.hl7.org.uk/CodeSystem/UKCore-SDSJobRoleName",
+            code: canceller.id,
+            display: canceller.display,
+          },
+        ],
+      },
+    ];
+    bundle.entry.push(cancelPractitionerRoleEntry);
+
+    const practitionerEntry = bundle.entry.filter(
+      (entry) => entry.resource.resourceType === "Practitioner"
+    )[0];
+    const cancelPractitionerEntry = JSON.parse(
+      JSON.stringify(practitionerEntry)
+    );
+    cancelPractitionerEntry.fullUrl = `urn:uuid:${cancelPractitionerIdentifier}`;
+    const cancelPractitioner = cancelPractitionerEntry.resource;
+    cancelPractitioner.identifier = [
+      {
+        system: "https://fhir.nhs.uk/Id/sds-user-id",
+        value: canceller.sdsUserId,
+      },
+      {
+        system: canceller.professionalCodeSystem,
+        value: canceller.professionalCodeValue,
+      },
+    ];
+    cancelPractitioner.name = [
+      {
+        family: canceller.lastName,
+        given: [canceller.firstName],
+        prefix: [canceller.title],
+      },
+    ];
+    bundle.entry.push(cancelPractitionerEntry);
+  }
+
+  console.log(JSON.stringify(bundle, null, 2));
   return bundle;
 }
 
