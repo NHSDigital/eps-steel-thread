@@ -225,7 +225,7 @@ function sendLoadRequest() {
     .concat(textPayloads)
     .filter(Boolean)
     .map((payload) => JSON.parse(payload));
-  if (isCustom && !payloads) {
+  if (isCustom && !payloads.length) {
     addError("Unable to parse custom prescription(s)");
   } else {
     resetPageData("edit");
@@ -511,16 +511,18 @@ function getPayloads() {
     .concat(textPayloads)
     .filter(Boolean)
     .map((payload) => JSON.parse(payload));
-  if (isCustom && !payloads) {
+  if (isCustom && !payloads.length) {
     addError("Unable to parse custom prescription(s)");
   }
-  return isCustom
-    ? payloads
-    : [
-        pageData.examples.filter(function (example) {
-          return example.id === pageData.selectedExampleId;
-        })[0].message,
-      ];
+  else {
+    return isCustom
+      ? payloads
+      : [
+          pageData.examples.filter(function (example) {
+            return example.id === pageData.selectedExampleId;
+          })[0].message,
+        ];
+    }
 }
 
 function getOdsCode() {
