@@ -33,6 +33,10 @@ const pageData = {
     new Pharmacy("YGM1E", "MBBM HEALTHCARE TECHNOLOGIES LTD"),
     new Pharmacy("custom", "Custom", null),
   ],
+  actions: [
+    new PrescriptionAction("", ""),
+    new PrescriptionAction("cancel", "Cancel")
+  ],
   mode: "home",
   signature: "",
   loggedIn: Cookies.get("Access-Token-Set") === "true",
@@ -62,6 +66,20 @@ function Pharmacy(id, description) {
     pageData.selectedPharmacy = id;
     pageData.showCustomPharmacyInput = id === "custom";
     resetPageData(pageData.mode);
+  };
+}
+
+function PrescriptionAction(id, description) {
+  this.id = id;
+  this.description = description;
+  this.select = function () {
+    const prescriptionId = Cookies.get("Current-Prescription-Id")
+    switch(id) {
+      case "cancel":
+        window.location.href = `/prescribe/cancel?prescription_id=${prescriptionId}`;
+      default:
+        return
+    }
   };
 }
 
