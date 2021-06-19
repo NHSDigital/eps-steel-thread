@@ -261,6 +261,16 @@ def get_cancel():
     return render_client("cancel")
 
 
+@app.route(CANCEL_URL, methods=["POST"])
+def post_cancel():
+    response = app.make_response({
+        "prescription_id": get_prescription_id_from_cookie(),
+        "body": {},
+        "success": True
+    })
+    return response
+
+
 @app.route(DISPENSE_RELEASE_NOMINATED_PHARMACY_URL, methods=["GET"])
 def get_nominated_pharmacy():
     return render_client("release-nominated-pharmacy")

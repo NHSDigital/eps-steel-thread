@@ -46,7 +46,10 @@ const pageData = {
     new CancellationReason("0006", "At the Pharmacist's request"),
     new CancellationReason("0007", "Notification of Death"),
     new CancellationReason("0008", "Patient deducted - other reason"),
-    new CancellationReason("0009", "Patient deducted - registered with new practice"),
+    new CancellationReason(
+      "0009",
+      "Patient deducted - registered with new practice"
+    ),
   ],
   mode: "home",
   signature: "",
@@ -91,7 +94,7 @@ function CancellationReason(id, description) {
   this.select = function () {
     pageData.selectedCancellationReasonId = id;
     resetPageData(pageData.mode);
-    console.log(`Selected cancellation reason: ${description}`)
+    console.log(`Selected cancellation reason: ${description}`);
   };
 }
 
@@ -339,12 +342,31 @@ function sendSignRequest() {
 
 function sendPrescriptionRequest() {
   try {
-    // todo: change callback url to /prescribe/send
     const response = makeRequest("POST", "/prescribe/send", {});
     pageData.signResponse = null;
     pageData.sendResponse = {};
     pageData.sendResponse.prescriptionId = response.prescription_id;
     pageData.sendResponse.success = response.success;
+  } catch (e) {
+    console.log(e);
+    addError("Communication error");
+  }
+}
+
+function sendCancelRequest() {
+  try {
+    const prescriptionId = Cookies.get("Current-Prescription-Id");
+    const prescription = makeRequest(
+      "GET",
+      `/prescribe/edit?prescription_id=${prescriptionId}`
+    );
+    resetPageData("sign");
+    const cancellation = getCancellation(prescription);
+    const response = makeRequest("POST", "/prescribe/cancel", cancellation);
+    pageData.cancelResponse = {};
+    pageData.cancelResponse.prescriptionId = response.prescription_id;
+    pageData.cancelResponse.success = response.success;
+    pageData.cancelResponse.body = response.body;
   } catch (e) {
     console.log(e);
     addError("Communication error");
@@ -584,6 +606,10 @@ function doPrescriptionAction(select) {
     default:
       return;
   }
+}
+
+function getCancellation(bundle) {
+  return bundle;
 }
 
 function onLoad() {
