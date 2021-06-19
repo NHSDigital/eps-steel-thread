@@ -84,7 +84,7 @@ const pageData = {
   showCustomPharmacyInput: false,
   selectedExampleId: "1",
   selectedCancellationReasonId: "0001",
-  selectedCancellerId: "R8006",
+  selectedCancellerId: "same-as-original-author",
   payloads: [],
 };
 
@@ -146,7 +146,7 @@ function Canceller(
   this.title = title;
   this.firstName = firstName;
   this.lastName = lastName;
-  this.description = id === "" ? display : `${type} - ${display}`;
+  this.description = id === "same-as-original-author" ? display : `${type} - ${display}`;
   this.select = function () {
     pageData.selectedCancellerId = id;
     resetPageData(pageData.mode);
@@ -716,7 +716,9 @@ function createCancellation(bundle) {
     medicationRequest.extension.push(
       {
         "url": "https://fhir.nhs.uk/StructureDefinition/Extension-DM-ResponsiblePractitioner",
-        "valueReference": `urn:uuid:${cancelPractitionerRoleIdentifier}`
+        "valueReference": {
+          "reference": `urn:uuid:${cancelPractitionerRoleIdentifier}`
+        }
       }
     )
 
@@ -736,17 +738,17 @@ function createCancellation(bundle) {
         value: canceller.sdsRoleProfileId,
       },
     ];
-    cancelPractitionerRole.code = [
-      {
-        coding: [
-          {
-            system: "https://fhir.hl7.org.uk/CodeSystem/UKCore-SDSJobRoleName",
-            code: canceller.id,
-            display: canceller.display,
-          },
-        ],
-      },
-    ];
+    cancelPractitionerRole.code.forEach((code) =>
+    code.coding
+      .filter(
+        (coding) =>
+          coding.system ===
+          "https://fhir.hl7.org.uk/CodeSystem/UKCore-SDSJobRoleName"
+      )
+      .forEach((coding) => {
+        (coding.code = canceller.id), (coding.display = canceller.display);
+      })
+  );
     bundle.entry.push(cancelPractitionerRoleEntry);
 
     const practitionerEntry = bundle.entry.filter(
