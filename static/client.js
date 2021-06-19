@@ -651,6 +651,7 @@ function doPrescriptionAction(select) {
 }
 
 function createCancellation(bundle) {
+  console.log(JSON.stringify(bundle, null, 2))
   // Fixes duplicate hl7v3 identifier error
   // this is not an obvious error for a supplier to resolve as
   // there is no mention of the fhir field it relates to
@@ -693,32 +694,35 @@ function createCancellation(bundle) {
     (canceller) => canceller.id === pageData.selectedCancellerId
   );
   practitionerRole.code.forEach((code) =>
-    code.coding.forEach((coding) => {
-      coding.code = canceller.id, (coding.display = canceller.display);
-    })
+    code.coding
+      .filter(
+        (coding) =>
+          coding.system ===
+          "https://fhir.hl7.org.uk/CodeSystem/UKCore-SDSJobRoleName"
+      )
+      .forEach((coding) => {
+        (coding.code = canceller.id), (coding.display = canceller.display);
+      })
   );
-  const practitioner = getResourcesOfType(bundle, "Practitioner")[0]
+  const practitioner = getResourcesOfType(bundle, "Practitioner")[0];
   practitioner.identifier = [
     {
-      "system": "https://fhir.nhs.uk/Id/sds-user-id",
-      "value": canceller.sdsUserId
+      system: "https://fhir.nhs.uk/Id/sds-user-id",
+      value: canceller.sdsUserId,
     },
     {
-      "system": canceller.professionalCodeSystem,
-      "value": canceller.professionalCodeValue
-    }
-  ]
+      system: canceller.professionalCodeSystem,
+      value: canceller.professionalCodeValue,
+    },
+  ];
   practitioner.name = [
     {
-      "family": canceller.lastName,
-      "given": [
-        canceller.firstName
-      ],
-      "prefix": [
-        canceller.title
-      ]
-    }
-  ]
+      family: canceller.lastName,
+      given: [canceller.firstName],
+      prefix: [canceller.title],
+    },
+  ];
+  console.log(JSON.stringify(bundle, null, 2))
   return bundle;
 }
 
