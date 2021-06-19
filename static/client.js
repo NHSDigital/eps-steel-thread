@@ -614,7 +614,7 @@ function createCancellation(bundle) {
   const messageHeader = getResourcesOfType(bundle, "MessageHeader")[0]
   messageHeader.eventCoding.code = "prescription-order-update"
   messageHeader.eventCoding.display = "Prescription Order Update"
-  const medicationRequests = bundle.entry.filter(entry.resource.resourceType === "MedicationRequest")
+  const medicationRequests = bundle.entry.filter(entry => entry.resource.resourceType === "MedicationRequest")
   const medicationRequest = JSON.parse(JSON.stringify(medicationRequests[0]))
   medicationRequest.status = "cancelled"
   medicationRequest.statusReason = {
