@@ -716,7 +716,7 @@ function createCancellation(bundle) {
     medicationRequest.extension.push(
       {
         "url": "https://fhir.nhs.uk/StructureDefinition/Extension-DM-ResponsiblePractitioner",
-        "valueReference": `urn:uuid:${cancelPractitionerIdentifier}`
+        "valueReference": `urn:uuid:${cancelPractitionerRoleIdentifier}`
       }
     )
 
