@@ -362,7 +362,7 @@ function sendCancelRequest() {
     );
     resetPageData("cancel");
     const cancellation = getCancellation(prescription);
-    const response = makeRequest("POST", "/prescribe/cancel", cancellation);
+    const response = makeRequest("POST", "/prescribe/cancel", JSON.stringify(cancellation));
     pageData.cancelResponse = {};
     pageData.cancelResponse.prescriptionId = response.prescription_id;
     pageData.cancelResponse.success = response.success;
