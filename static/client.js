@@ -612,6 +612,15 @@ function doPrescriptionAction(select) {
 
 function createCancellation(bundle) {
   console.log(JSON.stringify(bundle, null, 4));
+  // Fixes duplicate hl7v3 identifier error
+  // this is not an obvious error for a supplier to resolve as
+  // their is no mention of the fhir field it relates to
+  // can we improve our returned error message here??
+  bundle.identifier.value = uuidv4();
+  // ****************************************
+
+  // cheat and get first medicationrequest to cancel
+  // todo: cancellations need to be at medication level, not prescription level
   const messageHeader = getResourcesOfType(bundle, "MessageHeader")[0];
   messageHeader.eventCoding.code = "prescription-order-update";
   messageHeader.eventCoding.display = "Prescription Order Update";
@@ -622,7 +631,6 @@ function createCancellation(bundle) {
     JSON.stringify(medicationRequestEntries[0])
   );
   const medicationRequest = clonedMedicationRequestEntry.resource;
-  medicationRequest.groupIdentifier.value = uuidv4();
   medicationRequest.status = "cancelled";
   medicationRequest.statusReason = {
     coding: [
