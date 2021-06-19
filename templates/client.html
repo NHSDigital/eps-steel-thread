@@ -329,7 +329,7 @@
                 <dd class="nhsuk-summary-list__value" style="padding-top:0;">
                   <label class="nhsuk-label nhsuk-select__label" style="display:inline;font-weight:600;padding-right:20px;">Actions</label>
                   <select class="nhsuk-select" name="prescription-actions" id="prescription-actions">
-                    <option rv-each-action="actions" rv-id="action.id" rv-value="action.id" rv-on-click="action.select">{action.description}</option>
+                    <option rv-each-action="actions" rv-id="action.id" rv-value="action.id" rv-on-change="action.select">{action.description}</option>
                   </select>
                 </dd>
               </div>
