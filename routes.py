@@ -299,7 +299,7 @@ def post_nominated_pharmacy():
             ],
         },
     )
-    return {"body": json.dumps(response.json()), "success": cancel_response.status_code == 200}
+    return {"body": json.dumps(response.json()), "success": response.status_code == 200}
 
 
 @app.route("/logout", methods=["GET"])
