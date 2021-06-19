@@ -614,10 +614,11 @@ function createCancellation(bundle) {
   const messageHeader = getResourcesOfType(bundle, "MessageHeader")[0]
   messageHeader.eventCoding.code = "prescription-order-update"
   messageHeader.eventCoding.display = "Prescription Order Update"
-  const medicationRequests = bundle.entry.filter(entry => entry.resource.resourceType === "MedicationRequest")
-  const clonedMedicationRequest = JSON.parse(JSON.stringify(medicationRequests[0]))
-  clonedMedicationRequest.status = "cancelled"
-  clonedMedicationRequest.statusReason = {
+  const medicationRequestEntries = bundle.entry.filter(entry => entry.resource.resourceType === "MedicationRequest")
+  const clonedMedicationRequestEntry = JSON.parse(JSON.stringify(medicationRequestEntries[0]))
+  const medicationRequest = clonedMedicationRequestEntry.resource
+  medicationRequest.status = "cancelled"
+  medicationRequest.statusReason = {
     "coding": [
       {
         "system": "https://fhir.nhs.uk/CodeSystem/medicationrequest-status-reason",
@@ -627,10 +628,7 @@ function createCancellation(bundle) {
     ]
   }
   bundle.entry = bundle.entry.filter(entry => entry.resource.resourceType !== "MedicationRequest")
-  bundle.entry.push(clonedMedicationRequest)
-  const medicationRequestsCheck = bundle.entry.filter(entry => entry.resource.resourceType === "MedicationRequest")
-  console.log(`Cancellation bundle has ${medicationRequestsCheck.length} MedicationRequest(s)`)
-  console.log(medicationRequestsCheck.map(entry => entry.resource))
+  bundle.entry.push(clonedMedicationRequestEntry)
   return bundle;
 }
 
