@@ -63,10 +63,13 @@ DISPENSE_RELEASE_NOMINATED_PHARMACY_URL = "/dispense/release-nominated-pharmacy"
 def exclude_from_auth(*args, **kw):
     def wrapper(endpoint_method):
         endpoint_method._exclude_from_auth = False
+
         @wraps(endpoint_method)
         def wrapped(*endpoint_args, **endpoint_kw):
             return endpoint_method(*endpoint_args, **endpoint_kw)
+
         return wrapped
+
     return wrapper
 
 
@@ -261,12 +264,9 @@ def get_cancel():
 @app.route(CANCEL_URL, methods=["POST"])
 def post_cancel():
     cancel_request = flask.request.json
+    short_prescription_id = get_prescription_id(cancel_request)
     cancel_response = make_eps_api_process_message_request(get_access_token(), cancel_request)
-    response = app.make_response({
-        "prescription_id": short_prescription_id,
-        "body": cancel_response,
-        "success": True
-    })
+    response = app.make_response({"prescription_id": short_prescription_id, "body": cancel_response, "success": True})
     return response
 
 
