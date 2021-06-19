@@ -51,12 +51,27 @@ const pageData = {
       "Patient deducted - registered with new practice"
     ),
   ],
+  cancellers: [
+    new Canceller(
+      "R8006",
+      "Admin",
+      "Medical Secetary Access Role",
+      "555086718101",
+      "https://fhir.hl7.org.uk/Id/professional-code",
+      "unknown",
+      "MS",
+      "Medical",
+      "Secetary"
+    ),
+  ],
   mode: "home",
   signature: "",
   loggedIn: Cookies.get("Access-Token-Set") === "true",
   showCustomExampleInput: false,
   showCustomPharmacyInput: false,
   selectedExampleId: "1",
+  selectedCancellationReasonId: "0001",
+  selectedCancellerId: "R8006",
   payloads: [],
 };
 
@@ -71,11 +86,10 @@ function Prescription(id, description, message) {
   };
 }
 
-function Pharmacy(id, description) {
+function Pharmacy(id, name) {
   this.id = id;
-  this.description = description;
-  this.display =
-    id === "custom" ? "Custom" : this.id + " - " + this.description;
+  this.name = name;
+  this.display = id === "custom" ? "Custom" : this.id + " - " + this.name;
   this.select = function () {
     pageData.selectedPharmacy = id;
     pageData.showCustomPharmacyInput = id === "custom";
@@ -88,12 +102,38 @@ function PrescriptionAction(id, description) {
   this.description = description;
 }
 
-function CancellationReason(id, description) {
+function CancellationReason(id, display) {
   this.id = id;
-  this.description = description;
+  this.display = display;
   this.select = function () {
     pageData.selectedCancellationReasonId = id;
-    pageData.selectedCancellationDisplay = description;
+    resetPageData(pageData.mode);
+  };
+}
+
+function Canceller(
+  id,
+  type,
+  display,
+  sdsUserId,
+  professionalCodeSystem,
+  professionalCodeValue,
+  title,
+  firstName,
+  lastName
+) {
+  this.id = id;
+  this.type = type;
+  this.display = display;
+  this.sdsUserId = sdsUserId;
+  this.professionalCodeSystem = professionalCodeSystem;
+  this.professionalCodeValue = professionalCodeValue;
+  this.title = title;
+  this.firstName = firstName;
+  this.lastName = lastName;
+  this.description = `${type} - ${display}`;
+  this.select = function () {
+    pageData.selectedCancellerId = id;
     resetPageData(pageData.mode);
   };
 }
@@ -619,7 +659,7 @@ function createCancellation(bundle) {
   // ****************************************
 
   // cheat and get first medicationrequest to cancel
-  // todo: cancellations need to be at medication level, not prescription level
+  // todo: cancellations should be at medication level, not prescription level
   const messageHeader = getResourcesOfType(bundle, "MessageHeader")[0];
   messageHeader.eventCoding.code = "prescription-order-update";
   messageHeader.eventCoding.display = "Prescription Order Update";
@@ -631,13 +671,16 @@ function createCancellation(bundle) {
   );
   const medicationRequest = clonedMedicationRequestEntry.resource;
   medicationRequest.status = "cancelled";
+  const cancellationReason = pageData.reasons.filter(
+    (r) => r.id === pageData.selectedCancellationReasonId
+  )[0];
   medicationRequest.statusReason = {
     coding: [
       {
         system:
           "https://fhir.nhs.uk/CodeSystem/medicationrequest-status-reason",
-        code: pageData.selectedCancellationReasonId,
-        display: pageData.selectedCancellationDisplay,
+        code: cancellationReason.id,
+        display: cancellationReason.display,
       },
     ],
   };
@@ -645,6 +688,37 @@ function createCancellation(bundle) {
     (entry) => entry.resource.resourceType !== "MedicationRequest"
   );
   bundle.entry.push(clonedMedicationRequestEntry);
+  const practitionerRole = getResourcesOfType(bundle, "PractitionerRole")[0];
+  const canceller = pageData.cancellers.filter(
+    (canceller) => canceller.id === pageData.selectedCancellerId
+  );
+  practitionerRole.code.forEach((code) =>
+    code.coding.forEach((coding) => {
+      coding.code = canceller.id, (coding.display = canceller.display);
+    })
+  );
+  const practitioner = getResourcesOfType(bundle, "Practitioner")[0]
+  practitioner.identifier = [
+    {
+      "system": "https://fhir.nhs.uk/Id/sds-user-id",
+      "value": canceller.sdsUserId
+    },
+    {
+      "system": canceller.professionalCodeSystem,
+      "value": canceller.professionalCodeValue
+    }
+  ]
+  practitioner.name = [
+    {
+      "family": canceller.lastName,
+      "given": [
+        canceller.firstName
+      ],
+      "prefix": [
+        canceller.title
+      ]
+    }
+  ]
   return bundle;
 }
 

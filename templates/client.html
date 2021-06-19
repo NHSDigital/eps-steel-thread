@@ -351,7 +351,17 @@
                 <div class="nhsuk-radios__item" rv-each-reason="reasons">
                   <input class="nhsuk-radios__input" rv-id="reason.id" type="radio" name="reason"
                     rv-value="reason.id" rv-checked="selectedCancellationReasonId" rv-on-click="reason.select">
-                  <label class="nhsuk-label nhsuk-radios__label" rv-for="reason.id">{reason.description}</label>
+                  <label class="nhsuk-label nhsuk-radios__label" rv-for="reason.id">{reason.display}</label>
+                </div>
+              </div>
+              <div>
+                <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m">Select a cancellation user</legend>
+              </div>
+              <div class="nhsuk-radios">
+                <div class="nhsuk-radios__item" rv-each-canceller="cancellers">
+                  <input class="nhsuk-radios__input" rv-id="canceller.id" type="radio" name="cancellers"
+                    rv-value="canceller.id" rv-checked="selectedCancellerId" rv-on-click="canceller.select">
+                  <label class="nhsuk-label nhsuk-radios__label" rv-for="canceller.id">{canceller.description}</label>
                 </div>
               </div>
             </fieldset>
