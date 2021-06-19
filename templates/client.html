@@ -343,7 +343,7 @@
       <div class="nhsuk-grid-row" rv-show="mode | isCancel">
         <div class="nhsuk-grid-column-full" rv-hide="cancelResponse">
           <div class="nhsuk-form-group">
-            <fieldset class="nhsuk-fieldset" aria-describedby="cancel-hint">
+            <fieldset class="nhsuk-fieldset" aria-describedby="cancel-reason-hint">
               <div>
                 <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m">Select a reason for cancellation</legend>
               </div>
@@ -354,6 +354,10 @@
                   <label class="nhsuk-label nhsuk-radios__label" rv-for="reason.id">{reason.display}</label>
                 </div>
               </div>
+            </fieldset>
+          </div>
+          <div class="nhsuk-form-group">
+            <fieldset class="nhsuk-fieldset" aria-describedby="canceler-hint">
               <div>
                 <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m">Select a cancellation user</legend>
               </div>
