@@ -391,7 +391,7 @@ function sendDispenseNominatedPharmacyReleaseRequest() {
     pageData.releaseResponse = {};
     pageData.releaseResponse.body = response.success ? response.body : "";
     pageData.releaseResponse.prescriptions =
-      response.success
+      !response.success
         ? JSON.parse(response.body).entry.map(function (entry) {
             const bundle = entry.resource;
             const originalShortFormId = getMedicationRequests(bundle)[0]
