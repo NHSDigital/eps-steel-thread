@@ -622,6 +622,7 @@ function resetPageData(pageMode) {
   pageData.errorList = null;
   pageData.sendResponse = null;
   pageData.signResponse = null;
+  pageData.cancelResponse = null;
   pageData.showCustomExampleInput =
     pageMode === "load" ? pageData.selectedExampleId === "custom" : false;
   pageData.showCustomPharmacyInput =
