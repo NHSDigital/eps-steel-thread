@@ -35,7 +35,7 @@ const pageData = {
   ],
   actions: [
     new PrescriptionAction("", ""),
-    new PrescriptionAction("cancel", "Cancel")
+    new PrescriptionAction("cancel", "Cancel"),
   ],
   mode: "home",
   signature: "",
@@ -72,15 +72,6 @@ function Pharmacy(id, description) {
 function PrescriptionAction(id, description) {
   this.id = id;
   this.description = description;
-  this.select = function () {
-    const prescriptionId = Cookies.get("Current-Prescription-Id")
-    switch(id) {
-      case "cancel":
-        window.location.href = `/prescribe/cancel?prescription_id=${prescriptionId}`;
-      default:
-        return
-    }
-  };
 }
 
 // handle cases when no data is present without using "?." operator for IE compatibility
@@ -531,8 +522,7 @@ function getPayloads() {
     .map((payload) => JSON.parse(payload));
   if (isCustom && !payloads.length) {
     addError("Unable to parse custom prescription(s)");
-  }
-  else {
+  } else {
     return isCustom
       ? payloads
       : [
@@ -540,7 +530,7 @@ function getPayloads() {
             return example.id === pageData.selectedExampleId;
           })[0].message,
         ];
-    }
+  }
 }
 
 function getOdsCode() {
@@ -559,6 +549,17 @@ function getResourcesOfType(prescriptionBundle, resourceType) {
   return resources.filter(function (resource) {
     return resource.resourceType === resourceType;
   });
+}
+
+function doPrescriptionAction(select) {
+  const value = select.value;
+  const prescriptionId = Cookies.get("Current-Prescription-Id");
+  switch (value) {
+    case "cancel":
+      window.location.href = `/prescribe/cancel?prescription_id=${prescriptionId}`;
+    default:
+      return;
+  }
 }
 
 function onLoad() {
@@ -583,7 +584,7 @@ function resetPageData(pageMode) {
       ? pageData.selectedPharmacy ?? "VNFKT"
       : null;
   if (pageData.mode == "sign") {
-    const prescriptionId = Cookies.get("Current-Prescription-Id")
+    const prescriptionId = Cookies.get("Current-Prescription-Id");
     const response = makeRequest(
       "GET",
       `/prescribe/edit?prescription_id=${prescriptionId}`
