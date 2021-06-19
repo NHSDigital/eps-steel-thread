@@ -65,6 +65,9 @@
               <div rv-show="mode | isEdit">
                 <h1 class="nhsuk-fieldset__heading">Edit prescription</h1>
               </div>
+              <div rv-show="mode | isCancel">
+                <h1 class="nhsuk-fieldset__heading">Cancel prescription</h1>
+              </div>
               <div rv-show="mode | isSign">
                 <h1 class="nhsuk-fieldset__heading">Prescription</h1>
               </div>
@@ -334,6 +337,24 @@
                 </dd>
               </div>
             </dl>
+          </div>
+        </div>
+      </div>
+      <div class="nhsuk-grid-row" rv-show="mode | isCancel">
+        <div class="nhsuk-grid-column-full">
+          <div class="nhsuk-form-group">
+            <fieldset class="nhsuk-fieldset" aria-describedby="cancel-hint">
+              <div>
+                <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m">Select a reason for cancellation</legend>
+              </div>
+              <div class="nhsuk-radios">
+                <div class="nhsuk-radios__item" rv-each-reason="reasons">
+                  <input class="nhsuk-radios__input" rv-id="reason.id" type="radio" name="reason"
+                    rv-value="reason.id" rv-checked="selectedCancellationReasonId" rv-on-click="reason.select">
+                  <label class="nhsuk-label nhsuk-radios__label" rv-for="reason.id">{reason.description}</label>
+                </div>
+              </div>
+            </fieldset>
           </div>
         </div>
       </div>

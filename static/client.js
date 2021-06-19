@@ -37,6 +37,17 @@ const pageData = {
     new PrescriptionAction("", ""),
     new PrescriptionAction("cancel", "Cancel"),
   ],
+  reasons: [
+    new CancellationReason("0001", "Prescribing Error"),
+    new CancellationReason("0002", "Clinical contra-indication"),
+    new CancellationReason("0003", "Change to medication treatment regime"),
+    new CancellationReason("0004", "Clinical grounds"),
+    new CancellationReason("0005", "At the Patient's request"),
+    new CancellationReason("0006", "At the Pharmacist's request"),
+    new CancellationReason("0007", "Notification of Death"),
+    new CancellationReason("0008", "Patient deducted - other reason"),
+    new CancellationReason("0009", "Patient deducted - registered with new practice"),
+  ],
   mode: "home",
   signature: "",
   loggedIn: Cookies.get("Access-Token-Set") === "true",
@@ -72,6 +83,16 @@ function Pharmacy(id, description) {
 function PrescriptionAction(id, description) {
   this.id = id;
   this.description = description;
+}
+
+function CancellationReason(id, description) {
+  this.id = id;
+  this.description = description;
+  this.select = function () {
+    pageData.selectedCancellationReasonId = id;
+    resetPageData(pageData.mode);
+    console.log(`Selected cancellation reason: ${description}`)
+  };
 }
 
 // handle cases when no data is present without using "?." operator for IE compatibility
@@ -186,6 +207,9 @@ rivets.formatters.isVerify = function (mode) {
 };
 rivets.formatters.isSend = function (mode) {
   return mode === "send";
+};
+rivets.formatters.isCancel = function (mode) {
+  return mode === "cancel";
 };
 rivets.formatters.isReleaseNominatedPharmacy = function (mode) {
   return mode === "release-nominated-pharmacy";
@@ -556,7 +580,7 @@ function doPrescriptionAction(select) {
   const prescriptionId = Cookies.get("Current-Prescription-Id");
   switch (value) {
     case "cancel":
-      window.location.href = `/prescribe/cancel?prescription_id=${prescriptionId}`;
+      window.location.href = `/prescribe/cancel/edit?prescription_id=${prescriptionId}`;
     default:
       return;
   }

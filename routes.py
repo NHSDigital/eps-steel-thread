@@ -56,6 +56,7 @@ LOAD_URL = "/prescribe/load"
 EDIT_URL = "/prescribe/edit"
 SIGN_URL = "/prescribe/sign"
 SEND_URL = "/prescribe/send"
+CANCEL_URL = "/prescribe/cancel"
 DISPENSE_RELEASE_NOMINATED_PHARMACY_URL = "/dispense/release-nominated-pharmacy"
 
 
@@ -253,6 +254,11 @@ def post_send():
     print("Send Response from EPS...")
     print(send_prescription_response.json())
     return {"prescription_id": short_prescription_id, "success": send_prescription_response.status_code == 200}
+
+
+@app.route(CANCEL_URL, methods=["GET"])
+def get_cancel():
+    return render_client("cancel")
 
 
 @app.route(DISPENSE_RELEASE_NOMINATED_PHARMACY_URL, methods=["GET"])
