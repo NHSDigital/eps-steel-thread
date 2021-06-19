@@ -361,7 +361,7 @@ function sendCancelRequest() {
       `/prescribe/edit?prescription_id=${prescriptionId}`
     );
     resetPageData("cancel");
-    const cancellation = getCancellation(prescription);
+    const cancellation = createCancellation(prescription);
     const response = makeRequest(
       "POST",
       "/prescribe/cancel",
@@ -610,7 +610,24 @@ function doPrescriptionAction(select) {
   }
 }
 
-function getCancellation(bundle) {
+function createCancellation(bundle) {
+  const messageHeader = getResourcesOfType(bundle, "MessageHeader")[0]
+  messageHeader.eventCoding.code = "prescription-order-update"
+  messageHeader.eventCoding.display = "Prescription Order Update"
+  const medicationRequests = getResourcesOfType(bundle, "MedicationRequest")
+  medicationRequests.forEach(medicationRequest => {
+    medicationRequest.status = "cancelled"
+    medicationRequest.statusReason = {
+      "coding": [
+        {
+          "system": "https://fhir.nhs.uk/CodeSystem/medicationrequest-status-reason",
+          "code": "0001",
+          "display": "Prescribing Error"
+        }
+      ]
+    }
+  })
+  console.log(JSON.stringify(bundle))
   return bundle;
 }
 
