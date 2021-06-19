@@ -611,24 +611,32 @@ function doPrescriptionAction(select) {
 }
 
 function createCancellation(bundle) {
-  const messageHeader = getResourcesOfType(bundle, "MessageHeader")[0]
-  messageHeader.eventCoding.code = "prescription-order-update"
-  messageHeader.eventCoding.display = "Prescription Order Update"
-  const medicationRequestEntries = bundle.entry.filter(entry => entry.resource.resourceType === "MedicationRequest")
-  const clonedMedicationRequestEntry = JSON.parse(JSON.stringify(medicationRequestEntries[0]))
-  const medicationRequest = clonedMedicationRequestEntry.resource
-  medicationRequest.status = "cancelled"
+  updateBundleIds(bundle);
+  const messageHeader = getResourcesOfType(bundle, "MessageHeader")[0];
+  messageHeader.eventCoding.code = "prescription-order-update";
+  messageHeader.eventCoding.display = "Prescription Order Update";
+  const medicationRequestEntries = bundle.entry.filter(
+    (entry) => entry.resource.resourceType === "MedicationRequest"
+  );
+  const clonedMedicationRequestEntry = JSON.parse(
+    JSON.stringify(medicationRequestEntries[0])
+  );
+  const medicationRequest = clonedMedicationRequestEntry.resource;
+  medicationRequest.status = "cancelled";
   medicationRequest.statusReason = {
-    "coding": [
+    coding: [
       {
-        "system": "https://fhir.nhs.uk/CodeSystem/medicationrequest-status-reason",
-        "code": "0001",
-        "display": "Prescribing Error"
-      }
-    ]
-  }
-  bundle.entry = bundle.entry.filter(entry => entry.resource.resourceType !== "MedicationRequest")
-  bundle.entry.push(clonedMedicationRequestEntry)
+        system:
+          "https://fhir.nhs.uk/CodeSystem/medicationrequest-status-reason",
+        code: "0001",
+        display: "Prescribing Error",
+      },
+    ],
+  };
+  bundle.entry = bundle.entry.filter(
+    (entry) => entry.resource.resourceType !== "MedicationRequest"
+  );
+  bundle.entry.push(clonedMedicationRequestEntry);
   return bundle;
 }
 
