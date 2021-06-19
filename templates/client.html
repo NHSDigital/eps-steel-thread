@@ -379,10 +379,13 @@
                   </div>
                 </dd>
               </div>
-              <div class="nhsuk-summary-list__row">
-                <code>{cancelResponse.body | safe}</code>
-              </div>
+
             </dl>
+          </div>
+        </div>
+        <div class="nhsuk-grid-column-full" rv-hide="releaseResponse.prescriptions">
+          <div class="nhsuk-summary-list">
+            <code>{cancelResponse.body | safe}</code>
           </div>
         </div>
       </div>

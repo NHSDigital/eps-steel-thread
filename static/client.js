@@ -370,7 +370,7 @@ function sendCancelRequest() {
     pageData.cancelResponse = {};
     pageData.cancelResponse.prescriptionId = response.prescription_id;
     pageData.cancelResponse.success = response.success;
-    pageData.cancelResponse.body = JSON.stringify(response.body);
+    pageData.cancelResponse.body = response.body;
   } catch (e) {
     console.log(e);
     addError("Communication error");
@@ -390,15 +390,14 @@ function sendDispenseNominatedPharmacyReleaseRequest() {
     pageData.showCustomPharmacyInput = false;
     pageData.releaseResponse = {};
     pageData.releaseResponse.body = !response.success ? response.body : "";
-    pageData.releaseResponse.prescriptions =
-      response.success
-        ? JSON.parse(response.body).entry.map(function (entry) {
-            const bundle = entry.resource;
-            const originalShortFormId = getMedicationRequests(bundle)[0]
-              .groupIdentifier.value;
-            return { id: originalShortFormId };
-          })
-        : null;
+    pageData.releaseResponse.prescriptions = response.success
+      ? JSON.parse(response.body).entry.map(function (entry) {
+          const bundle = entry.resource;
+          const originalShortFormId = getMedicationRequests(bundle)[0]
+            .groupIdentifier.value;
+          return { id: originalShortFormId };
+        })
+      : null;
     pageData.releaseResponse.success = response.success;
   } catch (e) {
     console.log(e);
