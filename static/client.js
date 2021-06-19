@@ -692,7 +692,7 @@ function createCancellation(bundle) {
   const practitionerRole = getResourcesOfType(bundle, "PractitionerRole")[0];
   const canceller = pageData.cancellers.filter(
     (canceller) => canceller.id === pageData.selectedCancellerId
-  );
+  )[0];
   practitionerRole.code.forEach((code) =>
     code.coding
       .filter(
