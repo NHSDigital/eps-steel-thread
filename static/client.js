@@ -611,7 +611,6 @@ function doPrescriptionAction(select) {
 }
 
 function createCancellation(bundle) {
-  console.log(JSON.stringify(bundle, null, 4));
   // Fixes duplicate hl7v3 identifier error
   // this is not an obvious error for a supplier to resolve as
   // there is no mention of the fhir field it relates to
@@ -646,7 +645,6 @@ function createCancellation(bundle) {
     (entry) => entry.resource.resourceType !== "MedicationRequest"
   );
   bundle.entry.push(clonedMedicationRequestEntry);
-  console.log(JSON.stringify(bundle, null, 4));
   return bundle;
 }
 
