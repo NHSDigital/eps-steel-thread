@@ -679,6 +679,12 @@ function createCancellation(bundle) {
   const messageHeader = getResourcesOfType(bundle, "MessageHeader")[0];
   messageHeader.eventCoding.code = "prescription-order-update";
   messageHeader.eventCoding.display = "Prescription Order Update";
+
+  // cheat and remove focus references as references not in bundle causes validation errors
+  // but no references always passes
+  messageHeader.focus = []
+  // ****************************************
+
   const medicationRequestEntries = bundle.entry.filter(
     (entry) => entry.resource.resourceType === "MedicationRequest"
   );
