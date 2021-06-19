@@ -612,7 +612,6 @@ function doPrescriptionAction(select) {
 
 function createCancellation(bundle) {
   console.log(JSON.stringify(bundle, null, 4));
-  updateBundleIds(bundle);
   const messageHeader = getResourcesOfType(bundle, "MessageHeader")[0];
   messageHeader.eventCoding.code = "prescription-order-update";
   messageHeader.eventCoding.display = "Prescription Order Update";
@@ -623,6 +622,7 @@ function createCancellation(bundle) {
     JSON.stringify(medicationRequestEntries[0])
   );
   const medicationRequest = clonedMedicationRequestEntry.resource;
+  medicationRequest.groupIdentifier.value = uuidv4();
   medicationRequest.status = "cancelled";
   medicationRequest.statusReason = {
     coding: [
