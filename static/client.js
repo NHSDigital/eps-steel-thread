@@ -628,7 +628,9 @@ function createCancellation(bundle) {
   }
   delete medicationRequests
   bundle.entry.push(medicationRequest)
-  console.log(JSON.stringify(bundle))
+  const medicationRequestsCheck = bundle.entry.filter(entry => entry.resource.resourceType === "MedicationRequest")
+  console.log(`Cancellation bundle has ${medicationRequestsCheck.length} MedicationRequest(s)`)
+  console.log(medicationRequestsCheck.map(entry => entry.resource))
   return bundle;
 }
 
