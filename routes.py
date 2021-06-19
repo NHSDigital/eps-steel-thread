@@ -11,7 +11,7 @@ from functools import wraps
 from urllib.parse import urlencode
 from api import (
     make_eps_api_prepare_request,
-    make_eps_api_send_request,
+    make_eps_api_process_message_request,
     make_eps_api_release_nominated_pharmacy_request,
     make_sign_api_signature_upload_request,
     make_sign_api_signature_download_request,
@@ -63,13 +63,10 @@ DISPENSE_RELEASE_NOMINATED_PHARMACY_URL = "/dispense/release-nominated-pharmacy"
 def exclude_from_auth(*args, **kw):
     def wrapper(endpoint_method):
         endpoint_method._exclude_from_auth = False
-
         @wraps(endpoint_method)
         def wrapped(*endpoint_args, **endpoint_kw):
             return endpoint_method(*endpoint_args, **endpoint_kw)
-
         return wrapped
-
     return wrapper
 
 
@@ -248,7 +245,7 @@ def get_send():
 def post_send():
     short_prescription_id = get_prescription_id_from_cookie()
     send_request = load_send_request(short_prescription_id)
-    send_prescription_response = make_eps_api_send_request(get_access_token(), send_request)
+    send_prescription_response = make_eps_api_process_message_request(get_access_token(), send_request)
     print("Send Request to EPS...")
     print(send_request)
     print("Send Response from EPS...")
@@ -263,9 +260,11 @@ def get_cancel():
 
 @app.route(CANCEL_URL, methods=["POST"])
 def post_cancel():
+    cancel_request = flask.request.json
+    cancel_response = make_eps_api_process_message_request(cancel_request)
     response = app.make_response({
-        "prescription_id": get_prescription_id_from_cookie(),
-        "body": {},
+        "prescription_id": short_prescription_id,
+        "body": cancel_response,
         "success": True
     })
     return response

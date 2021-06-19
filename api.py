@@ -25,7 +25,7 @@ def make_eps_api_prepare_request(access_token, body):
     return {p["name"]: p["valueString"] for p in response_json["parameter"]}
 
 
-def make_eps_api_send_request(access_token, body):
+def make_eps_api_process_message_request(access_token, body):
     return make_eps_api_request("$process-message", access_token, body)
 
 
