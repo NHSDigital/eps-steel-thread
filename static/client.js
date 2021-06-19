@@ -565,7 +565,12 @@ function resetPageData(pageMode) {
       ? pageData.selectedPharmacy ?? "VNFKT"
       : null;
   if (pageData.mode == "sign") {
-    pageData.signRequestSummary = getSummary(getPayloads()[0])
+    const prescriptionId = Cookies.get("Current-Prescription-Id")
+    const response = makeRequest(
+      "GET",
+      `/prescribe/edit?prescription_id=${prescriptionId}`
+    );
+    pageData.signRequestSummary = getSummary(response);
     pageData.previous_prescription_id = Cookies.get("Previous-Prescription-Id");
     pageData.next_prescription_id = Cookies.get("Next-Prescription-Id");
   }

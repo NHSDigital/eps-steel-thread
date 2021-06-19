@@ -29,7 +29,7 @@ def set_current_prescription_id_cookie(response, short_prescription_id):
         short_prescription_id,
         expires=datetime.datetime.utcnow() + datetime.timedelta(seconds=float(600)),
         secure=not DEV_MODE,
-        httponly=True,
+        httponly=False,
     )
 
 
