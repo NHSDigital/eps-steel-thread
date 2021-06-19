@@ -267,7 +267,11 @@ def post_cancel():
     short_prescription_id = get_prescription_id(cancel_request)
     cancel_response = make_eps_api_process_message_request(get_access_token(), cancel_request)
     response = app.make_response(
-        {"prescription_id": short_prescription_id, "body": json.dumps(cancel_response.json()), "success": True}
+        {
+            "prescription_id": short_prescription_id,
+            "body": json.dumps(cancel_response.json()),
+            "success": cancel_response.status_code == 200,
+        }
     )
     return response
 
@@ -295,11 +299,7 @@ def post_nominated_pharmacy():
             ],
         },
     )
-    if response.status_code == 200:
-        status = "Success"
-    else:
-        status = "Failure"
-    return {"body": json.dumps(response.json()), "status": status}
+    return {"body": json.dumps(response.json()), "success": cancel_response.status_code == 200}
 
 
 @app.route("/logout", methods=["GET"])

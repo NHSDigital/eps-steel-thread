@@ -389,10 +389,9 @@ function sendDispenseNominatedPharmacyReleaseRequest() {
     );
     pageData.showCustomPharmacyInput = false;
     pageData.releaseResponse = {};
-    pageData.releaseResponse.body =
-      response.status === "Failure" ? response.body : "";
+    pageData.releaseResponse.body = response.success ? response.body : "";
     pageData.releaseResponse.prescriptions =
-      response.status === "Success"
+      response.success
         ? JSON.parse(response.body).entry.map(function (entry) {
             const bundle = entry.resource;
             const originalShortFormId = getMedicationRequests(bundle)[0]
@@ -400,7 +399,7 @@ function sendDispenseNominatedPharmacyReleaseRequest() {
             return { id: originalShortFormId };
           })
         : null;
-    pageData.releaseResponse.status = response.status;
+    pageData.releaseResponse.success = response.success;
   } catch (e) {
     console.log(e);
     addError("Communication error");
