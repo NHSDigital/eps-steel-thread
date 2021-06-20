@@ -405,7 +405,7 @@ function sendPrescriptionRequest() {
     pageData.sendResponse.success = response.success;
     document.getElementById("send-request-download-fhir").href = `data:application/json,${encodeURI(JSON.stringify(response.request, null, 2).replace(/\\/g, "").replace(/"/,"").replace(/.$/,""))}`;
     console.log(response.request_xml)
-    document.getElementById("send-request-download-xml").href = `data:text/xml,${encodeURI(response.request_xml)}`;
+    document.getElementById("send-request-download-xml").href = `data:application/xml,${encodeURI(response.request_xml)}`;
     document.getElementById("send-response-download").href = `data:application/json,${encodeURI(JSON.stringify(response.response, null, 2).replace(/\\/g, "").replace(/"/,"").replace(/.$/,""))}`;
   } catch (e) {
     console.log(e);
