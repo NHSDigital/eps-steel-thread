@@ -381,7 +381,7 @@
           <div class="nhsuk-panel">
             <dl class="nhsuk-summary-list">
               <div class="nhsuk-summary-list__row">
-                <dt class="nhsuk-summary-list__key">Cancellation</dt>
+                <dt class="nhsuk-summary-list__key">Prescription</dt>
                 <dd class="nhsuk-summary-list__value">
                   <div style="float:left;">{cancelResponse.prescriptionId}</div>
                 </dd>
@@ -397,7 +397,12 @@
                   </div>
                 </dd>
               </div>
-
+              <dd class="nhsuk-summary-list__value">
+                <div style="float:left;display: inline;width: 150px;margin-top: -12px;margin-left: 40px;">
+                  <a id="cancel-request-download" download="cancel_request.json"><img style="width: 33%;" src="../static/json.png" title="Request"/></a>
+                  <a id="cancel-response-download" download="cancel_response.json"><img style="width: 33%;margin-left: 10px;" src="../static/json.png" title="Response"/></a>
+                </div>
+              </dd>
             </dl>
           </div>
         </div>

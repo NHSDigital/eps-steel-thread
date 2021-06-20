@@ -272,6 +272,8 @@ def post_cancel():
             "prescription_id": short_prescription_id,
             "body": json.dumps(cancel_response.json()),
             "success": cancel_response.status_code == 200,
+            "request": json.dumps(cancel_request),
+            "response": json.dumps(cancel_response.json()),
         }
     )
     return response
