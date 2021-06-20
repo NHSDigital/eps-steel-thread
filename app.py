@@ -15,6 +15,13 @@ compress = Compress()
 
 def create_app():
     app = Flask(__name__)
+    app.config["COMPRESS_MIMETYPES"] = [
+        'text/html',
+        'text/css',
+        'text/xml',
+        'application/json',
+        'application/javascript'
+    ]
     compress.init_app(app)
     app.config.from_mapping(
         SECRET_KEY=SESSION_TOKEN_ENCRYPTION_KEY,
