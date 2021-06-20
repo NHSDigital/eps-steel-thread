@@ -249,10 +249,6 @@ def post_send():
     short_prescription_id = get_prescription_id_from_cookie()
     send_request = load_send_request(short_prescription_id)
     send_prescription_response = make_eps_api_process_message_request(get_access_token(), send_request)
-    print("Send Request to EPS...")
-    print(send_request)
-    print("Send Response from EPS...")
-    print(send_prescription_response.json())
     return {
         "prescription_id": short_prescription_id,
         "success": send_prescription_response.status_code == 200,
