@@ -388,7 +388,11 @@ function sendEditRequest() {
 
 function sendSignRequest(skipSignaturePage) {
   try {
-    const response = makeRequest("POST", "/prescribe/sign", JSON.stringify({skipSignaturePage}));
+    const response = makeRequest(
+      "POST",
+      "/prescribe/sign",
+      JSON.stringify({ skipSignaturePage })
+    );
     window.location.href = response.redirectUri;
   } catch (e) {
     console.log(e);
@@ -444,7 +448,7 @@ function sendCancelRequest() {
     );
     pageData.cancelResponse = {};
     pageData.cancelResponse.prescriptionId = response.prescription_id;
-    pageData.cancelResponse.success = response.success;
+    pageData.cancelResponse.pageData.cancelResponse.success = response.success;
     document.getElementById(
       "cancel-request-download-fhir"
     ).href = `data:application/json,${encodeURI(
@@ -621,8 +625,7 @@ window.onerror = function (msg, url, line, col, error) {
 
 function addError(message) {
   console.log(message);
-  if (pageData.errorList === undefined
-    || pageData.errorList === null) {
+  if (pageData.errorList === undefined || pageData.errorList === null) {
     pageData.errorList = [];
   }
   pageData.errorList.push({
@@ -828,12 +831,16 @@ function createCancellation(bundle) {
 }
 
 function onLoad() {
+  document.querySelector("#main-content").style.display = "none";
   bind();
-  if (pageData.mode === "send"
-    && !pageData.sendResponse
-    && Cookies.get("Skip-Signature-Page") === "True") {
-    sendPrescriptionRequest()
+  if (
+    pageData.mode === "send" &&
+    !pageData.sendResponse &&
+    Cookies.get("Skip-Signature-Page") === "True"
+  ) {
+    sendPrescriptionRequest();
   }
+  document.querySelector("#main-content").style.display = "";
 }
 
 // IE compat, no default values for function args

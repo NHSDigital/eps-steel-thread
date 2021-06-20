@@ -406,6 +406,72 @@
             </dl>
           </div>
         </div>
+        <div class="nhsuk-grid-column-full">
+          <div class="nhsuk-panel-with-label">
+            <h3 class="nhsuk-panel-with-label__label">Prescriber</h3>
+            <dl class="nhsuk-summary-list">
+              <div class="nhsuk-summary-list__row" rv-each-name="signRequestSummary.patient.name">
+                <dt class="nhsuk-summary-list__key">Name</dt>
+                <dd class="nhsuk-summary-list__value">{cancelResponse.name}</dd>
+              </div>
+              <div class="nhsuk-summary-list__row">
+                <dt class="nhsuk-summary-list__key">NHS number</dt>
+                <dd class="nhsuk-summary-list__value">{signRequestSummary.patient.identifier |
+                  nhsNumber}</dd>
+              </div>
+              <div class="nhsuk-summary-list__row">
+                <dt class="nhsuk-summary-list__key">Date of birth</dt>
+                <dd class="nhsuk-summary-list__value">{signRequestSummary.patient.birthDate}</dd>
+              </div>
+              <div class="nhsuk-summary-list__row">
+                <dt class="nhsuk-summary-list__key">Gender</dt>
+                <dd class="nhsuk-summary-list__value">{signRequestSummary.patient.gender | titleCase}
+                </dd>
+              </div>
+              <div class="nhsuk-summary-list__row" rv-each-address="signRequestSummary.patient.address">
+                <dt class="nhsuk-summary-list__key">Address</dt>
+                <dd class="nhsuk-summary-list__value">
+                  <div rv-each-line="address | fullAddress">
+                    {line}<br>
+                  </div>
+                </dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+        <div class="nhsuk-grid-column-full">
+          <div class="nhsuk-panel-with-label">
+            <h3 class="nhsuk-panel-with-label__label">Canceller</h3>
+            <dl class="nhsuk-summary-list">
+              <div class="nhsuk-summary-list__row" rv-each-name="signRequestSummary.patient.name">
+                <dt class="nhsuk-summary-list__key">Name</dt>
+                <dd class="nhsuk-summary-list__value">{name | fullName | joinWithSpaces}</dd>
+              </div>
+              <div class="nhsuk-summary-list__row">
+                <dt class="nhsuk-summary-list__key">NHS number</dt>
+                <dd class="nhsuk-summary-list__value">{signRequestSummary.patient.identifier |
+                  nhsNumber}</dd>
+              </div>
+              <div class="nhsuk-summary-list__row">
+                <dt class="nhsuk-summary-list__key">Date of birth</dt>
+                <dd class="nhsuk-summary-list__value">{signRequestSummary.patient.birthDate}</dd>
+              </div>
+              <div class="nhsuk-summary-list__row">
+                <dt class="nhsuk-summary-list__key">Gender</dt>
+                <dd class="nhsuk-summary-list__value">{signRequestSummary.patient.gender | titleCase}
+                </dd>
+              </div>
+              <div class="nhsuk-summary-list__row" rv-each-address="signRequestSummary.patient.address">
+                <dt class="nhsuk-summary-list__key">Address</dt>
+                <dd class="nhsuk-summary-list__value">
+                  <div rv-each-line="address | fullAddress">
+                    {line}<br>
+                  </div>
+                </dd>
+              </div>
+            </dl>
+          </div>
+        </div>
       </div>
       <div class="nhsuk-grid-row" id="pharmacy-container" rv-show="showCustomPharmacyInput">
         <div class="nhsuk-grid-column-full">
@@ -449,7 +515,7 @@
             aria-describedby="resultstable_info">
             <thead>
               <tr role="row">
-                <th tabindex="0" id="prescriptionId" rowspan="1" colspan="1">Prescription ID</th>
+                <th tabindex="0" id="prescriptionId" rowspan="1" colspan="1">Prescription</th>
               </tr>
             </thead>
             <tbody>
