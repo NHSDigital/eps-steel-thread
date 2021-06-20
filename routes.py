@@ -251,15 +251,15 @@ def post_send():
     send_request = load_send_request(short_prescription_id)
     print("attempting convert call...")
     send_request_xml = make_eps_api_convert_message_request(get_access_token(), send_request)
-    # print("attempting send call...")
-    # send_prescription_response = make_eps_api_process_message_request(get_access_token(), send_request)
+    print("attempting send call...")
+    send_prescription_response = make_eps_api_process_message_request(get_access_token(), send_request)
     print("returning response...")
     return {
         "prescription_id": short_prescription_id,
-        #"success": send_prescription_response.status_code == 200,
+        "success": send_prescription_response.status_code == 200,
         #"request_xml": send_request_xml.text,
-        #"request": json.dumps(send_request),
-        #"response": json.dumps(send_prescription_response.json()),
+        "request": json.dumps(send_request),
+        "response": json.dumps(send_prescription_response.json()),
     }
 
 
