@@ -831,7 +831,7 @@ function onLoad() {
   bind();
   if (pageData.mode === "send"
     && !pageData.sendResponse
-    && Cookies.get("Skip-Signature-Page")) {
+    && Cookies.get("Skip-Signature-Page") === "True") {
     sendPrescriptionRequest()
   }
 }
