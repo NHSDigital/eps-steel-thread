@@ -840,7 +840,9 @@ function onLoad() {
   ) {
     sendPrescriptionRequest();
   }
-  document.querySelector("#main-content").style.display = "";
+  else {
+    document.querySelector("#main-content").style.display = "";
+  }
 }
 
 // IE compat, no default values for function args
