@@ -410,31 +410,17 @@
           <div class="nhsuk-panel-with-label">
             <h3 class="nhsuk-panel-with-label__label">Prescriber</h3>
             <dl class="nhsuk-summary-list">
-              <div class="nhsuk-summary-list__row" rv-each-name="signRequestSummary.patient.name">
+              <div class="nhsuk-summary-list__row">
                 <dt class="nhsuk-summary-list__key">Name</dt>
-                <dd class="nhsuk-summary-list__value">{cancelResponse.name}</dd>
+                <dd class="nhsuk-summary-list__value"></dd>
               </div>
               <div class="nhsuk-summary-list__row">
-                <dt class="nhsuk-summary-list__key">NHS number</dt>
-                <dd class="nhsuk-summary-list__value">{signRequestSummary.patient.identifier |
-                  nhsNumber}</dd>
+                <dt class="nhsuk-summary-list__key">Code</dt>
+                <dd class="nhsuk-summary-list__value"></dd>
               </div>
               <div class="nhsuk-summary-list__row">
-                <dt class="nhsuk-summary-list__key">Date of birth</dt>
-                <dd class="nhsuk-summary-list__value">{signRequestSummary.patient.birthDate}</dd>
-              </div>
-              <div class="nhsuk-summary-list__row">
-                <dt class="nhsuk-summary-list__key">Gender</dt>
-                <dd class="nhsuk-summary-list__value">{signRequestSummary.patient.gender | titleCase}
-                </dd>
-              </div>
-              <div class="nhsuk-summary-list__row" rv-each-address="signRequestSummary.patient.address">
-                <dt class="nhsuk-summary-list__key">Address</dt>
-                <dd class="nhsuk-summary-list__value">
-                  <div rv-each-line="address | fullAddress">
-                    {line}<br>
-                  </div>
-                </dd>
+                <dt class="nhsuk-summary-list__key">Role</dt>
+                <dd class="nhsuk-summary-list__value"></dd>
               </div>
             </dl>
           </div>
@@ -443,31 +429,17 @@
           <div class="nhsuk-panel-with-label">
             <h3 class="nhsuk-panel-with-label__label">Canceller</h3>
             <dl class="nhsuk-summary-list">
-              <div class="nhsuk-summary-list__row" rv-each-name="signRequestSummary.patient.name">
+              <div class="nhsuk-summary-list__row">
                 <dt class="nhsuk-summary-list__key">Name</dt>
-                <dd class="nhsuk-summary-list__value">{name | fullName | joinWithSpaces}</dd>
+                <dd class="nhsuk-summary-list__value"></dd>
               </div>
               <div class="nhsuk-summary-list__row">
-                <dt class="nhsuk-summary-list__key">NHS number</dt>
-                <dd class="nhsuk-summary-list__value">{signRequestSummary.patient.identifier |
-                  nhsNumber}</dd>
+                <dt class="nhsuk-summary-list__key">Code</dt>
+                <dd class="nhsuk-summary-list__value"></dd>
               </div>
               <div class="nhsuk-summary-list__row">
-                <dt class="nhsuk-summary-list__key">Date of birth</dt>
-                <dd class="nhsuk-summary-list__value">{signRequestSummary.patient.birthDate}</dd>
-              </div>
-              <div class="nhsuk-summary-list__row">
-                <dt class="nhsuk-summary-list__key">Gender</dt>
-                <dd class="nhsuk-summary-list__value">{signRequestSummary.patient.gender | titleCase}
-                </dd>
-              </div>
-              <div class="nhsuk-summary-list__row" rv-each-address="signRequestSummary.patient.address">
-                <dt class="nhsuk-summary-list__key">Address</dt>
-                <dd class="nhsuk-summary-list__value">
-                  <div rv-each-line="address | fullAddress">
-                    {line}<br>
-                  </div>
-                </dd>
+                <dt class="nhsuk-summary-list__key">Role</dt>
+                <dd class="nhsuk-summary-list__value"></dd>
               </div>
             </dl>
           </div>
