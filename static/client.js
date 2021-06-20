@@ -513,7 +513,7 @@ function getPrescriber(cancelResponse) {
   const practitionerRoleReference = medicationRequest.requester.reference;
   const practitionerRoleEntry = cancelResponse.entry.filter(
     (e) => e.fullUrl === practitionerRoleReference
-  );
+  )[0];
   const practitionerRole = practitionerRoleEntry.resource;
   const practitionerRoleSdsRole = practitionerRole
     .flatMap((r) => r.code)
@@ -553,7 +553,7 @@ function getCanceller(cancelResponse) {
     practitionerRoleReferenceExtension[0].valueReference.reference;
   const practitionerRoleEntry = cancelResponse.entry.filter(
     (e) => e.fullUrl === practitionerRoleReference
-  );
+  )[0];
   const practitionerRole = practitionerRoleEntry.resource;
   const practitionerRoleSdsRole = practitionerRole
     .flatMap((r) => r.code)
