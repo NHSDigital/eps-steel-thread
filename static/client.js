@@ -402,6 +402,8 @@ function sendPrescriptionRequest() {
     pageData.sendResponse = {};
     pageData.sendResponse.prescriptionId = response.prescription_id;
     pageData.sendResponse.success = response.success;
+    pageData.sendResponse.request = response.request;
+    pageData.sendResponse.response = response.response;
   } catch (e) {
     console.log(e);
     addError("Communication error");

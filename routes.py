@@ -253,7 +253,12 @@ def post_send():
     print(send_request)
     print("Send Response from EPS...")
     print(send_prescription_response.json())
-    return {"prescription_id": short_prescription_id, "success": send_prescription_response.status_code == 200}
+    return {
+        "prescription_id": short_prescription_id,
+        "success": send_prescription_response.status_code == 200,
+        "request": json.dumps(send_request),
+        "response": json.dumps(send_prescription_response),
+    }
 
 
 @app.route(CANCEL_URL, methods=["GET"])
