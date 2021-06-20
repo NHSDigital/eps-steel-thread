@@ -403,11 +403,25 @@ function sendPrescriptionRequest() {
     pageData.sendResponse = {};
     pageData.sendResponse.prescriptionId = response.prescription_id;
     pageData.sendResponse.success = response.success;
-    const request = JSON.stringify(response.request, null, "\t").replace(/\\/g, "").replace(/"/,"").replace(/.$/,"")
-    console.log(request)
-    document.getElementById("send-request-download-fhir").href = `data:application/json,${encodeURI(request)}`;
-    document.getElementById("send-request-download-xml").href = `data:application/xml,${encodeURIComponent(response.request_xml)}`; // component includes '#' which is present in xml
-    document.getElementById("send-response-download").href = `data:application/json,${encodeURI(JSON.stringify(response.response, null, 2).replace(/\\/g, "").replace(/"/,"").replace(/.$/,""))}`;
+    document.getElementById(
+      "send-request-download-fhir"
+    ).href = `data:application/json,${encodeURI(
+      JSON.stringify(response.request, null, 2)
+        .replace(/\\/g, "")
+        .replace(/"/, "")
+        .replace(/.$/, "")
+    )}`;
+    document.getElementById(
+      "send-request-download-xml"
+    ).href = `data:application/xml,${encodeURIComponent(response.request_xml)}`; // component includes '#' which is present in xml
+    document.getElementById(
+      "send-response-download"
+    ).href = `data:application/json,${encodeURI(
+      JSON.stringify(response.response, null, 2)
+        .replace(/\\/g, "")
+        .replace(/"/, "")
+        .replace(/.$/, "")
+    )}`;
   } catch (e) {
     console.log(e);
     addError("Communication error");
@@ -431,9 +445,25 @@ function sendCancelRequest() {
     pageData.cancelResponse = {};
     pageData.cancelResponse.prescriptionId = response.prescription_id;
     pageData.cancelResponse.success = response.success;
-    document.getElementById("cancel-request-download-fhir").href = `data:application/json,${encodeURI(JSON.stringify(response.request, null, 2).replace(/\\/g, "").replace(/"/,"").replace(/.$/,""))}`;
-    document.getElementById("cancel-request-download-xml").href = `data:application/xml,${encodeURIComponent(response.request_xml)}`; // component includes '#' which is present in xml
-    document.getElementById("cancel-response-download").href = `data:application/json,${encodeURI(JSON.stringify(response.response, null, 2).replace(/\\/g, "").replace(/"/,"").replace(/.$/,""))}`;
+    document.getElementById(
+      "cancel-request-download-fhir"
+    ).href = `data:application/json,${encodeURI(
+      JSON.stringify(response.request, null, 2)
+        .replace(/\\/g, "")
+        .replace(/"/, "")
+        .replace(/.$/, "")
+    )}`;
+    document.getElementById(
+      "cancel-request-download-xml"
+    ).href = `data:application/xml,${encodeURIComponent(response.request_xml)}`; // component includes '#' which is present in xml
+    document.getElementById(
+      "cancel-response-download"
+    ).href = `data:application/json,${encodeURI(
+      JSON.stringify(response.response, null, 2)
+        .replace(/\\/g, "")
+        .replace(/"/, "")
+        .replace(/.$/, "")
+    )}`;
   } catch (e) {
     console.log(e);
     addError("Communication error");
