@@ -248,10 +248,12 @@ def get_send():
 def post_send():
     short_prescription_id = get_prescription_id_from_cookie()
     send_request = load_send_request(short_prescription_id)
+    send_request_xml = make_eps_api_convert_message_request(get_access_token(), send_request)
     send_prescription_response = make_eps_api_process_message_request(get_access_token(), send_request)
     return {
         "prescription_id": short_prescription_id,
         "success": send_prescription_response.status_code == 200,
+        "request_xml": send_request_xml.text,
         "request": json.dumps(send_request),
         "response": json.dumps(send_prescription_response.json()),
     }
@@ -266,12 +268,14 @@ def get_cancel():
 def post_cancel():
     cancel_request = flask.request.json
     short_prescription_id = get_prescription_id(cancel_request)
+    cancel_request_xml = make_eps_api_convert_message_request(get_access_token(), cancel_request)
     cancel_response = make_eps_api_process_message_request(get_access_token(), cancel_request)
     response = app.make_response(
         {
             "prescription_id": short_prescription_id,
             "success": cancel_response.status_code == 200,
             "request": json.dumps(cancel_request),
+            "request_xml": cancel_request_xml.text,
             "response": json.dumps(cancel_response.json()),
         }
     )
