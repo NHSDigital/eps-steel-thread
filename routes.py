@@ -256,10 +256,10 @@ def post_send():
     print("returning response...")
     return {
         "prescription_id": short_prescription_id,
-        "success": send_prescription_response.status_code == 200,
+        #"success": send_prescription_response.status_code == 200,
         "request_xml": send_request_xml.text,
         #"request": json.dumps(send_request),
-        "response": json.dumps(send_prescription_response.json()),
+        #"response": json.dumps(send_prescription_response.json()),
     }
 
 
