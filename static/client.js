@@ -525,7 +525,7 @@ function getPrescriber(cancelResponse) {
   const practitionerReference = practitionerRole.practitioner.reference;
   const practitionerEntry = cancelResponse.entry.filter(
     (e) => e.fullUrl === practitionerReference
-  );
+  )[0];
   const practitioner = practitionerEntry.resource;
   const practitionerName = practitioner.name[0];
   return {
@@ -564,7 +564,7 @@ function getCanceller(cancelResponse) {
   const practitionerReference = practitionerRole.practitioner.reference;
   const practitionerEntry = cancelResponse.entry.filter(
     (e) => e.fullUrl === practitionerReference
-  );
+  )[0];
   const practitioner = practitionerEntry.resource;
   const practitionerName = practitioner.name[0];
   return {
