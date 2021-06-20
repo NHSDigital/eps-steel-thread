@@ -15,6 +15,7 @@ from api import (
     make_eps_api_release_nominated_pharmacy_request,
     make_sign_api_signature_upload_request,
     make_sign_api_signature_download_request,
+    make_eps_api_convert_message_request,
 )
 from app import app, db, fernet
 from auth import exchange_code_for_token, get_access_token, redirect_and_set_cookies
