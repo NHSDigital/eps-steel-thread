@@ -388,7 +388,7 @@ function sendEditRequest() {
 
 function sendSignRequest(skipSignaturePage) {
   try {
-    const response = makeRequest("POST", "/prescribe/sign", {skipSignaturePage});
+    const response = makeRequest("POST", "/prescribe/sign", JSON.stringify({skipSignaturePage}));
     window.location.href = response.redirectUri;
   } catch (e) {
     console.log(e);
