@@ -257,7 +257,7 @@ def post_send():
         "prescription_id": short_prescription_id,
         "success": send_prescription_response.status_code == 200,
         "request": json.dumps(send_request),
-        "response": json.dumps(send_prescription_response),
+        "response": json.dumps(send_prescription_response.json()),
     }
 
 
