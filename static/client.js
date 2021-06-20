@@ -403,8 +403,8 @@ function sendPrescriptionRequest() {
     pageData.sendResponse = {};
     pageData.sendResponse.prescriptionId = response.prescription_id;
     pageData.sendResponse.success = response.success;
-    document.getElementById("send-request-download").href = `data:application/json,${encodeURI(JSON.stringify(response.request, null, 2))}`;
-    document.getElementById("send-response-download").href = `data:application/json,${encodeURI(JSON.stringify(response.response, null, 2))}`;
+    document.getElementById("send-request-download").href = `data:application/json,${encodeURI(JSON.stringify(response.request, null, 2).replace(/\\/g, ""))}`;
+    document.getElementById("send-response-download").href = `data:application/json,${encodeURI(JSON.stringify(response.response, null, 2).replace(/\\/g, ""))}`;
   } catch (e) {
     console.log(e);
     addError("Communication error");
@@ -428,8 +428,8 @@ function sendCancelRequest() {
     pageData.cancelResponse = {};
     pageData.cancelResponse.prescriptionId = response.prescription_id;
     pageData.cancelResponse.success = response.success;
-    document.getElementById("cancel-request-download").href = `data:application/json,${encodeURI(JSON.stringify(response.request, null, 2))}`;
-    document.getElementById("cancel-response-download").href = `data:application/json,${encodeURI(JSON.stringify(response.response, null, 2))}`;
+    document.getElementById("cancel-request-download").href = `data:application/json,${encodeURI(JSON.stringify(response.request, null, 2).replace(/\\/g, ""))}`;
+    document.getElementById("cancel-response-download").href = `data:application/json,${encodeURI(JSON.stringify(response.response, null, 2).replace(/\\/g, ""))}`;
   } catch (e) {
     console.log(e);
     addError("Communication error");
