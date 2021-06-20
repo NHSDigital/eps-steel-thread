@@ -17,17 +17,16 @@ EDIT_URL = "/prescribe/edit"
 SIGN_URL = "/prescribe/sign"
 SEND_URL = "/prescribe/send"
 DISPENSE_RELEASE_NOMINATED_PHARMACY_URL = "/dispense/release-nominated-pharmacy"
-REDIRECT_URL_FOR_STATE = {
-    "login": "/login",
-    "home": "/"
-}
+REDIRECT_URL_FOR_STATE = {"login": "/login", "home": "/"}
 
 
 def redirect_and_set_cookies(state, access_token_encrypted, cookie_expiry):
     redirect_url = REDIRECT_URL_FOR_STATE.get(state, "home")
     callback_response = flask.redirect(redirect_url)
     secure_flag = not DEV_MODE
-    callback_response.set_cookie("Access-Token", access_token_encrypted, expires=cookie_expiry, secure=secure_flag, httponly=True)
+    callback_response.set_cookie(
+        "Access-Token", access_token_encrypted, expires=cookie_expiry, secure=secure_flag, httponly=True
+    )
     callback_response.set_cookie("Access-Token-Set", "true", expires=cookie_expiry, secure=secure_flag)
     return callback_response
 
@@ -48,8 +47,8 @@ def exchange_code_for_token(code, auth_method):
             "code": code,
             "redirect_uri": OAUTH_REDIRECT_URI,
             "client_id": DEMO_APP_CLIENT_ID,
-            "client_secret": DEMO_APP_CLIENT_SECRET
-        }
+            "client_secret": DEMO_APP_CLIENT_SECRET,
+        },
     )
     return token_response.json()
 
@@ -57,4 +56,4 @@ def exchange_code_for_token(code, auth_method):
 def get_access_token():
     access_token_encrypted = flask.request.cookies.get("Access-Token")
     if access_token_encrypted is not None:
-        return fernet.decrypt(access_token_encrypted.encode('utf-8')).decode('utf-8')
+        return fernet.decrypt(access_token_encrypted.encode("utf-8")).decode("utf-8")
