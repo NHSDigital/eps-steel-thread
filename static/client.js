@@ -621,7 +621,8 @@ window.onerror = function (msg, url, line, col, error) {
 
 function addError(message) {
   console.log(message);
-  if (pageData.errorList === undefined) {
+  if (pageData.errorList === undefined
+    || pageData.errorList === null) {
     pageData.errorList = [];
   }
   pageData.errorList.push({
