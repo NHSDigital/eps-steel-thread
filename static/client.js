@@ -572,6 +572,7 @@ function getCanceller(cancelResponse) {
     code: practitionerRoleSdsRole.code,
     role: practitionerRoleSdsRole.display ? practitionerRoleSdsRole.display : "???",
   };
+}
 
 function updateBundleIds(bundle) {
   const firstGroupIdentifier = getMedicationRequests(bundle)[0].groupIdentifier;
