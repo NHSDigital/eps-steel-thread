@@ -829,7 +829,7 @@ function createCancellation(bundle) {
 
 function onLoad() {
   bind();
-  if (pageData.pageMode === "send"
+  if (pageData.mode === "send"
     && !pageData.sendResponse
     && Cookies.get("Skip-Signature-Page")) {
     sendPrescriptionRequest()
