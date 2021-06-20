@@ -449,6 +449,8 @@ function sendCancelRequest() {
     pageData.cancelResponse = {};
     pageData.cancelResponse.prescriptionId = response.prescription_id;
     pageData.cancelResponse.success = response.success;
+    pageData.cancelResponse.prescriber = getPrescriber(response.response);
+    pageData.cancelResponse.canceller = getCanceller(response.response);
     document.getElementById(
       "cancel-request-download-fhir"
     ).href = `data:application/json,${encodeURI(
@@ -499,6 +501,22 @@ function sendDispenseNominatedPharmacyReleaseRequest() {
   } catch (e) {
     console.log(e);
     addError("Communication error");
+  }
+}
+
+function getPrescriber(cancelResponse) {
+  return {
+    name: "",
+    code: "",
+    role: "",
+  }
+}
+
+function getCanceller(cancelResponse) {
+  return {
+    name: "",
+    code: "",
+    role: "",
   }
 }
 
@@ -624,7 +642,6 @@ window.onerror = function (msg, url, line, col, error) {
 };
 
 function addError(message) {
-  console.log(message);
   if (pageData.errorList === undefined || pageData.errorList === null) {
     pageData.errorList = [];
   }
@@ -708,7 +725,6 @@ function doPrescriptionAction(select) {
 }
 
 function createCancellation(bundle) {
-  console.log(JSON.stringify(bundle, null, 2));
   // Fixes duplicate hl7v3 identifier error
   // this is not an obvious error for a supplier to resolve as
   // there is no mention of the fhir field it relates to
@@ -826,7 +842,6 @@ function createCancellation(bundle) {
     bundle.entry.push(cancelPractitionerEntry);
   }
 
-  console.log(JSON.stringify(bundle, null, 2));
   return bundle;
 }
 
