@@ -146,7 +146,8 @@ function Canceller(
   this.title = title;
   this.firstName = firstName;
   this.lastName = lastName;
-  this.description = id === "same-as-original-author" ? display : `${type} - ${display}`;
+  this.description =
+    id === "same-as-original-author" ? display : `${type} - ${display}`;
   this.select = function () {
     pageData.selectedCancellerId = id;
     resetPageData(pageData.mode);
@@ -282,6 +283,14 @@ rivets.formatters.joinWithSpaces = function (strings) {
 
 rivets.formatters.appendPageMode = function (string) {
   return string + pageData.mode;
+};
+
+rivets.formatters.appendSendRequest = function (string) {
+  return string + pageData.sendResponse?.request;
+};
+
+rivets.formatters.appendSendResponse = function (string) {
+  return string + pageData.sendResponse?.response;
 };
 
 function concatenateIfPresent(fields) {
@@ -684,7 +693,7 @@ function createCancellation(bundle) {
 
   // cheat and remove focus references as references not in bundle causes validation errors
   // but no references always passes
-  messageHeader.focus = []
+  messageHeader.focus = [];
   // ****************************************
 
   const medicationRequestEntries = bundle.entry.filter(
@@ -721,14 +730,13 @@ function createCancellation(bundle) {
     const cancelPractitionerRoleIdentifier = uuidv4();
     const cancelPractitionerIdentifier = uuidv4();
 
-    medicationRequest.extension.push(
-      {
-        "url": "https://fhir.nhs.uk/StructureDefinition/Extension-DM-ResponsiblePractitioner",
-        "valueReference": {
-          "reference": `urn:uuid:${cancelPractitionerRoleIdentifier}`
-        }
-      }
-    )
+    medicationRequest.extension.push({
+      url:
+        "https://fhir.nhs.uk/StructureDefinition/Extension-DM-ResponsiblePractitioner",
+      valueReference: {
+        reference: `urn:uuid:${cancelPractitionerRoleIdentifier}`,
+      },
+    });
 
     const practitionerRoleEntry = bundle.entry.filter(
       (entry) => entry.resource.resourceType === "PractitionerRole"
@@ -747,16 +755,16 @@ function createCancellation(bundle) {
       },
     ];
     cancelPractitionerRole.code.forEach((code) =>
-    code.coding
-      .filter(
-        (coding) =>
-          coding.system ===
-          "https://fhir.hl7.org.uk/CodeSystem/UKCore-SDSJobRoleName"
-      )
-      .forEach((coding) => {
-        (coding.code = canceller.id), (coding.display = canceller.display);
-      })
-  );
+      code.coding
+        .filter(
+          (coding) =>
+            coding.system ===
+            "https://fhir.hl7.org.uk/CodeSystem/UKCore-SDSJobRoleName"
+        )
+        .forEach((coding) => {
+          (coding.code = canceller.id), (coding.display = canceller.display);
+        })
+    );
     bundle.entry.push(cancelPractitionerRoleEntry);
 
     const practitionerEntry = bundle.entry.filter(

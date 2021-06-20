@@ -329,8 +329,8 @@
                     </svg>
                   </div>
                 </dd>
-                <a download="send_request.json" href="data:application/json,{{sendResponse.request}}"><img src="../static/json.png" title="Request"/></a>
-                <a download="send_response.json" href="data:application/json,{{sendResponse.response}}"><img src="../static/json.png" title="Response"/></a>
+                <a download="send_request.json" rv-href="'data:application/json,' | appendSendRequest"><img src="../static/json.png" title="Request"/></a>
+                <a download="send_response.json" rv-href="'data:application/json,' | appendSendResponse"><img src="../static/json.png" title="Response"/></a>
                 <dd class="nhsuk-summary-list__value" style="padding-top:0;">
                   <label class="nhsuk-label nhsuk-select__label" style="display:inline;font-weight:600;padding-right:20px;">Actions</label>
                   <select class="nhsuk-select" name="prescription-actions" id="prescription-actions" onchange="doPrescriptionAction(this)">
