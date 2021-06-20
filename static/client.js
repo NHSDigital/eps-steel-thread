@@ -518,9 +518,9 @@ function getPrescriber(cancelResponse) {
   const practitionerRoleSdsRole = practitionerRole.code
     .flatMap((code) => code.coding)
     .filter(
-      (coding =
+      (coding) =>
         coding.system ===
-        "https://fhir.hl7.org.uk/CodeSystem/UKCore-SDSJobRoleName")
+        "https://fhir.hl7.org.uk/CodeSystem/UKCore-SDSJobRoleName"
     )[0];
   const practitionerReference = practitionerRole.practitioner.reference;
   const practitionerEntry = cancelResponse.entry.filter(
@@ -557,9 +557,9 @@ function getCanceller(cancelResponse) {
   const practitionerRoleSdsRole = practitionerRole.code
     .flatMap((code) => code.coding)
     .filter(
-      (coding =
+      (coding) =>
         coding.system ===
-        "https://fhir.hl7.org.uk/CodeSystem/UKCore-SDSJobRoleName")
+        "https://fhir.hl7.org.uk/CodeSystem/UKCore-SDSJobRoleName"
     )[0];
   const practitionerReference = practitionerRole.practitioner.reference;
   const practitionerEntry = cancelResponse.entry.filter(
