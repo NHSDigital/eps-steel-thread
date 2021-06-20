@@ -531,7 +531,7 @@ function getPrescriber(cancelResponse) {
   return {
     name: `${practitionerName.prefix[0]} ${practitionerName.given[0]} ${practitionerName.family}`,
     code: practitionerRoleSdsRole.code,
-    role: practitionerRoleSdsRole.display ?? "???",
+    role: practitionerRoleSdsRole.display ? practitionerRoleSdsRole.display : "???",
   };
 }
 
@@ -570,9 +570,8 @@ function getCanceller(cancelResponse) {
   return {
     name: `${practitionerName.prefix[0]} ${practitionerName.given[0]} ${practitionerName.family}`,
     code: practitionerRoleSdsRole.code,
-    role: practitionerRoleSdsRole.display ?? "???",
+    role: practitionerRoleSdsRole.display ? practitionerRoleSdsRole.display : "???",
   };
-}
 
 function updateBundleIds(bundle) {
   const firstGroupIdentifier = getMedicationRequests(bundle)[0].groupIdentifier;
