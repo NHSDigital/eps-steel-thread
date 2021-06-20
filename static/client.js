@@ -515,9 +515,8 @@ function getPrescriber(cancelResponse) {
     (e) => e.fullUrl === practitionerRoleReference
   )[0];
   const practitionerRole = practitionerRoleEntry.resource;
-  const practitionerRoleSdsRole = practitionerRole
-    .flatMap((r) => r.code)
-    .map((code) => code.coding)
+  const practitionerRoleSdsRole = practitionerRole.code
+    .flatMap((code) => code.coding)
     .filter(
       (coding =
         coding.system ===
@@ -555,9 +554,8 @@ function getCanceller(cancelResponse) {
     (e) => e.fullUrl === practitionerRoleReference
   )[0];
   const practitionerRole = practitionerRoleEntry.resource;
-  const practitionerRoleSdsRole = practitionerRole
-    .flatMap((r) => r.code)
-    .map((code) => code.coding)
+  const practitionerRoleSdsRole = practitionerRole.code
+    .flatMap((code) => code.coding)
     .filter(
       (coding =
         coding.system ===
