@@ -386,9 +386,9 @@ function sendEditRequest() {
   }
 }
 
-function sendSignRequest() {
+function sendSignRequest(skipSignaturePage) {
   try {
-    const response = makeRequest("POST", "/prescribe/sign", {});
+    const response = makeRequest("POST", "/prescribe/sign", {skipSignaturePage});
     window.location.href = response.redirectUri;
   } catch (e) {
     console.log(e);
@@ -828,6 +828,11 @@ function createCancellation(bundle) {
 
 function onLoad() {
   bind();
+  if (pageData.pageMode === "send"
+    && !pageData.sendResponse
+    && Cookies.get("Skip-Signature-Page")) {
+    sendPrescriptionRequest()
+  }
 }
 
 // IE compat, no default values for function args

@@ -514,7 +514,8 @@
       <div rv-show="mode | isSign">
         <div class="nhsuk-grid-row">
           <div class="nhsuk-grid-column-full">
-            <button class="nhsuk-button" type="submit" onclick="sendSignRequest()">Sign</button>
+            <button class="nhsuk-button" type="submit" onclick="sendSignRequest(true)">Send</button>
+            <button class="nhsuk-button nhsuk-button--reverse" type="submit" onclick="sendSignRequest(false)">Sign</button>
             <button class="nhsuk-button nhsuk-button--secondary" type="submit"
               onclick="resetPageData('load');">Back</button>
           </div>

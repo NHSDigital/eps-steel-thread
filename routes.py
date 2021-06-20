@@ -31,6 +31,7 @@ from cookies import (
     get_prescription_ids_from_cookie,
     get_auth_method_from_cookie,
     set_auth_method_cookie,
+    set_skip_signature_page_cookie,
 )
 from client import render_client
 from database import (
@@ -200,6 +201,8 @@ def get_sign():
 
 @app.route(SIGN_URL, methods=["POST"])
 def post_sign():
+    sign_request = flask.request.json
+    skip_signature_page = sign_request["skipSignaturePage"]
     short_prescription_id = get_prescription_id_from_cookie()
     prepare_request = load_prepare_request(short_prescription_id)
     prepare_response = make_eps_api_prepare_request(get_access_token(), prepare_request)
@@ -210,6 +213,7 @@ def post_sign():
     print("Response from Signing Service signature upload request...")
     print(json.dumps(sign_response))
     response = app.make_response({"redirectUri": sign_response["redirectUri"]})
+    set_skip_signature_page_cookie(response, skip_signature_page)
     add_prepare_response(short_prescription_id, prepare_response)
     return response
 

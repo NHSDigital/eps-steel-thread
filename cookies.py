@@ -74,3 +74,14 @@ def set_auth_method_cookie(response, auth_method):
         secure=not DEV_MODE,
         httponly=True,
     )
+
+
+
+def set_skip_signature_page_cookie(response, skip_signature_page):
+    response.set_cookie(
+        "Skip-Signature-Page",
+        skip_signature_page,
+        expires=datetime.datetime.utcnow() + datetime.timedelta(seconds=float(600)),
+        secure=not DEV_MODE,
+        httponly=False,
+    )
