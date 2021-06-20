@@ -589,7 +589,7 @@ window.onerror = function (msg, url, line, col, error) {
 
 function addError(message) {
   console.log(message);
-  if (pageData.errorList === null) {
+  if (pageData.errorList === undefined) {
     pageData.errorList = [];
   }
   pageData.errorList.push({
