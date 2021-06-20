@@ -403,8 +403,9 @@ function sendPrescriptionRequest() {
     pageData.sendResponse = {};
     pageData.sendResponse.prescriptionId = response.prescription_id;
     pageData.sendResponse.success = response.success;
-    document.getElementById("send-request-download-fhir").href = `data:application/json,${encodeURI(JSON.stringify(response.request, null, 2).replace(/\\/g, "").replace(/"/,"").replace(/.$/,""))}`;
-    console.log(response.request_xml)
+    const request = JSON.stringify(response.request, null, 2).replace(/\\/g, "").replace(/"/,"").replace(/.$/,"")
+    console.log(request)
+    document.getElementById("send-request-download-fhir").href = `data:application/json,${encodeURI(request)}`;
     document.getElementById("send-request-download-xml").href = `data:application/xml,${encodeURIComponent(response.request_xml)}`; // component includes '#' which is present in xml
     document.getElementById("send-response-download").href = `data:application/json,${encodeURI(JSON.stringify(response.response, null, 2).replace(/\\/g, "").replace(/"/,"").replace(/.$/,""))}`;
   } catch (e) {
@@ -431,7 +432,7 @@ function sendCancelRequest() {
     pageData.cancelResponse.prescriptionId = response.prescription_id;
     pageData.cancelResponse.success = response.success;
     document.getElementById("cancel-request-download-fhir").href = `data:application/json,${encodeURI(JSON.stringify(response.request, null, 2).replace(/\\/g, "").replace(/"/,"").replace(/.$/,""))}`;
-    document.getElementById("cancel-request-download-xml").href = `data:application/xml,${encodeURIComponent(response.request_xml)}`;
+    document.getElementById("cancel-request-download-xml").href = `data:application/xml,${encodeURIComponent(response.request_xml)}`; // component includes '#' which is present in xml
     document.getElementById("cancel-response-download").href = `data:application/json,${encodeURI(JSON.stringify(response.response, null, 2).replace(/\\/g, "").replace(/"/,"").replace(/.$/,""))}`;
   } catch (e) {
     console.log(e);
