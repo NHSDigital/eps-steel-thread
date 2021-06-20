@@ -448,7 +448,7 @@ function sendCancelRequest() {
     );
     pageData.cancelResponse = {};
     pageData.cancelResponse.prescriptionId = response.prescription_id;
-    pageData.cancelResponse.pageData.cancelResponse.success = response.success;
+    pageData.cancelResponse.success = response.success;
     document.getElementById(
       "cancel-request-download-fhir"
     ).href = `data:application/json,${encodeURI(
