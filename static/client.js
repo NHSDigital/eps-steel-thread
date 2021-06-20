@@ -831,7 +831,6 @@ function createCancellation(bundle) {
 }
 
 function onLoad() {
-  document.querySelector("#main-content").style.display = "none";
   bind();
   if (
     pageData.mode === "send" &&
@@ -840,9 +839,7 @@ function onLoad() {
   ) {
     sendPrescriptionRequest();
   }
-  else {
-    document.querySelector("#main-content").style.display = "";
-  }
+  document.querySelector("#main-content").style.display = "";
 }
 
 // IE compat, no default values for function args
