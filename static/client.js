@@ -449,8 +449,9 @@ function sendCancelRequest() {
     pageData.cancelResponse = {};
     pageData.cancelResponse.prescriptionId = response.prescription_id;
     pageData.cancelResponse.success = response.success;
-    pageData.cancelResponse.prescriber = getPrescriber(response.response);
-    pageData.cancelResponse.canceller = getCanceller(response.response);
+    const parsedCancelResponse = JSON.parse(response.response);
+    pageData.cancelResponse.prescriber = getPrescriber(parsedCancelResponse);
+    pageData.cancelResponse.canceller = getCanceller(parsedCancelResponse);
     document.getElementById(
       "cancel-request-download-fhir"
     ).href = `data:application/json,${encodeURI(
@@ -505,15 +506,29 @@ function sendDispenseNominatedPharmacyReleaseRequest() {
 }
 
 function getPrescriber(cancelResponse) {
-  const medicationRequest = getResourcesOfType(cancelResponse, "MedicationRequest")[0]
-  const practitionerRoleReference = medicationRequest.requester.reference
-  const practitionerRoleEntry = cancelResponse.entry.filter(e => e.fullUrl === practitionerRoleReference)
-  const practitionerRole = practitionerRoleEntry.resource
-  const practitionerRoleSdsRole = practitionerRole.flatMap(r => r.code).map(code => code.coding).filter(coding = coding.system === "https://fhir.hl7.org.uk/CodeSystem/UKCore-SDSJobRoleName")[0]
-  const practitionerReference = practitionerRole.practitioner.reference
-  const practitionerEntry = cancelResponse.entry.filter(e => e.fullUrl === practitionerReference)
-  const practitioner = practitionerEntry.resource
-  const practitionerName = practitioner.name[0]
+  const medicationRequest = getResourcesOfType(
+    cancelResponse,
+    "MedicationRequest"
+  )[0];
+  const practitionerRoleReference = medicationRequest.requester.reference;
+  const practitionerRoleEntry = cancelResponse.entry.filter(
+    (e) => e.fullUrl === practitionerRoleReference
+  );
+  const practitionerRole = practitionerRoleEntry.resource;
+  const practitionerRoleSdsRole = practitionerRole
+    .flatMap((r) => r.code)
+    .map((code) => code.coding)
+    .filter(
+      (coding =
+        coding.system ===
+        "https://fhir.hl7.org.uk/CodeSystem/UKCore-SDSJobRoleName")
+    )[0];
+  const practitionerReference = practitionerRole.practitioner.reference;
+  const practitionerEntry = cancelResponse.entry.filter(
+    (e) => e.fullUrl === practitionerReference
+  );
+  const practitioner = practitionerEntry.resource;
+  const practitionerName = practitioner.name[0];
   return {
     name: `${practitionerName.prefix[0]} ${practitionerName.given[0]} ${practitionerName.family}`,
     code: practitionerRoleSdsRole.code,
@@ -522,19 +537,38 @@ function getPrescriber(cancelResponse) {
 }
 
 function getCanceller(cancelResponse) {
-  const medicationRequest = getResourcesOfType(cancelResponse, "MedicationRequest")[0]
-  const practitionerRoleReferenceExtension = medicationRequest.extension.filter(e => e.url === "https://fhir.nhs.uk/StructureDefinition/Extension-DM-ResponsiblePractitioner")
+  const medicationRequest = getResourcesOfType(
+    cancelResponse,
+    "MedicationRequest"
+  )[0];
+  const practitionerRoleReferenceExtension = medicationRequest.extension.filter(
+    (e) =>
+      e.url ===
+      "https://fhir.nhs.uk/StructureDefinition/Extension-DM-ResponsiblePractitioner"
+  );
   if (!practitionerRoleReferenceExtension) {
-    return getPrescriber(cancelResponse)
+    return getPrescriber(cancelResponse);
   }
-  const practitionerRoleReference = practitionerRoleReferenceExtension[0].valueReference.reference
-  const practitionerRoleEntry = cancelResponse.entry.filter(e => e.fullUrl === practitionerRoleReference)
-  const practitionerRole = practitionerRoleEntry.resource
-  const practitionerRoleSdsRole = practitionerRole.flatMap(r => r.code).map(code => code.coding).filter(coding = coding.system === "https://fhir.hl7.org.uk/CodeSystem/UKCore-SDSJobRoleName")[0]
-  const practitionerReference = practitionerRole.practitioner.reference
-  const practitionerEntry = cancelResponse.entry.filter(e => e.fullUrl === practitionerReference)
-  const practitioner = practitionerEntry.resource
-  const practitionerName = practitioner.name[0]
+  const practitionerRoleReference =
+    practitionerRoleReferenceExtension[0].valueReference.reference;
+  const practitionerRoleEntry = cancelResponse.entry.filter(
+    (e) => e.fullUrl === practitionerRoleReference
+  );
+  const practitionerRole = practitionerRoleEntry.resource;
+  const practitionerRoleSdsRole = practitionerRole
+    .flatMap((r) => r.code)
+    .map((code) => code.coding)
+    .filter(
+      (coding =
+        coding.system ===
+        "https://fhir.hl7.org.uk/CodeSystem/UKCore-SDSJobRoleName")
+    )[0];
+  const practitionerReference = practitionerRole.practitioner.reference;
+  const practitionerEntry = cancelResponse.entry.filter(
+    (e) => e.fullUrl === practitionerReference
+  );
+  const practitioner = practitionerEntry.resource;
+  const practitionerName = practitioner.name[0];
   return {
     name: `${practitionerName.prefix[0]} ${practitionerName.given[0]} ${practitionerName.family}`,
     code: practitionerRoleSdsRole.code,
