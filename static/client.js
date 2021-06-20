@@ -428,7 +428,6 @@ function sendCancelRequest() {
     pageData.cancelResponse = {};
     pageData.cancelResponse.prescriptionId = response.prescription_id;
     pageData.cancelResponse.success = response.success;
-    pageData.cancelResponse.body = response.body;
     document.getElementById("cancel-request-download").href = `data:application/json,${response.request}`;
     document.getElementById("cancel-response-download").href = `data:application/json,${response.response}`;
   } catch (e) {
