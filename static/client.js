@@ -554,7 +554,7 @@ function getCanceller(cancelResponse, success) {
   const medicationRequest = getResourcesOfType(
     cancelResponse,
     "MedicationRequest"
-  )[0];,
+  )[0];
   const practitionerRoleReferenceExtension = medicationRequest.extension.filter(
     (e) =>
       e.url ===
