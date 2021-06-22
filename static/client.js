@@ -184,7 +184,7 @@ rivets.formatters.prescriptionEndorsements = function (extensions) {
           (prescriptionEndorsement) =>
             prescriptionEndorsement.valueCodeableConcept.coding
         )
-        .map((coding) => coding.display)
+        .map((coding) => coding.code)
         .join(", ")
     : "";
 };
