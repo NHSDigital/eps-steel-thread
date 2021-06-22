@@ -450,8 +450,8 @@ function sendCancelRequest() {
     pageData.cancelResponse.prescriptionId = response.prescription_id;
     pageData.cancelResponse.success = response.success;
     const parsedCancelResponse = JSON.parse(response.response);
-    pageData.cancelResponse.prescriber = getPrescriber(parsedCancelResponse);
-    pageData.cancelResponse.canceller = getCanceller(parsedCancelResponse);
+    pageData.cancelResponse.prescriber = getPrescriber(parsedCancelResponse, response.success);
+    pageData.cancelResponse.canceller = getCanceller(parsedCancelResponse, response.success);
     document.getElementById(
       "cancel-request-download-fhir"
     ).href = `data:application/json,${encodeURI(
@@ -505,10 +505,17 @@ function sendDispenseNominatedPharmacyReleaseRequest() {
   }
 }
 
-function getPrescriber(cancelResponse) {
+function getPrescriber(cancelResponse, success) {
+  if (!success) {
+    return {
+      name: null,
+      code: null,
+      role: null,
+    };
+  }
   const medicationRequest = getResourcesOfType(
     cancelResponse,
-    "MedicationRequest"
+    "MedicationRequest",
   )[0];
   const practitionerRoleReference = medicationRequest.requester.reference;
   const practitionerRoleEntry = cancelResponse.entry.filter(
@@ -535,11 +542,19 @@ function getPrescriber(cancelResponse) {
   };
 }
 
-function getCanceller(cancelResponse) {
+function getCanceller(cancelResponse, success) {
+  if (!success) {
+    return {
+      name: null,
+      code: null,
+      role: null,
+    };
+  }
+
   const medicationRequest = getResourcesOfType(
     cancelResponse,
     "MedicationRequest"
-  )[0];
+  )[0];,
   const practitionerRoleReferenceExtension = medicationRequest.extension.filter(
     (e) =>
       e.url ===
