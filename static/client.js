@@ -808,8 +808,7 @@ var ExcelToJSON = function () {
         var XL_row_object = XLSX.utils.sheet_to_row_object_array(
           workbook.Sheets[sheetName]
         );
-        var json_object = JSON.stringify(XL_row_object);
-        createPrescription(json_object);
+        createPrescription(XL_row_object);
       });
     };
 
@@ -827,8 +826,7 @@ function handleFileSelect(evt) {
   xl2json.parseExcel(files[0]);
 }
 
-function createPrescription(xlsxSheet) {
-  const xlsxRows = xlsxSheet.map((sheet) => sheet);
+function createPrescription(xlsxRows) {
   xlsxRows.forEach((row) => {
     console.log(row);
     const prescription = {
