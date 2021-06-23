@@ -953,12 +953,7 @@ function createPrescription(xlsxRows) {
             },
             courseOfTherapyType: {
               coding: [
-                {
-                  system:
-                    "http://terminology.hl7.org/CodeSystem/medicationrequest-course-of-therapy",
-                  code: "acute",
-                  display: "Short course (acute) therapy",
-                },
+                createPrescriptionType(getPrescriptionType(row)),
               ],
             },
             dosageInstruction: [
@@ -1461,6 +1456,17 @@ function createPrescription(xlsxRows) {
     };
     console.log(prescription);
   });
+}
+
+function getPrescriptionType(row) {
+  return row["Prescription Type"].split(" ")[0];
+}
+
+function createPrescriptionType(code) {
+  return {
+    system: "http://terminology.hl7.org/CodeSystem/medicationrequest-course-of-therapy",
+    code
+  };
 }
 
 function doPrescriptionAction(select) {
