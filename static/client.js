@@ -803,7 +803,7 @@ var ExcelToJSON = function () {
       });
 
       workbook.SheetNames.forEach(function (sheetName) {
-        if (sheetName.toLower() !== "prescriptions") return;
+        if (sheetName.toLowerCase() !== "prescriptions") return;
 
         var XL_row_object = XLSX.utils.sheet_to_row_object_array(
           workbook.Sheets[sheetName]
