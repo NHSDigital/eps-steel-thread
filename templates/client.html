@@ -128,6 +128,57 @@
         </div>
         <div class="nhsuk-grid-column-full">
           <fieldset class="nhsuk-fieldset">
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.0/jszip.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.0/xlsx.js"></script>
+            <script>
+              var ExcelToJSON = function() {
+
+                this.parseExcel = function(file) {
+                  var reader = new FileReader();
+
+                  reader.onload = function(e) {
+                    var data = e.target.result;
+                    var workbook = XLSX.read(data, {
+                      type: 'binary'
+                    });
+
+                    workbook.SheetNames.forEach(function(sheetName) {
+                      // Here is your object
+                      var XL_row_object = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[sheetName]);
+                      var json_object = JSON.stringify(XL_row_object);
+                      console.log(json_object);
+
+                    })
+
+                  };
+
+                  reader.onerror = function(ex) {
+                    console.log(ex);
+                  };
+
+                  reader.readAsBinaryString(file);
+                };
+              };
+
+              function handleFileSelect(evt) {
+                var files = evt.target.files; // FileList object
+                var xl2json = new ExcelToJSON();
+                xl2json.parseExcel(files[0]);
+              }
+            </script>
+            <div class="nhsuk-form-group">
+              <div class="nhsuk-label" id="prescription-test-pact-hint">
+                Upload Test Pack
+              </div>
+              <input class="nhsuk-input" multiple id="prescription-test-pack" type="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
+            </div>
+            <script>
+              document.getElementById('prescription-test-pack').addEventListener('change', handleFileSelect, false);
+          </script>
+          </fieldset>
+        </div>
+        <div class="nhsuk-grid-column-full">
+          <fieldset class="nhsuk-fieldset">
             <div class="nhsuk-form-group">
               <div class="nhsuk-label" id="prescription-files-hint">
                 Upload FHIR prescription files
