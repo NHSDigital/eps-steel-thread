@@ -747,7 +747,6 @@ function getPayloads() {
   const isCustom = pageData.selectedExampleId == "custom";
   const filePayloads = pageData.payloads;
   const textPayloads = [document.getElementById("prescription-textarea").value];
-  const testPackPayloads =
   const payloads = filePayloads
     .concat(textPayloads)
     .filter(Boolean)
