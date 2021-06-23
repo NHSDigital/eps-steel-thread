@@ -808,7 +808,7 @@ var ExcelToJSON = function () {
         var XL_row_object = XLSX.utils.sheet_to_row_object_array(
           workbook.Sheets[sheetName]
         );
-        createPrescription(XL_row_object);
+        createPrescriptions(XL_row_object);
       });
     };
 
