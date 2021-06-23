@@ -450,8 +450,14 @@ function sendCancelRequest() {
     pageData.cancelResponse.prescriptionId = response.prescription_id;
     pageData.cancelResponse.success = response.success;
     const parsedCancelResponse = JSON.parse(response.response);
-    pageData.cancelResponse.prescriber = getPrescriber(parsedCancelResponse, response.success);
-    pageData.cancelResponse.canceller = getCanceller(parsedCancelResponse, response.success);
+    pageData.cancelResponse.prescriber = getPrescriber(
+      parsedCancelResponse,
+      response.success
+    );
+    pageData.cancelResponse.canceller = getCanceller(
+      parsedCancelResponse,
+      response.success
+    );
     document.getElementById(
       "cancel-request-download-fhir"
     ).href = `data:application/json,${encodeURI(
@@ -515,7 +521,7 @@ function getPrescriber(cancelResponse, success) {
   }
   const medicationRequest = getResourcesOfType(
     cancelResponse,
-    "MedicationRequest",
+    "MedicationRequest"
   )[0];
   const practitionerRoleReference = medicationRequest.requester.reference;
   const practitionerRoleEntry = cancelResponse.entry.filter(
@@ -538,7 +544,9 @@ function getPrescriber(cancelResponse, success) {
   return {
     name: `${practitionerName.prefix[0]} ${practitionerName.given[0]} ${practitionerName.family}`,
     code: practitionerRoleSdsRole.code,
-    role: practitionerRoleSdsRole.display ? practitionerRoleSdsRole.display : "???",
+    role: practitionerRoleSdsRole.display
+      ? practitionerRoleSdsRole.display
+      : "???",
   };
 }
 
@@ -585,7 +593,9 @@ function getCanceller(cancelResponse, success) {
   return {
     name: `${practitionerName.prefix[0]} ${practitionerName.given[0]} ${practitionerName.family}`,
     code: practitionerRoleSdsRole.code,
-    role: practitionerRoleSdsRole.display ? practitionerRoleSdsRole.display : "???",
+    role: practitionerRoleSdsRole.display
+      ? practitionerRoleSdsRole.display
+      : "???",
   };
 }
 
@@ -782,25 +792,28 @@ function getResourcesOfType(prescriptionBundle, resourceType) {
   });
 }
 
-var ExcelToJSON = function() {
-  this.parseExcel = function(file) {
+var ExcelToJSON = function () {
+  this.parseExcel = function (file) {
     var reader = new FileReader();
 
-    reader.onload = function(e) {
+    reader.onload = function (e) {
       var data = e.target.result;
       var workbook = XLSX.read(data, {
-        type: 'binary'
+        type: "binary",
       });
 
-      workbook.SheetNames.forEach(function(sheetName) {
-        // Here is your object
-        var XL_row_object = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[sheetName]);
+      workbook.SheetNames.forEach(function (sheetName) {
+        if (sheetName.toLower() !== "prescriptions") return;
+
+        var XL_row_object = XLSX.utils.sheet_to_row_object_array(
+          workbook.Sheets[sheetName]
+        );
         var json_object = JSON.stringify(XL_row_object);
         createPrescription(json_object);
-      })
+      });
     };
 
-    reader.onerror = function(ex) {
+    reader.onerror = function (ex) {
       console.log(ex);
     };
 
@@ -814,634 +827,642 @@ function handleFileSelect(evt) {
   xl2json.parseExcel(files[0]);
 }
 
-function createPrescription(xmlRow) {
-  console.log(xmlRow)
-  const prescription = {
-    "resourceType": "Bundle",
-    "id": "aef77afb-7e3c-427a-8657-2c427f71a272",
-    "identifier": {
-      "system": "https://tools.ietf.org/html/rfc4122",
-      "value": "ea66ee9d-a981-432f-8c27-6907cbd99219"
-    },
-    "type": "message",
-    "entry": [
-      {
-        "fullUrl": "urn:uuid:aef77afb-7e3c-427a-8657-2c427f71a272",
-        "resource": {
-          "resourceType": "MessageHeader",
-          "id": "3599c0e9-9292-413e-9270-9a1ef1ead99c",
-          "eventCoding": {
-            "system": "https://fhir.nhs.uk/CodeSystem/message-event",
-            "code": "prescription-order",
-            "display": "Prescription Order"
-          },
-          "sender": {
-            "identifier": {
-              "system": "https://fhir.nhs.uk/Id/ods-organization-code",
-              "value": "RBA"
-            },
-            "reference": "urn:uuid:56166769-c1c4-4d07-afa8-132b5dfca666",
-            "display": "RAZIA|ALI"
-          },
-          "source": {
-            "endpoint": "urn:nhs-uk:addressing:ods:RBA"
-          },
-          "destination": [
-            {
-              "endpoint": "https://sandbox.api.service.nhs.uk/electronic-prescriptions/$post-message",
-              "receiver": {
-                "identifier": {
-                  "system": "https://fhir.nhs.uk/Id/ods-organization-code",
-                  "value": "X26"
-                }
-              }
-            }
-          ],
-          "focus": [
-            {
-              "reference": "urn:uuid:78d3c2eb-009e-4ec8-a358-b042954aa9b2"
-            },
-            {
-              "reference": "urn:uuid:a54219b8-f741-4c47-b662-e4f8dfa49ab6"
-            },
-            {
-              "reference": "urn:uuid:51793ac0-112f-46c7-a891-9af8cefb206e"
-            }
-          ]
-        }
+function createPrescription(xlsxSheet) {
+  const xlsxRows = xlsxSheet.map((sheet) => sheet);
+  xlsxRows.forEach((row) => {
+    console.log(row);
+    const prescription = {
+      resourceType: "Bundle",
+      id: "aef77afb-7e3c-427a-8657-2c427f71a272",
+      identifier: {
+        system: "https://tools.ietf.org/html/rfc4122",
+        value: "ea66ee9d-a981-432f-8c27-6907cbd99219",
       },
-      {
-        "fullUrl": "urn:uuid:a54219b8-f741-4c47-b662-e4f8dfa49ab6",
-        "resource": {
-          "resourceType": "MedicationRequest",
-          "id": "a54219b8-f741-4c47-b662-e4f8dfa49ab6",
-          "extension": [
-            {
-              "url": "https://fhir.nhs.uk/StructureDefinition/Extension-DM-PrescriptionType",
-              "valueCoding": {
-                "system": "https://fhir.nhs.uk/CodeSystem/prescription-type",
-                "code": "1201",
-                "display": "Outpatient Homecare Prescriber - Medical Prescriber"
-              }
-            }
-          ],
-          "identifier": [
-            {
-              "system": "https://fhir.nhs.uk/Id/prescription-order-item-number",
-              "value": "a54219b8-f741-4c47-b662-e4f8dfa49ab6"
-            }
-          ],
-          "status": "active",
-          "intent": "order",
-          "category": [
-            {
-              "coding": [
-                {
-                  "system": "http://terminology.hl7.org/CodeSystem/medicationrequest-category",
-                  "code": "outpatient",
-                  "display": "Outpatient"
-                }
-              ]
-            }
-          ],
-          "medicationCodeableConcept": {
-            "coding": [
-              {
-                "system": "http://snomed.info/sct",
-                "code": "13892511000001100",
-                "display": "Amlodipine 5mg/5ml oral solution"
-              }
-            ]
-          },
-          "subject": {
-            "reference": "urn:uuid:78d3c2eb-009e-4ec8-a358-b042954aa9b2"
-          },
-          "authoredOn": "2021-05-07T14:47:29+00:00",
-          "requester": {
-            "reference": "urn:uuid:56166769-c1c4-4d07-afa8-132b5dfca666"
-          },
-          "groupIdentifier": {
-            "extension": [
-              {
-                "url": "https://fhir.nhs.uk/StructureDefinition/Extension-DM-PrescriptionId",
-                "valueIdentifier": {
-                  "system": "https://fhir.nhs.uk/Id/prescription",
-                  "value": "a5b9dc81-ccf4-4dab-b887-3d88e557febb"
-                }
-              }
-            ],
-            "system": "https://fhir.nhs.uk/Id/prescription-order-number",
-            "value": "A0548B-A99968-451485"
-          },
-          "courseOfTherapyType": {
-            "coding": [
-              {
-                "system": "http://terminology.hl7.org/CodeSystem/medicationrequest-course-of-therapy",
-                "code": "acute",
-                "display": "Short course (acute) therapy"
-              }
-            ]
-          },
-          "dosageInstruction": [
-            {
-              "text": "Once daily",
-              "timing": {
-                "repeat": {
-                  "frequency": 5,
-                  "period": 1,
-                  "periodUnit": "d",
-                  "boundsDuration": {
-                    "value": 10,
-                    "unit": "day",
-                    "system": "http://unitsofmeasure.org",
-                    "code": "d"
-                  }
-                }
+      type: "message",
+      entry: [
+        {
+          fullUrl: "urn:uuid:aef77afb-7e3c-427a-8657-2c427f71a272",
+          resource: {
+            resourceType: "MessageHeader",
+            id: "3599c0e9-9292-413e-9270-9a1ef1ead99c",
+            eventCoding: {
+              system: "https://fhir.nhs.uk/CodeSystem/message-event",
+              code: "prescription-order",
+              display: "Prescription Order",
+            },
+            sender: {
+              identifier: {
+                system: "https://fhir.nhs.uk/Id/ods-organization-code",
+                value: "RBA",
               },
-              "route": {
-                "coding": [
+              reference: "urn:uuid:56166769-c1c4-4d07-afa8-132b5dfca666",
+              display: "RAZIA|ALI",
+            },
+            source: {
+              endpoint: "urn:nhs-uk:addressing:ods:RBA",
+            },
+            destination: [
+              {
+                endpoint:
+                  "https://sandbox.api.service.nhs.uk/electronic-prescriptions/$post-message",
+                receiver: {
+                  identifier: {
+                    system: "https://fhir.nhs.uk/Id/ods-organization-code",
+                    value: "X26",
+                  },
+                },
+              },
+            ],
+            focus: [
+              {
+                reference: "urn:uuid:78d3c2eb-009e-4ec8-a358-b042954aa9b2",
+              },
+              {
+                reference: "urn:uuid:a54219b8-f741-4c47-b662-e4f8dfa49ab6",
+              },
+              {
+                reference: "urn:uuid:51793ac0-112f-46c7-a891-9af8cefb206e",
+              },
+            ],
+          },
+        },
+        {
+          fullUrl: "urn:uuid:a54219b8-f741-4c47-b662-e4f8dfa49ab6",
+          resource: {
+            resourceType: "MedicationRequest",
+            id: "a54219b8-f741-4c47-b662-e4f8dfa49ab6",
+            extension: [
+              {
+                url:
+                  "https://fhir.nhs.uk/StructureDefinition/Extension-DM-PrescriptionType",
+                valueCoding: {
+                  system: "https://fhir.nhs.uk/CodeSystem/prescription-type",
+                  code: "1201",
+                  display:
+                    "Outpatient Homecare Prescriber - Medical Prescriber",
+                },
+              },
+            ],
+            identifier: [
+              {
+                system: "https://fhir.nhs.uk/Id/prescription-order-item-number",
+                value: "a54219b8-f741-4c47-b662-e4f8dfa49ab6",
+              },
+            ],
+            status: "active",
+            intent: "order",
+            category: [
+              {
+                coding: [
                   {
-                    "system": "http://snomed.info/sct",
-                    "code": "26643006",
-                    "display": "Oral"
-                  }
-                ]
+                    system:
+                      "http://terminology.hl7.org/CodeSystem/medicationrequest-category",
+                    code: "outpatient",
+                    display: "Outpatient",
+                  },
+                ],
               },
-              "doseAndRate": [
-                {
-                  "doseQuantity": {
-                    "value": 5,
-                    "unit": "milligram",
-                    "system": "http://unitsofmeasure.org",
-                    "code": "mg"
-                  }
-                }
-              ]
-            }
-          ],
-          "dispenseRequest": {
-            "extension": [
-              {
-                "url": "https://fhir.nhs.uk/StructureDefinition/Extension-DM-PerformerSiteType",
-                "valueCoding": {
-                  "system": "https://fhir.nhs.uk/CodeSystem/dispensing-site-preference",
-                  "code": "P1"
-                }
-              }
             ],
-            "performer": {
-              "identifier": {
-                "system": "https://fhir.nhs.uk/Id/ods-organization-code",
-                "value": "VNCEL"
-              }
+            medicationCodeableConcept: {
+              coding: [
+                {
+                  system: "http://snomed.info/sct",
+                  code: "13892511000001100",
+                  display: "Amlodipine 5mg/5ml oral solution",
+                },
+              ],
             },
-            "quantity": {
-              "value": 5,
-              "unit": "ml",
-              "system": "http://snomed.info/sct",
-              "code": "385024007"
-            }
-          },
-          "substitution": {
-            "allowedBoolean": false
-          }
-        }
-      },
-      {
-        "fullUrl": "urn:uuid:a54219b8-f741-4c47-b662-e4f8dfa49ab7",
-        "resource": {
-          "resourceType": "MedicationRequest",
-          "id": "a54219b8-f741-4c47-b662-e4f8dfa49ab7",
-          "extension": [
-            {
-              "url": "https://fhir.nhs.uk/StructureDefinition/Extension-DM-PrescriptionType",
-              "valueCoding": {
-                "system": "https://fhir.nhs.uk/CodeSystem/prescription-type",
-                "code": "1201",
-                "display": "Outpatient Homecare Prescriber - Medical Prescriber"
-              }
-            }
-          ],
-          "identifier": [
-            {
-              "system": "https://fhir.nhs.uk/Id/prescription-order-item-number",
-              "value": "a54219b8-f741-4c47-b662-e4f8dfa49ab7"
-            }
-          ],
-          "status": "active",
-          "intent": "order",
-          "category": [
-            {
-              "coding": [
+            subject: {
+              reference: "urn:uuid:78d3c2eb-009e-4ec8-a358-b042954aa9b2",
+            },
+            authoredOn: "2021-05-07T14:47:29+00:00",
+            requester: {
+              reference: "urn:uuid:56166769-c1c4-4d07-afa8-132b5dfca666",
+            },
+            groupIdentifier: {
+              extension: [
                 {
-                  "system": "http://terminology.hl7.org/CodeSystem/medicationrequest-category",
-                  "code": "outpatient",
-                  "display": "Outpatient"
-                }
-              ]
-            }
-          ],
-          "medicationCodeableConcept": {
-            "coding": [
+                  url:
+                    "https://fhir.nhs.uk/StructureDefinition/Extension-DM-PrescriptionId",
+                  valueIdentifier: {
+                    system: "https://fhir.nhs.uk/Id/prescription",
+                    value: "a5b9dc81-ccf4-4dab-b887-3d88e557febb",
+                  },
+                },
+              ],
+              system: "https://fhir.nhs.uk/Id/prescription-order-number",
+              value: "A0548B-A99968-451485",
+            },
+            courseOfTherapyType: {
+              coding: [
+                {
+                  system:
+                    "http://terminology.hl7.org/CodeSystem/medicationrequest-course-of-therapy",
+                  code: "acute",
+                  display: "Short course (acute) therapy",
+                },
+              ],
+            },
+            dosageInstruction: [
               {
-                "system": "http://snomed.info/sct",
-                "code": "317972000",
-                "display": "Furosemide 40mg tablets"
-              }
-            ]
-          },
-          "subject": {
-            "reference": "urn:uuid:78d3c2eb-009e-4ec8-a358-b042954aa9b2"
-          },
-          "authoredOn": "2021-05-07T14:47:29+00:00",
-          "requester": {
-            "reference": "urn:uuid:56166769-c1c4-4d07-afa8-132b5dfca666"
-          },
-          "groupIdentifier": {
-            "extension": [
-              {
-                "url": "https://fhir.nhs.uk/StructureDefinition/Extension-DM-PrescriptionId",
-                "valueIdentifier": {
-                  "system": "https://fhir.nhs.uk/Id/prescription",
-                  "value": "a5b9dc81-ccf4-4dab-b887-3d88e557febb"
-                }
-              }
-            ],
-            "system": "https://fhir.nhs.uk/Id/prescription-order-number",
-            "value": "A0548B-A99968-451485"
-          },
-          "courseOfTherapyType": {
-            "coding": [
-              {
-                "system": "http://terminology.hl7.org/CodeSystem/medicationrequest-course-of-therapy",
-                "code": "acute",
-                "display": "Short course (acute) therapy"
-              }
-            ]
-          },
-          "dosageInstruction": [
-            {
-              "text": "80mg at 8am and 40mg at 2pm for 5 days. Then 40mg tablet - oral-  daily at 8am",
-              "timing": {
-                "repeat": {
-                  "frequency": 5,
-                  "period": 1,
-                  "periodUnit": "d",
-                  "boundsDuration": {
-                    "value": 10,
-                    "unit": "day",
-                    "system": "http://unitsofmeasure.org",
-                    "code": "d"
-                  }
-                }
-              },
-              "route": {
-                "coding": [
+                text: "Once daily",
+                timing: {
+                  repeat: {
+                    frequency: 5,
+                    period: 1,
+                    periodUnit: "d",
+                    boundsDuration: {
+                      value: 10,
+                      unit: "day",
+                      system: "http://unitsofmeasure.org",
+                      code: "d",
+                    },
+                  },
+                },
+                route: {
+                  coding: [
+                    {
+                      system: "http://snomed.info/sct",
+                      code: "26643006",
+                      display: "Oral",
+                    },
+                  ],
+                },
+                doseAndRate: [
                   {
-                    "system": "http://snomed.info/sct",
-                    "code": "26643006",
-                    "display": "Oral"
-                  }
-                ]
-              }
-            }
-          ],
-          "dispenseRequest": {
-            "extension": [
+                    doseQuantity: {
+                      value: 5,
+                      unit: "milligram",
+                      system: "http://unitsofmeasure.org",
+                      code: "mg",
+                    },
+                  },
+                ],
+              },
+            ],
+            dispenseRequest: {
+              extension: [
+                {
+                  url:
+                    "https://fhir.nhs.uk/StructureDefinition/Extension-DM-PerformerSiteType",
+                  valueCoding: {
+                    system:
+                      "https://fhir.nhs.uk/CodeSystem/dispensing-site-preference",
+                    code: "P1",
+                  },
+                },
+              ],
+              performer: {
+                identifier: {
+                  system: "https://fhir.nhs.uk/Id/ods-organization-code",
+                  value: "VNCEL",
+                },
+              },
+              quantity: {
+                value: 5,
+                unit: "ml",
+                system: "http://snomed.info/sct",
+                code: "385024007",
+              },
+            },
+            substitution: {
+              allowedBoolean: false,
+            },
+          },
+        },
+        {
+          fullUrl: "urn:uuid:a54219b8-f741-4c47-b662-e4f8dfa49ab7",
+          resource: {
+            resourceType: "MedicationRequest",
+            id: "a54219b8-f741-4c47-b662-e4f8dfa49ab7",
+            extension: [
               {
-                "url": "https://fhir.nhs.uk/StructureDefinition/Extension-DM-PerformerSiteType",
-                "valueCoding": {
-                  "system": "https://fhir.nhs.uk/CodeSystem/dispensing-site-preference",
-                  "code": "P1"
-                }
-              }
+                url:
+                  "https://fhir.nhs.uk/StructureDefinition/Extension-DM-PrescriptionType",
+                valueCoding: {
+                  system: "https://fhir.nhs.uk/CodeSystem/prescription-type",
+                  code: "1201",
+                  display:
+                    "Outpatient Homecare Prescriber - Medical Prescriber",
+                },
+              },
             ],
-            "performer": {
-              "identifier": {
-                "system": "https://fhir.nhs.uk/Id/ods-organization-code",
-                "value": "VNCEL"
-              }
-            },
-            "quantity": {
-              "value": 28,
-              "unit": "tablet",
-              "system": "http://snomed.info/sct",
-              "code": "428673006"
-            }
-          },
-          "substitution": {
-            "allowedBoolean": false
-          }
-        }
-      },
-      {
-        "fullUrl": "urn:uuid:78d3c2eb-009e-4ec8-a358-b042954aa9b2",
-        "resource": {
-          "resourceType": "Patient",
-          "identifier": [
-            {
-              "extension": [
-                {
-                  "url": "https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-NHSNumberVerificationStatus",
-                  "valueCodeableConcept": {
-                    "coding": [
-                      {
-                        "system": "https://fhir.hl7.org.uk/CodeSystem/UKCore-NHSNumberVerificationStatus",
-                        "code": "01",
-                        "display": "Number present and verified"
-                      }
-                    ]
-                  }
-                }
-              ],
-              "system": "https://fhir.nhs.uk/Id/nhs-number",
-              "value": "9449307571"
-            }
-          ],
-          "name": [
-            {
-              "use": "usual",
-              "family": "PIMPL",
-              "given": [
-                "TETTY"
-              ],
-              "prefix": [
-                "MS"
-              ]
-            }
-          ],
-          "gender": "female",
-          "birthDate": "1949-07-13",
-          "address": [
-            {
-              "use": "home",
-              "line": [
-                "COPTHORNE",
-                "BURNHAMS ROAD",
-                "BOOKHAM",
-                "LEATHERHEAD",
-                "SURREY"
-              ],
-              "postalCode": "KT23 3BB"
-            }
-          ],
-          "generalPractitioner": [
-            {
-              "identifier": {
-                "system": "https://fhir.nhs.uk/Id/ods-organization-code",
-                "value": "B81001"
-              }
-            }
-          ]
-        }
-      },
-      {
-        "fullUrl": "urn:uuid:56166769-c1c4-4d07-afa8-132b5dfca666",
-        "resource": {
-          "resourceType": "PractitionerRole",
-          "id": "56166769-c1c4-4d07-afa8-132b5dfca666",
-          "identifier": [
-            {
-              "system": "https://fhir.nhs.uk/Id/sds-role-profile-id",
-              "value": "100102238986"
-            }
-          ],
-          "practitioner": {
-            "reference": "urn:uuid:a8c85454-f8cb-498d-9629-78e2cb5fa47a"
-          },
-          "organization": {
-            "reference": "urn:uuid:3b4b03a5-52ba-4ba6-9b82-70350aa109d8"
-          },
-          "code": [
-            {
-              "coding": [
-                {
-                  "system": "https://fhir.hl7.org.uk/CodeSystem/UKCore-SDSJobRoleName",
-                  "code": "R8000",
-                  "display": "Clinical Practitioner Access Role"
-                }
-              ]
-            }
-          ],
-          "healthcareService": [
-            {
-              "reference": "urn:uuid:54b0506d-49af-4245-9d40-d7d64902055e",
-              "display": "SOMERSET BOWEL CANCER SCREENING CENTRE"
-            }
-          ],
-          "telecom": [
-            {
-              "system": "phone",
-              "value": "01234567890",
-              "use": "work"
-            }
-          ]
-        }
-      },
-      {
-        "fullUrl": "urn:uuid:a8c85454-f8cb-498d-9629-78e2cb5fa47a",
-        "resource": {
-          "resourceType": "Practitioner",
-          "id": "a8c85454-f8cb-498d-9629-78e2cb5fa47a",
-          "identifier": [
-            {
-              "system": "https://fhir.nhs.uk/Id/sds-user-id",
-              "value": "7020134158"
-            },
-            {
-              "system": "https://fhir.hl7.org.uk/Id/gmc-number",
-              "value": "G9999999"
-            },
-            {
-              "system": "https://fhir.hl7.org.uk/Id/din-number",
-              "value": "70201123456"
-            }
-          ],
-          "name": [
-            {
-              "family": "Edwards",
-              "given": [
-                "Thomas"
-              ],
-              "prefix": [
-                "DR"
-              ]
-            }
-          ]
-        }
-      },
-      {
-        "fullUrl": "urn:uuid:3b4b03a5-52ba-4ba6-9b82-70350aa109d8",
-        "resource": {
-          "resourceType": "Organization",
-          "id": "3b4b03a5-52ba-4ba6-9b82-70350aa109d8",
-          "identifier": [
-            {
-              "system": "https://fhir.nhs.uk/Id/ods-organization-code",
-              "value": "RBA"
-            }
-          ],
-          "type": [
-            {
-              "coding": [
-                {
-                  "system": "https://fhir.nhs.uk/CodeSystem/organisation-role",
-                  "code": "197",
-                  "display": "NHS TRUST"
-                }
-              ]
-            }
-          ],
-          "name": "TAUNTON AND SOMERSET NHS FOUNDATION TRUST",
-          "address": [
-            {
-              "line": [
-                "MUSGROVE PARK HOSPITAL",
-                "PARKFIELD DRIVE",
-                "TAUNTON"
-              ],
-              "postalCode": "TA1 5DA"
-            }
-          ],
-          "telecom": [
-            {
-              "system": "phone",
-              "value": "01823333444",
-              "use": "work"
-            }
-          ]
-        }
-      },
-      {
-        "fullUrl": "urn:uuid:54b0506d-49af-4245-9d40-d7d64902055e",
-        "resource": {
-          "resourceType": "HealthcareService",
-          "id": "54b0506d-49af-4245-9d40-d7d64902055e",
-          "identifier": [
-            {
-              "use": "usual",
-              "system": "https://fhir.nhs.uk/Id/ods-organization-code",
-              "value": "A99968"
-            }
-          ],
-          "active": true,
-          "providedBy": {
-            "identifier": {
-              "system": "https://fhir.nhs.uk/Id/ods-organization-code",
-              "value": "RBA"
-            }
-          },
-          "location": [
-            {
-              "reference": "urn:uuid:8a5d7d67-64fb-44ec-9802-2dc214bb3dcb"
-            }
-          ],
-          "name": "SOMERSET BOWEL CANCER SCREENING CENTRE",
-          "telecom": [
-            {
-              "system": "phone",
-              "value": "01823 333444",
-              "use": "work"
-            }
-          ]
-        }
-      },
-      {
-        "fullUrl": "urn:uuid:8a5d7d67-64fb-44ec-9802-2dc214bb3dcb",
-        "resource": {
-          "resourceType": "Location",
-          "id": "8a5d7d67-64fb-44ec-9802-2dc214bb3dcb",
-          "identifier": [
-            {
-              "value": "10008800708"
-            }
-          ],
-          "status": "active",
-          "mode": "instance",
-          "address": {
-            "use": "work",
-            "line": [
-              "MUSGROVE PARK HOSPITAL"
+            identifier: [
+              {
+                system: "https://fhir.nhs.uk/Id/prescription-order-item-number",
+                value: "a54219b8-f741-4c47-b662-e4f8dfa49ab7",
+              },
             ],
-            "city": "TAUNTON",
-            "postalCode": "TA1 5DA"
-          }
-        }
-      },
-      {
-        "fullUrl": "urn:uuid:51793ac0-112f-46c7-a891-9af8cefb206e",
-        "resource": {
-          "resourceType": "CommunicationRequest",
-          "status": "unknown",
-          "subject": {
-            "reference": "urn:uuid:78d3c2eb-009e-4ec8-a358-b042954aa9b2"
-          },
-          "payload": [
-            {
-              "contentReference": {
-                "reference": "urn:uuid:d0f003a0-8763-43d5-a264-ce52a38901c9",
-                "display": "List of Repeat Medications for re-ordering"
-              }
-            }
-          ],
-          "requester": {
-            "type": "Organization",
-            "identifier": {
-              "system": "https://fhir.nhs.uk/Id/ods-organization-code",
-              "value": "RBA"
+            status: "active",
+            intent: "order",
+            category: [
+              {
+                coding: [
+                  {
+                    system:
+                      "http://terminology.hl7.org/CodeSystem/medicationrequest-category",
+                    code: "outpatient",
+                    display: "Outpatient",
+                  },
+                ],
+              },
+            ],
+            medicationCodeableConcept: {
+              coding: [
+                {
+                  system: "http://snomed.info/sct",
+                  code: "317972000",
+                  display: "Furosemide 40mg tablets",
+                },
+              ],
             },
-            "display": "TAUNTON AND SOMERSET NHS FOUNDATION TRUST"
-          },
-          "recipient": [
-            {
-              "type": "Patient",
-              "identifier": {
-                "system": "https://fhir.nhs.uk/Id/nhs-number",
-                "value": "9453740519"
-              }
-            }
-          ]
-        }
-      },
-      {
-        "fullUrl": "urn:uuid:d0f003a0-8763-43d5-a264-ce52a38901c9",
-        "resource": {
-          "resourceType": "List",
-          "status": "current",
-          "mode": "snapshot",
-          "code": {
-            "text": "Repeat Medications"
-          },
-          "subject": {
-            "reference": "urn:uuid:78d3c2eb-009e-4ec8-a358-b042954aa9b2"
-          },
-          "entry": [
-            {
-              "item": {
-                "display": "Metformin 500mg tablets"
-              }
+            subject: {
+              reference: "urn:uuid:78d3c2eb-009e-4ec8-a358-b042954aa9b2",
             },
-            {
-              "item": {
-                "display": "Aspirin 75mg dispersible tablets"
-              }
+            authoredOn: "2021-05-07T14:47:29+00:00",
+            requester: {
+              reference: "urn:uuid:56166769-c1c4-4d07-afa8-132b5dfca666",
             },
-            {
-              "item": {
-                "display": "Simvastatin 40mg tablets"
-              }
+            groupIdentifier: {
+              extension: [
+                {
+                  url:
+                    "https://fhir.nhs.uk/StructureDefinition/Extension-DM-PrescriptionId",
+                  valueIdentifier: {
+                    system: "https://fhir.nhs.uk/Id/prescription",
+                    value: "a5b9dc81-ccf4-4dab-b887-3d88e557febb",
+                  },
+                },
+              ],
+              system: "https://fhir.nhs.uk/Id/prescription-order-number",
+              value: "A0548B-A99968-451485",
             },
-            {
-              "item": {
-                "display": "Chloramphenicol 0.5% eye drops"
-              }
-            }
-          ]
-        }
-      }
-    ]
-  }
-  console.log(prescription)
+            courseOfTherapyType: {
+              coding: [
+                {
+                  system:
+                    "http://terminology.hl7.org/CodeSystem/medicationrequest-course-of-therapy",
+                  code: "acute",
+                  display: "Short course (acute) therapy",
+                },
+              ],
+            },
+            dosageInstruction: [
+              {
+                text:
+                  "80mg at 8am and 40mg at 2pm for 5 days. Then 40mg tablet - oral-  daily at 8am",
+                timing: {
+                  repeat: {
+                    frequency: 5,
+                    period: 1,
+                    periodUnit: "d",
+                    boundsDuration: {
+                      value: 10,
+                      unit: "day",
+                      system: "http://unitsofmeasure.org",
+                      code: "d",
+                    },
+                  },
+                },
+                route: {
+                  coding: [
+                    {
+                      system: "http://snomed.info/sct",
+                      code: "26643006",
+                      display: "Oral",
+                    },
+                  ],
+                },
+              },
+            ],
+            dispenseRequest: {
+              extension: [
+                {
+                  url:
+                    "https://fhir.nhs.uk/StructureDefinition/Extension-DM-PerformerSiteType",
+                  valueCoding: {
+                    system:
+                      "https://fhir.nhs.uk/CodeSystem/dispensing-site-preference",
+                    code: "P1",
+                  },
+                },
+              ],
+              performer: {
+                identifier: {
+                  system: "https://fhir.nhs.uk/Id/ods-organization-code",
+                  value: "VNCEL",
+                },
+              },
+              quantity: {
+                value: 28,
+                unit: "tablet",
+                system: "http://snomed.info/sct",
+                code: "428673006",
+              },
+            },
+            substitution: {
+              allowedBoolean: false,
+            },
+          },
+        },
+        {
+          fullUrl: "urn:uuid:78d3c2eb-009e-4ec8-a358-b042954aa9b2",
+          resource: {
+            resourceType: "Patient",
+            identifier: [
+              {
+                extension: [
+                  {
+                    url:
+                      "https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-NHSNumberVerificationStatus",
+                    valueCodeableConcept: {
+                      coding: [
+                        {
+                          system:
+                            "https://fhir.hl7.org.uk/CodeSystem/UKCore-NHSNumberVerificationStatus",
+                          code: "01",
+                          display: "Number present and verified",
+                        },
+                      ],
+                    },
+                  },
+                ],
+                system: "https://fhir.nhs.uk/Id/nhs-number",
+                value: "9449307571",
+              },
+            ],
+            name: [
+              {
+                use: "usual",
+                family: "PIMPL",
+                given: ["TETTY"],
+                prefix: ["MS"],
+              },
+            ],
+            gender: "female",
+            birthDate: "1949-07-13",
+            address: [
+              {
+                use: "home",
+                line: [
+                  "COPTHORNE",
+                  "BURNHAMS ROAD",
+                  "BOOKHAM",
+                  "LEATHERHEAD",
+                  "SURREY",
+                ],
+                postalCode: "KT23 3BB",
+              },
+            ],
+            generalPractitioner: [
+              {
+                identifier: {
+                  system: "https://fhir.nhs.uk/Id/ods-organization-code",
+                  value: "B81001",
+                },
+              },
+            ],
+          },
+        },
+        {
+          fullUrl: "urn:uuid:56166769-c1c4-4d07-afa8-132b5dfca666",
+          resource: {
+            resourceType: "PractitionerRole",
+            id: "56166769-c1c4-4d07-afa8-132b5dfca666",
+            identifier: [
+              {
+                system: "https://fhir.nhs.uk/Id/sds-role-profile-id",
+                value: "100102238986",
+              },
+            ],
+            practitioner: {
+              reference: "urn:uuid:a8c85454-f8cb-498d-9629-78e2cb5fa47a",
+            },
+            organization: {
+              reference: "urn:uuid:3b4b03a5-52ba-4ba6-9b82-70350aa109d8",
+            },
+            code: [
+              {
+                coding: [
+                  {
+                    system:
+                      "https://fhir.hl7.org.uk/CodeSystem/UKCore-SDSJobRoleName",
+                    code: "R8000",
+                    display: "Clinical Practitioner Access Role",
+                  },
+                ],
+              },
+            ],
+            healthcareService: [
+              {
+                reference: "urn:uuid:54b0506d-49af-4245-9d40-d7d64902055e",
+                display: "SOMERSET BOWEL CANCER SCREENING CENTRE",
+              },
+            ],
+            telecom: [
+              {
+                system: "phone",
+                value: "01234567890",
+                use: "work",
+              },
+            ],
+          },
+        },
+        {
+          fullUrl: "urn:uuid:a8c85454-f8cb-498d-9629-78e2cb5fa47a",
+          resource: {
+            resourceType: "Practitioner",
+            id: "a8c85454-f8cb-498d-9629-78e2cb5fa47a",
+            identifier: [
+              {
+                system: "https://fhir.nhs.uk/Id/sds-user-id",
+                value: "7020134158",
+              },
+              {
+                system: "https://fhir.hl7.org.uk/Id/gmc-number",
+                value: "G9999999",
+              },
+              {
+                system: "https://fhir.hl7.org.uk/Id/din-number",
+                value: "70201123456",
+              },
+            ],
+            name: [
+              {
+                family: "Edwards",
+                given: ["Thomas"],
+                prefix: ["DR"],
+              },
+            ],
+          },
+        },
+        {
+          fullUrl: "urn:uuid:3b4b03a5-52ba-4ba6-9b82-70350aa109d8",
+          resource: {
+            resourceType: "Organization",
+            id: "3b4b03a5-52ba-4ba6-9b82-70350aa109d8",
+            identifier: [
+              {
+                system: "https://fhir.nhs.uk/Id/ods-organization-code",
+                value: "RBA",
+              },
+            ],
+            type: [
+              {
+                coding: [
+                  {
+                    system: "https://fhir.nhs.uk/CodeSystem/organisation-role",
+                    code: "197",
+                    display: "NHS TRUST",
+                  },
+                ],
+              },
+            ],
+            name: "TAUNTON AND SOMERSET NHS FOUNDATION TRUST",
+            address: [
+              {
+                line: ["MUSGROVE PARK HOSPITAL", "PARKFIELD DRIVE", "TAUNTON"],
+                postalCode: "TA1 5DA",
+              },
+            ],
+            telecom: [
+              {
+                system: "phone",
+                value: "01823333444",
+                use: "work",
+              },
+            ],
+          },
+        },
+        {
+          fullUrl: "urn:uuid:54b0506d-49af-4245-9d40-d7d64902055e",
+          resource: {
+            resourceType: "HealthcareService",
+            id: "54b0506d-49af-4245-9d40-d7d64902055e",
+            identifier: [
+              {
+                use: "usual",
+                system: "https://fhir.nhs.uk/Id/ods-organization-code",
+                value: "A99968",
+              },
+            ],
+            active: true,
+            providedBy: {
+              identifier: {
+                system: "https://fhir.nhs.uk/Id/ods-organization-code",
+                value: "RBA",
+              },
+            },
+            location: [
+              {
+                reference: "urn:uuid:8a5d7d67-64fb-44ec-9802-2dc214bb3dcb",
+              },
+            ],
+            name: "SOMERSET BOWEL CANCER SCREENING CENTRE",
+            telecom: [
+              {
+                system: "phone",
+                value: "01823 333444",
+                use: "work",
+              },
+            ],
+          },
+        },
+        {
+          fullUrl: "urn:uuid:8a5d7d67-64fb-44ec-9802-2dc214bb3dcb",
+          resource: {
+            resourceType: "Location",
+            id: "8a5d7d67-64fb-44ec-9802-2dc214bb3dcb",
+            identifier: [
+              {
+                value: "10008800708",
+              },
+            ],
+            status: "active",
+            mode: "instance",
+            address: {
+              use: "work",
+              line: ["MUSGROVE PARK HOSPITAL"],
+              city: "TAUNTON",
+              postalCode: "TA1 5DA",
+            },
+          },
+        },
+        {
+          fullUrl: "urn:uuid:51793ac0-112f-46c7-a891-9af8cefb206e",
+          resource: {
+            resourceType: "CommunicationRequest",
+            status: "unknown",
+            subject: {
+              reference: "urn:uuid:78d3c2eb-009e-4ec8-a358-b042954aa9b2",
+            },
+            payload: [
+              {
+                contentReference: {
+                  reference: "urn:uuid:d0f003a0-8763-43d5-a264-ce52a38901c9",
+                  display: "List of Repeat Medications for re-ordering",
+                },
+              },
+            ],
+            requester: {
+              type: "Organization",
+              identifier: {
+                system: "https://fhir.nhs.uk/Id/ods-organization-code",
+                value: "RBA",
+              },
+              display: "TAUNTON AND SOMERSET NHS FOUNDATION TRUST",
+            },
+            recipient: [
+              {
+                type: "Patient",
+                identifier: {
+                  system: "https://fhir.nhs.uk/Id/nhs-number",
+                  value: "9453740519",
+                },
+              },
+            ],
+          },
+        },
+        {
+          fullUrl: "urn:uuid:d0f003a0-8763-43d5-a264-ce52a38901c9",
+          resource: {
+            resourceType: "List",
+            status: "current",
+            mode: "snapshot",
+            code: {
+              text: "Repeat Medications",
+            },
+            subject: {
+              reference: "urn:uuid:78d3c2eb-009e-4ec8-a358-b042954aa9b2",
+            },
+            entry: [
+              {
+                item: {
+                  display: "Metformin 500mg tablets",
+                },
+              },
+              {
+                item: {
+                  display: "Aspirin 75mg dispersible tablets",
+                },
+              },
+              {
+                item: {
+                  display: "Simvastatin 40mg tablets",
+                },
+              },
+              {
+                item: {
+                  display: "Chloramphenicol 0.5% eye drops",
+                },
+              },
+            ],
+          },
+        },
+      ],
+    };
+    console.log(prescription);
+  });
 }
 
 function doPrescriptionAction(select) {
@@ -1585,7 +1606,9 @@ function onLoad() {
   ) {
     sendPrescriptionRequest();
   }
-  document.getElementById('prescription-test-pack').addEventListener('change', handleFileSelect, false);
+  document
+    .getElementById("prescription-test-pack")
+    .addEventListener("change", handleFileSelect, false);
   document.querySelector("#main-content").style.display = "";
 }
 
