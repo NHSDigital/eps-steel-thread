@@ -761,8 +761,8 @@ function getPayloads() {
     .concat(textPayloads)
     .filter(Boolean)
     .map((payload) => {
-      console.log(payload)
-      JSON.parse(payload)
+      console.log(payload);
+      JSON.parse(payload);
     });
   if (isCustom && !payloads.length) {
     addError("Unable to parse custom prescription(s)");
@@ -830,7 +830,7 @@ function handleFileSelect(evt) {
 }
 
 function createPrescriptions(xlsxRows) {
-  pageData.payloads = []
+  pageData.payloads = [];
   xlsxRows.forEach((row) => {
     console.log(row);
 
@@ -1251,7 +1251,7 @@ function createPrescription(row, repeatsIssued = 0, maxRepeatsAllowed = 0) {
   };
   updateBundleIds(prescription);
   console.log(prescription);
-  return prescription;
+  return JSON.stringify(prescription);
 }
 
 function getDosageInstructionText(row) {
