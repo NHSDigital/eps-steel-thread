@@ -921,7 +921,7 @@ function createPrescriptions(patients, rows) {
   prescriptionRows.forEach((prescriptionRows) => {
     const prescription = prescriptionRows[0];
 
-    if (getPrescriptionType(prescription) === "repeat-dispensing") {
+    if (getPrescriptionTypeCode(prescription) === "repeat-dispensing") {
       const repeatsAllowed = getNumberOfRepeatsAllowed(prescription);
       for (
         let repeatsIssued = 0;
@@ -1310,7 +1310,7 @@ function createMedicationRequests(
           value: "A0548B-A99968-451485",
         },
         courseOfTherapyType: {
-          coding: [createPrescriptionType(getPrescriptionType(row))],
+          coding: [createPrescriptionType(getPrescriptionTypeSystem(row), getPrescriptionTypeCode(row))],
         },
         dosageInstruction: [
           {
@@ -1382,11 +1382,19 @@ function getMedicationRequestExtensions(row, repeatsIssued, maxRepeatsAllowed) {
   return extension;
 }
 
-function getPrescriptionType(row) {
+function getPrescriptionTypeCode(row) {
   const firstPart = row["Prescription Type"].split(" ")[0];
   if (firstPart === "acute") return "acute";
   else {
-    return "repeat-dispensing";
+    return "continuous-repeat-dispensing";
+  }
+}
+
+function getPrescriptionTypeSystem(row) {
+  const firstPart = row["Prescription Type"].split(" ")[0];
+  if (firstPart === "acute") return "http://terminology.hl7.org/CodeSystem/medicationrequest-course-of-therapy";
+  else {
+    return "https://fhir.nhs.uk/CodeSystem/medicationrequest-course-of-therapy";
   }
 }
 
@@ -1394,11 +1402,10 @@ function getNumberOfRepeatsAllowed(row) {
   return parseInt(row["Prescription Type"].split(" ")[0]);
 }
 
-function createPrescriptionType(code) {
+function createPrescriptionType(system, code) {
   return {
-    system:
-      "http://terminology.hl7.org/CodeSystem/medicationrequest-course-of-therapy",
-    code,
+    system,
+    code
   };
 }
 
