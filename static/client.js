@@ -979,7 +979,7 @@ function getMedicationQuantity(row) {
 
 function getPatient(patients, prescription) {
   const testNumber = prescription["Test"]
-  return patients.filter(patient => patient["Test ref"] === testNumber)[0]
+  return patients[testNumber - 1]
 }
 
 function createPrescription(
