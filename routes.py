@@ -161,7 +161,10 @@ def get_load():
 def download():
     zFile = io.BytesIO()
     with zipfile.ZipFile(zFile, 'w') as zip_file:
-        zip_file.writestr("send_request.json", json.dumps({}))
+        short_prescription_ids = get_prescription_ids_from_cookie()
+        for index, short_prescription_id in enumerate(short_prescription_ids):
+            bundle = load_prepare_request(short_prescription_id)
+            zip_file.writestr(f"send_request_{index+1}.json", json.dumps(bundle))
     zFile.seek(0)
 
     return flask.send_file(
@@ -169,29 +172,6 @@ def download():
         mimetype='application/zip',
         as_attachment=True,
         attachment_filename='send_requests.zip')
-
-
-def make_zipfile(row):
-    zipdir = tempfile.mkdtemp(prefix='/tmp/')
-    oldpath = os.getcwd()
-    os.chdir(zipdir)
-
-    # jdata = json.loads(row)
-    # for conf in jdata:
-    #     for f in conf:
-    #         makeFile(zipdir, f, conf[f])
-
-    # Create the in-memory zip image
-    data = io.BytesIO()
-    with zipfile.ZipFile(data, mode='w') as z:
-        for fname in os.listdir("."):
-            z.write(fname)
-            os.unlink(fname)
-    data.seek(0)
-
-    os.chdir(oldpath)
-    os.rmdir(zipdir)
-    return data
 
 
 def update_pagination(response, short_prescription_ids, current_short_prescription_id):
