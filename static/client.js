@@ -80,7 +80,9 @@ const pageData = {
   mode: "home",
   signature: "",
   loggedIn: Cookies.get("Access-Token-Set") === "true",
-  loggedInToCis2: Cookies.get("Access-Token-Set") === "true" && Cookies.get("Auth-Method") === "cis2",
+  loggedInToCis2:
+    Cookies.get("Access-Token-Set") === "true" &&
+    Cookies.get("Auth-Method") === "cis2",
   showCustomExampleInput: false,
   showCustomPharmacyInput: false,
   selectedExampleId: "1",
@@ -803,18 +805,18 @@ var ExcelToJSON = function () {
         type: "binary",
       });
 
-      let patients = []
+      let patients = [];
       workbook.SheetNames.forEach(function (sheetName) {
         var rows = XLSX.utils.sheet_to_row_object_array(
           workbook.Sheets[sheetName]
         );
 
-        switch(sheetName.toLowerCase()) {
+        switch (sheetName.toLowerCase()) {
           case "patients":
-            patients = createPatients(rows)
+            patients = createPatients(rows);
             break;
           case "prescriptions":
-            createPrescriptions(patients, rows)
+            createPrescriptions(patients, rows);
             break;
         }
       });
@@ -837,103 +839,109 @@ function handleFileSelect(evt) {
 function groupBy(list, keyGetter) {
   const map = new Map();
   list.forEach((item) => {
-       const key = keyGetter(item);
-       const collection = map.get(key);
-       if (!collection) {
-           map.set(key, [item]);
-       } else {
-           collection.push(item);
-       }
+    const key = keyGetter(item);
+    const collection = map.get(key);
+    if (!collection) {
+      map.set(key, [item]);
+    } else {
+      collection.push(item);
+    }
   });
   return map;
 }
 
 function createPatients(rows) {
-  return rows.map(row => {
+  return rows.map((row) => {
     return {
-      "fullUrl": "urn:uuid:78d3c2eb-009e-4ec8-a358-b042954aa9b2",
-      "resource": {
-        "resourceType": "Patient",
-        "identifier": [
+      fullUrl: "urn:uuid:78d3c2eb-009e-4ec8-a358-b042954aa9b2",
+      resource: {
+        resourceType: "Patient",
+        identifier: [
           {
-            "extension": [
+            extension: [
               {
-                "url": "https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-NHSNumberVerificationStatus",
-                "valueCodeableConcept": {
-                  "coding": [
+                url:
+                  "https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-NHSNumberVerificationStatus",
+                valueCodeableConcept: {
+                  coding: [
                     {
-                      "system": "https://fhir.hl7.org.uk/CodeSystem/UKCore-NHSNumberVerificationStatus",
-                      "code": "01",
-                      "display": "Number present and verified"
-                    }
-                  ]
-                }
-              }
+                      system:
+                        "https://fhir.hl7.org.uk/CodeSystem/UKCore-NHSNumberVerificationStatus",
+                      code: "01",
+                      display: "Number present and verified",
+                    },
+                  ],
+                },
+              },
             ],
-            "system": "https://fhir.nhs.uk/Id/nhs-number",
-            "value": row["NHS_NUMBER"]
-          }
+            system: "https://fhir.nhs.uk/Id/nhs-number",
+            value: row["NHS_NUMBER"],
+          },
         ],
-        "name": [
+        name: [
           {
-            "use": "usual",
-            "family": row["FAMILY_NAME"],
-            "given": [
+            use: "usual",
+            family: row["FAMILY_NAME"],
+            given: [
               //row["OTHER_GIVEN_NAME"], - todo, null handling
-              row["GIVEN_NAME"]
+              row["GIVEN_NAME"],
             ],
-            "prefix": [
-              row["TITLE"]
-            ]
-          }
+            prefix: [row["TITLE"]],
+          },
         ],
-        "gender": row["GENDER"].toLowerCase(),
-        "birthDate": `${row["DATE_OF_BIRTH"].substring(0, 4)}-${row["DATE_OF_BIRTH"].substring(4, 6)}-${row["DATE_OF_BIRTH"].substring(6)}`,
-        "address": [
+        gender: row["GENDER"].toLowerCase(),
+        birthDate: `${row["DATE_OF_BIRTH"].substring(0, 4)}-${row[
+          "DATE_OF_BIRTH"
+        ].substring(4, 6)}-${row["DATE_OF_BIRTH"].substring(6)}`,
+        address: [
           {
-            "use": "home",
-            "line": [
+            use: "home",
+            line: [
               //row["ADDRESS_LINE_1"], todo null handling
               row["ADDRESS_LINE_2"],
               //row["ADDRESS_LINE_3"],
               row["ADDRESS_LINE_4"],
               //row["ADDRESS_LINE_5"]
             ],
-            "postalCode": row["POST_CODE"]
-          }
+            postalCode: row["POST_CODE"],
+          },
         ],
-        "generalPractitioner": [
+        generalPractitioner: [
           {
-            "identifier": {
-              "system": "https://fhir.nhs.uk/Id/ods-organization-code",
-              "value": "A83008"
-            }
-          }
-        ]
-      }
-    }
-  })
+            identifier: {
+              system: "https://fhir.nhs.uk/Id/ods-organization-code",
+              value: "A83008",
+            },
+          },
+        ],
+      },
+    };
+  });
 }
 
 function createPrescriptions(patients, rows) {
   pageData.payloads = [];
-  const prescriptionRows = groupBy(rows, row => row["Test"]);
+  const prescriptionRows = groupBy(rows, (row) => row["Test"]);
   prescriptionRows.forEach((prescriptionRows) => {
     const prescription = prescriptionRows[0];
 
-    if (getPrescriptionTypeCode(prescription) === "continuous-repeat-dispensing") {
+    if (
+      getPrescriptionTypeCode(prescription) === "continuous-repeat-dispensing"
+    ) {
       const repeatsAllowed = getNumberOfRepeatsAllowed(prescription);
       for (
         let repeatsIssued = 0;
         repeatsIssued < repeatsAllowed - 1;
         repeatsIssued++
       ) {
-        pageData.payloads.push(createPrescription(
-          patients,
-          prescriptionRows,
-          repeatsIssued,
-          repeatsAllowed
-        ));
+        pageData.payloads.push(
+          createPrescription(
+            patients,
+            prescriptionRows,
+            repeatsIssued,
+            repeatsAllowed
+          )
+        );
       }
     }
     pageData.payloads.push(createPrescription(patients, prescriptionRows));
@@ -978,9 +986,9 @@ function getMedicationQuantity(row) {
 }
 
 function getPatient(patients, prescriptionRows) {
-  const prescription = prescriptionRows[0]
-  const testNumber = prescription["Test"]
-  return patients[testNumber - 1]
+  const prescription = prescriptionRows[0];
+  const testNumber = prescription["Test"];
+  return patients[testNumber - 1];
 }
 
 function createPrescription(
@@ -1205,39 +1213,41 @@ function createPrescription(
           resourceType: "CommunicationRequest",
           status: "unknown",
           subject: {
-            reference: "urn:uuid:78d3c2eb-009e-4ec8-a358-b042954aa9b2"
+            reference: "urn:uuid:78d3c2eb-009e-4ec8-a358-b042954aa9b2",
           },
           payload: [
             {
-              contentString: "TEST PRESCRIPTION - DO NOT DISPENSE"
-            }
+              contentString: "TEST PRESCRIPTION - DO NOT DISPENSE",
+            },
           ],
           requester: {
             type: "Organization",
             identifier: {
               system: "https://fhir.nhs.uk/Id/ods-organization-code",
-              value: "RBA"
+              value: "RBA",
             },
-            display: "TAUNTON AND SOMERSET NHS FOUNDATION TRUST"
+            display: "TAUNTON AND SOMERSET NHS FOUNDATION TRUST",
           },
           recipient: [
             {
               type: "Patient",
               identifier: {
                 system: "https://fhir.nhs.uk/Id/nhs-number",
-                value: "9449307571"
-              }
-            }
-          ]
-        }
-      }
+                value: "9449307571",
+              },
+            },
+          ],
+        },
+      },
     ],
   };
   createMedicationRequests(
     prescription,
     repeatsIssued,
     maxRepeatsAllowed
-  ).forEach(medicationRequest => fhirPrescription.entry.push(medicationRequest))
+  ).forEach((medicationRequest) =>
+    fhirPrescription.entry.push(medicationRequest)
+  );
   updateBundleIds(fhirPrescription);
   return JSON.stringify(fhirPrescription);
 }
@@ -1248,7 +1258,7 @@ function createMedicationRequests(
   maxRepeatsAllowed
 ) {
   return xlsxRowGroup.map((row) => {
-    const id = uuidv4()
+    const id = uuidv4();
     return {
       fullUrl: `urn:uuid:${id}`,
       resource: {
@@ -1310,33 +1320,19 @@ function createMedicationRequests(
           value: "A0548B-A99968-451485",
         },
         courseOfTherapyType: {
-          coding: [createPrescriptionType(getPrescriptionTypeSystem(row), getPrescriptionTypeCode(row))],
+          coding: [
+            createPrescriptionType(
+              getPrescriptionTypeSystem(row),
+              getPrescriptionTypeCode(row)
+            ),
+          ],
         },
         dosageInstruction: [
           {
             text: getDosageInstructionText(row),
           },
         ],
-        dispenseRequest: {
-          extension: [
-            {
-              url:
-                "https://fhir.nhs.uk/StructureDefinition/Extension-DM-PerformerSiteType",
-              valueCoding: {
-                system:
-                  "https://fhir.nhs.uk/CodeSystem/dispensing-site-preference",
-                code: "P1",
-              },
-            },
-          ],
-          performer: {
-            identifier: {
-              system: "https://fhir.nhs.uk/Id/ods-organization-code",
-              value: "VNCEL",
-            },
-          },
-          quantity: getMedicationQuantity(row),
-        },
+        dispenseRequest: getDispenseRequest(row),
         substitution: {
           allowedBoolean: false,
         },
@@ -1345,8 +1341,64 @@ function createMedicationRequests(
   });
 }
 
+function getDispenseRequest(row) {
+  if (getPrescriptionTypeCode(row) === "continuous-repeat-dispensing") {
+    return {
+      extension: [
+        {
+          url:
+            "https://fhir.nhs.uk/StructureDefinition/Extension-DM-PerformerSiteType",
+          valueCoding: {
+            system: "https://fhir.nhs.uk/CodeSystem/dispensing-site-preference",
+            code: "P1",
+          },
+        },
+      ],
+      performer: {
+        identifier: {
+          system: "https://fhir.nhs.uk/Id/ods-organization-code",
+          value: "VNCEL",
+        },
+      },
+      quantity: getMedicationQuantity(row),
+      validityPeriod: {
+        start: "2021-05-07",
+        end: "2021-07-04"
+      },
+      expectedSupplyDuration: {
+        "value": 30,
+        "unit": "day",
+        "system": "http://unitsofmeasure.org",
+        "code": "d"
+      }
+    };
+  }
+
+  return {
+    extension: [
+      {
+        url:
+          "https://fhir.nhs.uk/StructureDefinition/Extension-DM-PerformerSiteType",
+        valueCoding: {
+          system: "https://fhir.nhs.uk/CodeSystem/dispensing-site-preference",
+          code: "P1",
+        },
+      },
+    ],
+    performer: {
+      identifier: {
+        system: "https://fhir.nhs.uk/Id/ods-organization-code",
+        value: "VNCEL",
+      },
+    },
+    quantity: getMedicationQuantity(row),
+  };
+}
+
 function getDosageInstructionText(row) {
-  return row["Dosage Instructions"] ? row["Dosage Instructions"] : "As directed";
+  return row["Dosage Instructions"]
+    ? row["Dosage Instructions"]
+    : "As directed";
 }
 
 function getMedicationDisplay(row) {
@@ -1357,7 +1409,8 @@ function getMedicationRequestExtensions(row, repeatsIssued, maxRepeatsAllowed) {
   const prescriberTypeParts = row["Prescriber Type"].split(" - ");
   const prescriberTypeCode = prescriberTypeParts[1];
   let prescriberTypeDisplay = prescriberTypeParts[0];
-  prescriberTypeDisplay = prescriberTypeDisplay[0].toUpperCase() + prescriberTypeDisplay.slice(1);
+  prescriberTypeDisplay =
+    prescriberTypeDisplay[0].toUpperCase() + prescriberTypeDisplay.slice(1);
   const extension = [
     {
       url:
@@ -1392,7 +1445,8 @@ function getPrescriptionTypeCode(row) {
 
 function getPrescriptionTypeSystem(row) {
   const firstPart = row["Prescription Type"].split(" ")[0];
-  if (firstPart === "acute") return "http://terminology.hl7.org/CodeSystem/medicationrequest-course-of-therapy";
+  if (firstPart === "acute")
+    return "http://terminology.hl7.org/CodeSystem/medicationrequest-course-of-therapy";
   else {
     return "https://fhir.nhs.uk/CodeSystem/medicationrequest-course-of-therapy";
   }
@@ -1405,7 +1459,7 @@ function getNumberOfRepeatsAllowed(row) {
 function createPrescriptionType(system, code) {
   return {
     system,
-    code
+    code,
   };
 }
 
