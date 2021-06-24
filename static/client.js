@@ -871,32 +871,35 @@ function createPatients(rows) {
               }
             ],
             "system": "https://fhir.nhs.uk/Id/nhs-number",
-            "value": "9449305552"
+            "value": row["NHS_NUMBER"]
           }
         ],
         "name": [
           {
             "use": "usual",
-            "family": "CHISLETT",
+            "family": row["FAMILY_NAME"],
             "given": [
-              "OCTAVIA"
+              //row["OTHER_GIVEN_NAME"], - todo, null handling
+              row["GIVEN_NAME"]
             ],
             "prefix": [
-              "MS"
+              row["TITLE"]
             ]
           }
         ],
-        "gender": "female",
-        "birthDate": "2008-09-20",
+        "gender": row["GENDER"].toLowerCase(),
+        "birthDate": `${row["DATE_OF_BIRTH"].substring(0, 4)}-${row["DATE_OF_BIRTH"].substring(4, 2)}-${row["DATE_OF_BIRTH"].substring(6, 2)}`,
         "address": [
           {
             "use": "home",
             "line": [
-              "1 RAVENSFIELD GARDENS",
-              "EPSOM",
-              "SURREY"
+              //row["ADDRESS_LINE_1"], todo null handling
+              row["ADDRESS_LINE_2"],
+              //row["ADDRESS_LINE_3"],
+              row["ADDRESS_LINE_4"],
+              //row["ADDRESS_LINE_5"]
             ],
-            "postalCode": "KT19 0ST"
+            "postalCode": row["POST_CODE"]
           }
         ],
         "generalPractitioner": [
