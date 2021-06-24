@@ -172,6 +172,18 @@
         </div>
       </div>
       <div class="nhsuk-grid-row" rv-show="mode | isSign">
+        <div class="nhsuk-grid-column-full">
+          <div class="nhsuk-panel">
+            <dl class="nhsuk-summary-list">
+              <div class="nhsuk-summary-list__row">
+                <dt class="nhsuk-summary-list__key">Start Date</dt>
+                <dd class="nhsuk-summary-list__value">{signRequestSummary.author.startDate}</dd>
+                <dt class="nhsuk-summary-list__key" rv-show="signRequestSummary.repeatNumber">Repeat Number</dt>
+                <dd class="nhsuk-summary-list__value" rv-show="signRequestSummary.repeatNumber">{signRequestSummary.repeatNumber}</dd>
+              </div>
+            </dl>
+          </div>
+        </div>
         <nav class="nhsuk-pagination" role="navigation" aria-label="Pagination">
           <ul class="nhsuk-list nhsuk-pagination__list">
             <li class="nhsuk-pagination-item--previous" rv-show="previous_prescription_id">
@@ -202,18 +214,6 @@
             </li>
           </ul>
         </nav>
-        <div class="nhsuk-grid-column-full">
-          <div class="nhsuk-panel">
-            <dl class="nhsuk-summary-list">
-              <div class="nhsuk-summary-list__row">
-                <dt class="nhsuk-summary-list__key">Start Date</dt>
-                <dd class="nhsuk-summary-list__value">{signRequestSummary.author.startDate}</dd>
-                <dt class="nhsuk-summary-list__key" rv-show="signRequestSummary.repeatNumber">Repeat Number</dt>
-                <dd class="nhsuk-summary-list__value" rv-show="signRequestSummary.repeatNumber">{signRequestSummary.repeatNumber}</dd>
-              </div>
-            </dl>
-          </div>
-        </div>
         <div class="nhsuk-grid-column-full">
           <div class="nhsuk-panel-with-label">
             <h3 class="nhsuk-panel-with-label__label">Patient</h3>

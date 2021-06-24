@@ -756,7 +756,7 @@ function getSummary(payload) {
     author: {
       startDate: startDate,
     },
-    repeatNumber: isInteger(numberOfRepeatPrescriptionsIssued) ? numberOfRepeatPrescriptionsIssued + 1 : null,
+    repeatNumber: Number.isInteger(numberOfRepeatPrescriptionsIssued) ? numberOfRepeatPrescriptionsIssued + 1 : null,
     patient: patient,
     practitioner: practitioner,
     encounter: encounter,
