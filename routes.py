@@ -206,8 +206,6 @@ def post_sign():
     short_prescription_id = get_prescription_id_from_cookie()
     prepare_request = load_prepare_request(short_prescription_id)
     prepare_response = make_eps_api_prepare_request(get_access_token(), prepare_request)
-    print("Response from EPS prepare request...")
-    print(json.dumps(prepare_response))
     auth_method = get_auth_method_from_cookie()
     sign_response = make_sign_api_signature_upload_request(
         auth_method, get_access_token(), prepare_response["digest"], prepare_response["algorithm"]

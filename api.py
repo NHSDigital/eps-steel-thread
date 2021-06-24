@@ -22,6 +22,8 @@ DEMO_APP_REMOTE_SIGNING_KID = os.environ["RSS_JWT_KID"]
 def make_eps_api_prepare_request(access_token, body):
     response = make_eps_api_request("$prepare", access_token, body)
     response_json = response.json()
+    print("Response from EPS prepare request...")
+    print(json.dumps(response_json))
     return {p["name"]: p["valueString"] for p in response_json["parameter"]}
 
 
