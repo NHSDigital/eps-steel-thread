@@ -1195,11 +1195,12 @@ function createMedicationRequests(
   maxRepeatsAllowed
 ) {
   return xlsxRowGroup.map((xlsxRow) => {
+    const id = uuidv4()
     return {
-      fullUrl: "urn:uuid:a54219b8-f741-4c47-b662-e4f8dfa49ab6",
+      fullUrl: `urn:uuid:${id}`,
       resource: {
         resourceType: "MedicationRequest",
-        id: "a54219b8-f741-4c47-b662-e4f8dfa49ab6",
+        id: id,
         extension: getMedicationRequestExtensions(
           xlsxRow,
           repeatsIssued,
@@ -1208,7 +1209,7 @@ function createMedicationRequests(
         identifier: [
           {
             system: "https://fhir.nhs.uk/Id/prescription-order-item-number",
-            value: "a54219b8-f741-4c47-b662-e4f8dfa49ab6",
+            value: id,
           },
         ],
         status: "active",
