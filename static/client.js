@@ -826,22 +826,36 @@ function handleFileSelect(evt) {
   xl2json.parseExcel(files[0]);
 }
 
+var groupBy = function (xs, key) {
+  return xs.reduce(function (rv, x) {
+    (rv[x[key]] = rv[x[key]] || []).push(x);
+    return rv;
+  }, {});
+};
+
 function createPrescriptions(xlsxRows) {
   pageData.payloads = [];
-  xlsxRows.forEach((row) => {
-    console.log(row);
+  const xlsxRowGroup = groupBy(xlsxRows, "Test");
+  xlsxRowGroup.forEach((xlsxRowGroup) => {
+    console.log(xlsxRowGroup);
+    const xlsxPrescription = xlsxRowGroup[0];
 
-    if (getPrescriptionType(row) === "repeat-dispensing") {
-      const repeatsAllowed = getNumberOfRepeatsAllowed(row);
+    if (getPrescriptionType(xlsxPrescription) === "repeat-dispensing") {
+      const repeatsAllowed = getNumberOfRepeatsAllowed(xlsxPrescription);
       for (
         let repeatsIssued = 0;
         repeatsIssued < repeatsAllowed - 1;
         repeatsIssued++
       ) {
-        createPrescription(row, repeatsIssued, repeatsAllowed);
+        createPrescription(
+          xlsxPrescription,
+          xlsxRowGroup,
+          repeatsIssued,
+          repeatsAllowed
+        );
       }
     }
-    pageData.payloads.push(createPrescription(row));
+    pageData.payloads.push(createPrescription(xlsxPrescription, xlsxRowGroup));
   });
 }
 
@@ -882,7 +896,12 @@ function getMedicationQuantity(row) {
   };
 }
 
-function createPrescription(row, repeatsIssued = 0, maxRepeatsAllowed = 0) {
+function createPrescription(
+  row,
+  xlsxRowGroup,
+  repeatsIssued = 0,
+  maxRepeatsAllowed = 0
+) {
   const prescription = {
     resourceType: "Bundle",
     id: "aef77afb-7e3c-427a-8657-2c427f71a272",
@@ -928,99 +947,11 @@ function createPrescription(row, repeatsIssued = 0, maxRepeatsAllowed = 0) {
           focus: [],
         },
       },
-      {
-        fullUrl: "urn:uuid:a54219b8-f741-4c47-b662-e4f8dfa49ab6",
-        resource: {
-          resourceType: "MedicationRequest",
-          id: "a54219b8-f741-4c47-b662-e4f8dfa49ab6",
-          extension: getMedicationRequestExtensions(
-            row,
-            repeatsIssued,
-            maxRepeatsAllowed
-          ),
-          identifier: [
-            {
-              system: "https://fhir.nhs.uk/Id/prescription-order-item-number",
-              value: "a54219b8-f741-4c47-b662-e4f8dfa49ab6",
-            },
-          ],
-          status: "active",
-          intent: "order",
-          category: [
-            {
-              coding: [
-                {
-                  system:
-                    "http://terminology.hl7.org/CodeSystem/medicationrequest-category",
-                  code: "outpatient",
-                  display: "Outpatient",
-                },
-              ],
-            },
-          ],
-          medicationCodeableConcept: {
-            coding: [
-              {
-                system: "http://snomed.info/sct",
-                code: "13892511000001100",
-                display: getMedicationDisplay(row),
-              },
-            ],
-          },
-          subject: {
-            reference: "urn:uuid:78d3c2eb-009e-4ec8-a358-b042954aa9b2",
-          },
-          authoredOn: "2021-05-07T14:47:29+00:00",
-          requester: {
-            reference: "urn:uuid:56166769-c1c4-4d07-afa8-132b5dfca666",
-          },
-          groupIdentifier: {
-            extension: [
-              {
-                url:
-                  "https://fhir.nhs.uk/StructureDefinition/Extension-DM-PrescriptionId",
-                valueIdentifier: {
-                  system: "https://fhir.nhs.uk/Id/prescription",
-                  value: "a5b9dc81-ccf4-4dab-b887-3d88e557febb",
-                },
-              },
-            ],
-            system: "https://fhir.nhs.uk/Id/prescription-order-number",
-            value: "A0548B-A99968-451485",
-          },
-          courseOfTherapyType: {
-            coding: [createPrescriptionType(getPrescriptionType(row))],
-          },
-          dosageInstruction: [
-            {
-              text: getDosageInstructionText(row),
-            },
-          ],
-          dispenseRequest: {
-            extension: [
-              {
-                url:
-                  "https://fhir.nhs.uk/StructureDefinition/Extension-DM-PerformerSiteType",
-                valueCoding: {
-                  system:
-                    "https://fhir.nhs.uk/CodeSystem/dispensing-site-preference",
-                  code: "P1",
-                },
-              },
-            ],
-            performer: {
-              identifier: {
-                system: "https://fhir.nhs.uk/Id/ods-organization-code",
-                value: "VNCEL",
-              },
-            },
-            quantity: getMedicationQuantity(row),
-          },
-          substitution: {
-            allowedBoolean: false,
-          },
-        },
-      },
+      createMedicationRequests(
+        xlsxRowGroup,
+        repeatsIssued,
+        maxRepeatsAllowed
+      ),
       {
         fullUrl: "urn:uuid:78d3c2eb-009e-4ec8-a358-b042954aa9b2",
         resource: {
@@ -1249,6 +1180,108 @@ function createPrescription(row, repeatsIssued = 0, maxRepeatsAllowed = 0) {
   updateBundleIds(prescription);
   console.log(prescription);
   return JSON.stringify(prescription);
+}
+
+function createMedicationRequests(
+  xlsxRowGroup,
+  repeatsIssued,
+  maxRepeatsAllowed
+) {
+  xlsxRowGroup.forEach((xlsxRow) => {
+    return {
+      fullUrl: "urn:uuid:a54219b8-f741-4c47-b662-e4f8dfa49ab6",
+      resource: {
+        resourceType: "MedicationRequest",
+        id: "a54219b8-f741-4c47-b662-e4f8dfa49ab6",
+        extension: getMedicationRequestExtensions(
+          row,
+          repeatsIssued,
+          maxRepeatsAllowed
+        ),
+        identifier: [
+          {
+            system: "https://fhir.nhs.uk/Id/prescription-order-item-number",
+            value: "a54219b8-f741-4c47-b662-e4f8dfa49ab6",
+          },
+        ],
+        status: "active",
+        intent: "order",
+        category: [
+          {
+            coding: [
+              {
+                system:
+                  "http://terminology.hl7.org/CodeSystem/medicationrequest-category",
+                code: "outpatient",
+                display: "Outpatient",
+              },
+            ],
+          },
+        ],
+        medicationCodeableConcept: {
+          coding: [
+            {
+              system: "http://snomed.info/sct",
+              code: "13892511000001100",
+              display: getMedicationDisplay(xlsxRow),
+            },
+          ],
+        },
+        subject: {
+          reference: "urn:uuid:78d3c2eb-009e-4ec8-a358-b042954aa9b2",
+        },
+        authoredOn: "2021-05-07T14:47:29+00:00",
+        requester: {
+          reference: "urn:uuid:56166769-c1c4-4d07-afa8-132b5dfca666",
+        },
+        groupIdentifier: {
+          extension: [
+            {
+              url:
+                "https://fhir.nhs.uk/StructureDefinition/Extension-DM-PrescriptionId",
+              valueIdentifier: {
+                system: "https://fhir.nhs.uk/Id/prescription",
+                value: "a5b9dc81-ccf4-4dab-b887-3d88e557febb",
+              },
+            },
+          ],
+          system: "https://fhir.nhs.uk/Id/prescription-order-number",
+          value: "A0548B-A99968-451485",
+        },
+        courseOfTherapyType: {
+          coding: [createPrescriptionType(getPrescriptionType(xlsxRow))],
+        },
+        dosageInstruction: [
+          {
+            text: getDosageInstructionText(xlsxRow),
+          },
+        ],
+        dispenseRequest: {
+          extension: [
+            {
+              url:
+                "https://fhir.nhs.uk/StructureDefinition/Extension-DM-PerformerSiteType",
+              valueCoding: {
+                system:
+                  "https://fhir.nhs.uk/CodeSystem/dispensing-site-preference",
+                code: "P1",
+              },
+            },
+          ],
+          performer: {
+            identifier: {
+              system: "https://fhir.nhs.uk/Id/ods-organization-code",
+              value: "VNCEL",
+            },
+          },
+          quantity: getMedicationQuantity(xlsxRow),
+        },
+        substitution: {
+          allowedBoolean: false,
+        },
+      },
+    };
+  });
 }
 
 function getDosageInstructionText(row) {
