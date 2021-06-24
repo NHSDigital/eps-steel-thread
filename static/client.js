@@ -758,7 +758,7 @@ function getPayloads() {
   const filePayloads = pageData.payloads;
   const textPayloads = [document.getElementById("prescription-textarea").value];
   const payloads = filePayloads
-    .concat(testPackPayloads)
+    .concat(textPayloads)
     .filter(Boolean)
     .map((payload) => JSON.parse(payload));
   if (isCustom && !payloads.length) {
