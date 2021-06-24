@@ -1273,7 +1273,6 @@ function getMedicationRequestExtensions(row, repeatsIssued, maxRepeatsAllowed) {
         display: prescriberTypeDisplay,
       },
     },
-    ,
   ];
 
   if (maxRepeatsAllowed) {
