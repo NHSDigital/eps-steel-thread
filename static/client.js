@@ -803,12 +803,12 @@ var ExcelToJSON = function () {
         type: "binary",
       });
 
+      let patients = []
       workbook.SheetNames.forEach(function (sheetName) {
         var rows = XLSX.utils.sheet_to_row_object_array(
           workbook.Sheets[sheetName]
         );
 
-        let patients = []
         switch(sheetName.toLowerCase()) {
           case "patients":
             patients = createPatients(rows)
