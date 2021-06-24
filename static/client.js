@@ -743,10 +743,20 @@ function getSummary(payload) {
   const startDate =
     medicationRequests[0].dispenseRequest.validityPeriod?.start ??
     new Date().toISOString().slice(0, 10);
+  const medicationRepeatInformation = medicationRequests[0].extension.filter(e => e.url === "https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-MedicationRepeatInformation")
+  const numberOfRepeatPrescriptionsIssuedExtension = medicationRepeatInformation
+    ? medicationRepeatInformation[0].extension.filter(e => e.url === "numberOfRepeatPrescriptionsIssued")
+    : null
+  const numberOfRepeatPrescriptionsIssued = medicationRepeatInformation && !numberOfRepeatPrescriptionsIssuedExtension
+    ? 0
+    : medicationRepeatInformation
+      ? numberOfRepeatPrescriptionsIssuedExtension[0].valueUnsignedInt
+      : null
   return {
     author: {
       startDate: startDate,
     },
+    repeatNumber: numberOfRepeatPrescriptionsIssued ? numberOfRepeatPrescriptionsIssued + 1 : null,
     patient: patient,
     practitioner: practitioner,
     encounter: encounter,
