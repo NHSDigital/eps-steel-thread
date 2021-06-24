@@ -747,7 +747,7 @@ function getSummary(payload) {
   const numberOfRepeatPrescriptionsIssuedExtension = medicationRepeatInformation.length
     ? medicationRepeatInformation[0].extension.filter(e => e.url === "numberOfRepeatPrescriptionsIssued")
     : null
-  const numberOfRepeatPrescriptionsIssued = medicationRepeatInformation.length && !numberOfRepeatPrescriptionsIssuedExtension
+  const numberOfRepeatPrescriptionsIssued = medicationRepeatInformation.length && !numberOfRepeatPrescriptionsIssuedExtension.length
     ? 0
     : medicationRepeatInformation.length
       ? numberOfRepeatPrescriptionsIssuedExtension[0].valueUnsignedInt
