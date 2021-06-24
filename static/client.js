@@ -757,8 +757,10 @@ function getPayloads() {
   const isCustom = pageData.selectedExampleId == "custom";
   const filePayloads = pageData.payloads;
   const textPayloads = [document.getElementById("prescription-textarea").value];
+  const testPackPayloads = pageData.payloads
   const payloads = filePayloads
     .concat(textPayloads)
+    .concat(testPackPayloads)
     .filter(Boolean)
     .map((payload) => JSON.parse(payload));
   if (isCustom && !payloads.length) {
@@ -840,7 +842,7 @@ function createPrescriptions(xlsxRows) {
         createPrescription(row, repeatsIssued, repeatsAllowed);
       }
     }
-    createPrescription(row);
+    pageData.payloads.push(createPrescription(row));
   });
 }
 
