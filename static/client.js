@@ -926,21 +926,7 @@ function createPrescription(row, repeatsIssued = 0, maxRepeatsAllowed = 0) {
         resource: {
           resourceType: "MedicationRequest",
           id: "a54219b8-f741-4c47-b662-e4f8dfa49ab6",
-          extension: [
-            {
-              url:
-                "https://fhir.nhs.uk/StructureDefinition/Extension-DM-PrescriptionType",
-              valueCoding: {
-                system: "https://fhir.nhs.uk/CodeSystem/prescription-type",
-                code: "1201",
-                display: "Outpatient Homecare Prescriber - Medical Prescriber",
-              },
-            },
-            createRepeatDispensingExtensionIfRequired(
-              repeatsIssued,
-              maxRepeatsAllowed
-            ),
-          ],
+          extension: getMedicationRequestExtensions(row, repeatsIssued, maxRepeatsAllowed),
           identifier: [
             {
               system: "https://fhir.nhs.uk/Id/prescription-order-item-number",
@@ -1288,6 +1274,29 @@ function createPrescription(row, repeatsIssued = 0, maxRepeatsAllowed = 0) {
   };
   updateBundleIds(prescription);
   console.log(prescription);
+}
+
+function getMedicationRequestExtensions(row, repeatsIssued, maxRepeatsAllowed) {
+  const extension = [
+    {
+      url: "https://fhir.nhs.uk/StructureDefinition/Extension-DM-PrescriptionType",
+      valueCoding: {
+        system: "https://fhir.nhs.uk/CodeSystem/prescription-type",
+        code: "1201",
+        display: "Outpatient Homecare Prescriber - Medical Prescriber",
+      },
+    },
+    ,
+  ];
+
+  if (maxRepeatsAllowed) {
+    extension.push(createRepeatDispensingExtensionIfRequired(
+      repeatsIssued,
+      maxRepeatsAllowed
+    ))
+  }
+
+  return extension
 }
 
 function getPrescriptionType(row) {
