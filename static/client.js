@@ -888,7 +888,7 @@ function createPatients(rows) {
           }
         ],
         "gender": row["GENDER"].toLowerCase(),
-        "birthDate": `${row["DATE_OF_BIRTH"].substring(0, 4)}-${row["DATE_OF_BIRTH"].substring(4, 2)}-${row["DATE_OF_BIRTH"].substring(6, 2)}`,
+        "birthDate": `${row["DATE_OF_BIRTH"].substring(0, 4)}-${row["DATE_OF_BIRTH"].substring(4, 6)}-${row["DATE_OF_BIRTH"].substring(6)}`,
         "address": [
           {
             "use": "home",
