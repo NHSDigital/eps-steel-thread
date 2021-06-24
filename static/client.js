@@ -1292,7 +1292,7 @@ function createMedicationRequests(
 }
 
 function getDosageInstructionText(row) {
-  return row["Dosage Instructions"];
+  return row["Dosage Instructions"] ? row["Dosage Instructions"] : "As directed";
 }
 
 function getMedicationDisplay(row) {
