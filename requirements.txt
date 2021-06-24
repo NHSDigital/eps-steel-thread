@@ -7,3 +7,4 @@ uwsgi
 cryptography
 jwt
 psycopg2
+zipfile

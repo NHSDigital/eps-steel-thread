@@ -44,7 +44,6 @@
         <label class="nhsuk-label nhsuk-select__label" style="display: inline;color: #ffffff;">Environment:</label>
         <select class="nhsuk-select" name="environment" id="environment">
           <option value="int">Integration</option>
-          <option value="prod" rv-show="loggedInToCis2">Production</option>
         </select>
       </div>
     </div>
@@ -72,6 +71,9 @@
               </div>
               <div rv-show="mode | isSign">
                 <h1 class="nhsuk-fieldset__heading">Prescription</h1>
+                <div style="float:left;display: inline;width: 150px;margin-top: -7px;">
+                  <a href="/download" id="send-request-bulk-download-fhir" download="send_requests.zip"><img style="width: 25%;" src="../static/json.png" title="Request"/></a>
+                </div>
               </div>
               <div rv-show="mode | isSend">
                 <h1 class="nhsuk-fieldset__heading">Send prescription</h1>

@@ -80,9 +80,6 @@ const pageData = {
   mode: "home",
   signature: "",
   loggedIn: Cookies.get("Access-Token-Set") === "true",
-  loggedInToCis2:
-    Cookies.get("Access-Token-Set") === "true" &&
-    Cookies.get("Auth-Method") === "cis2",
   showCustomExampleInput: false,
   showCustomPharmacyInput: false,
   selectedExampleId: "1",

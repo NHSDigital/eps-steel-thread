@@ -5,6 +5,8 @@ import json
 import base64
 import flask
 import httpx
+import time
+import zipfile
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from functools import wraps
@@ -152,6 +154,48 @@ def get_home():
 @app.route(LOAD_URL, methods=["GET"])
 def get_load():
     return render_client("load")
+
+
+FILEPATH = '/change/it/to/any_file.path'
+@app.route('/download', methods=['GET'])
+def download():
+    zFile = io.BytesIO()
+    with zipfile.ZipFile(zFile, 'w') as zip_file:
+        #zip_info = zipfile.ZipInfo(FILEPATH)
+        zip_info.date_time = time.localtime(time.time())[:6]
+        zip_info.compress_type = zipfile.ZIP_DEFLATED
+        # with open(FILEPATH, 'rb') as fd:
+        #     zip_file.writestr(zip_info, fd.read())
+    zFile.seek(0)
+
+    return flask.send_file(
+        zfile,
+        mimetype='application/zip',
+        as_attachment=True,
+        attachment_filename='send_requests.zip')
+
+
+def make_zipfile(row):
+    zipdir = tempfile.mkdtemp(prefix='/tmp/')
+    oldpath = os.getcwd()
+    os.chdir(zipdir)
+
+    # jdata = json.loads(row)
+    # for conf in jdata:
+    #     for f in conf:
+    #         makeFile(zipdir, f, conf[f])
+
+    # Create the in-memory zip image
+    data = io.BytesIO()
+    with zipfile.ZipFile(data, mode='w') as z:
+        for fname in os.listdir("."):
+            z.write(fname)
+            os.unlink(fname)
+    data.seek(0)
+
+    os.chdir(oldpath)
+    os.rmdir(zipdir)
+    return data
 
 
 def update_pagination(response, short_prescription_ids, current_short_prescription_id):
