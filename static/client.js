@@ -804,8 +804,6 @@ var ExcelToJSON = function () {
       });
 
       workbook.SheetNames.forEach(function (sheetName) {
-        if (sheetName.toLowerCase() !== "prescriptions") return;
-
         var rows = XLSX.utils.sheet_to_row_object_array(
           workbook.Sheets[sheetName]
         );
