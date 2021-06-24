@@ -827,6 +827,7 @@ function handleFileSelect(evt) {
 }
 
 function createPrescriptions(xlsxRows) {
+  pageData.payloads = []
   xlsxRows.forEach((row) => {
     console.log(row);
 
@@ -1246,6 +1247,7 @@ function createPrescription(row, repeatsIssued = 0, maxRepeatsAllowed = 0) {
     ],
   };
   updateBundleIds(prescription);
+  console.log(prescription);
   return prescription;
 }
 
