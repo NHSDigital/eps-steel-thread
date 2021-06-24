@@ -806,17 +806,17 @@ var ExcelToJSON = function () {
       workbook.SheetNames.forEach(function (sheetName) {
         if (sheetName.toLowerCase() !== "prescriptions") return;
 
-        var XL_row_object = XLSX.utils.sheet_to_row_object_array(
+        var rows = XLSX.utils.sheet_to_row_object_array(
           workbook.Sheets[sheetName]
         );
 
-        const patients = []
+        let patients = []
         switch(sheetName.toLowerCase()) {
           case "patients":
-            createPatients(XL_row_object).map(patient => patients.push(patient))
+            patients = createPatients(rows)
             break;
           case "prescriptions":
-            createPrescriptions(patients, XL_row_object)
+            createPrescriptions(patients, rows)
             break;
         }
       });
@@ -850,8 +850,8 @@ function groupBy(list, keyGetter) {
   return map;
 }
 
-function createPatients(xlsxRows) {
-  return xlsxRows.map(row => {
+function createPatients(rows) {
+  return rows.map(row => {
     return {
       "fullUrl": "urn:uuid:78d3c2eb-009e-4ec8-a358-b042954aa9b2",
       "resource": {
@@ -914,14 +914,14 @@ function createPatients(xlsxRows) {
   })
 }
 
-function createPrescriptions(patients, xlsxRows) {
+function createPrescriptions(patients, rows) {
   pageData.payloads = [];
-  const xlsxRowGroup = groupBy(xlsxRows, row => row["Test"]);
-  xlsxRowGroup.forEach((xlsxRowGroup) => {
-    const xlsxPrescription = xlsxRowGroup[0];
+  const prescriptionRows = groupBy(rows, row => row["Test"]);
+  prescriptionRows.forEach((prescriptionRows) => {
+    const prescription = prescriptionRows[0];
 
-    if (getPrescriptionType(xlsxPrescription) === "repeat-dispensing") {
-      const repeatsAllowed = getNumberOfRepeatsAllowed(xlsxPrescription);
+    if (getPrescriptionType(prescription) === "repeat-dispensing") {
+      const repeatsAllowed = getNumberOfRepeatsAllowed(prescription);
       for (
         let repeatsIssued = 0;
         repeatsIssued < repeatsAllowed - 1;
@@ -929,13 +929,13 @@ function createPrescriptions(patients, xlsxRows) {
       ) {
         createPrescription(
           patients,
-          xlsxRowGroup,
+          prescriptionRows,
           repeatsIssued,
           repeatsAllowed
         );
       }
     }
-    pageData.payloads.push(createPrescription(patients, xlsxRowGroup));
+    pageData.payloads.push(createPrescription(patients, prescriptionRows));
   });
 }
 
@@ -976,20 +976,20 @@ function getMedicationQuantity(row) {
   };
 }
 
-function getPatient(patients, testNumber) {
-  return patients[testNumber - 1]
+function getPatient(patients, prescription) {
+  const testNumber = prescription["Test"]
+  return patients.filter(patient => patient["Test ref"] === testNumber)[0]
 }
 
 function createPrescription(
   patients,
-  xlsxRowGroup,
+  prescription,
   repeatsIssued = 0,
   maxRepeatsAllowed = 0
 ) {
   console.log(patients)
-  console.log(xlsxRowGroup)
-  const testNumber = 0
-  const prescription = {
+  console.log(prescription)
+  const fhirPrescription = {
     resourceType: "Bundle",
     id: "aef77afb-7e3c-427a-8657-2c427f71a272",
     identifier: {
@@ -1034,7 +1034,7 @@ function createPrescription(
           focus: [],
         },
       },
-      getPatient(patients, testNumber),
+      getPatient(patients, prescription),
       {
         fullUrl: "urn:uuid:56166769-c1c4-4d07-afa8-132b5dfca666",
         resource: {
@@ -1234,12 +1234,12 @@ function createPrescription(
     ],
   };
   createMedicationRequests(
-    xlsxRowGroup,
+    prescription,
     repeatsIssued,
     maxRepeatsAllowed
-  ).forEach(medicationRequest => prescription.entry.push(medicationRequest))
-  updateBundleIds(prescription);
-  return JSON.stringify(prescription);
+  ).forEach(medicationRequest => fhirPrescription.entry.push(medicationRequest))
+  updateBundleIds(fhirPrescription);
+  return JSON.stringify(fhirPrescription);
 }
 
 function createMedicationRequests(
