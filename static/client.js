@@ -316,10 +316,7 @@ function sendLoadRequest() {
   const payloads = filePayloads
     .concat(textPayloads)
     .filter(Boolean)
-    .map((payload) => {
-      console.log(payload)
-      JSON.parse(payload)
-    });
+    .map((payload) => JSON.parse(payload));
   if (isCustom && !payloads.length) {
     addError("Unable to parse custom prescription(s)");
   } else {
@@ -763,7 +760,10 @@ function getPayloads() {
   const payloads = filePayloads
     .concat(textPayloads)
     .filter(Boolean)
-    .map((payload) => JSON.parse(payload));
+    .map((payload) => {
+      console.log(payload)
+      JSON.parse(payload)
+    });
   if (isCustom && !payloads.length) {
     addError("Unable to parse custom prescription(s)");
   } else {
