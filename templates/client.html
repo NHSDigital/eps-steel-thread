@@ -70,10 +70,11 @@
                 <h1 class="nhsuk-fieldset__heading">Cancel prescription</h1>
               </div>
               <div rv-show="mode | isSign">
-                <h1 class="nhsuk-fieldset__heading">Prescription</h1>
-                <div style="float:left;display: inline;width: 150px;margin-top: -7px;">
-                  <a href="/download" id="send-request-bulk-download-fhir" download="send_requests.zip"><img style="width: 25%;" src="../static/json.png" title="Request"/></a>
-                </div>
+                <h1 class="nhsuk-fieldset__heading">Prescription
+                  <div style="float:right;display:inline;width:150px;margin-left:20px;">
+                    <a href="/download" id="send-request-bulk-download-fhir" download="send_requests.zip"><img style="width: 35%;" src="../static/json.png" title="Request"></a>
+                  </div>
+                </h1>
               </div>
               <div rv-show="mode | isSend">
                 <h1 class="nhsuk-fieldset__heading">Send prescription</h1>

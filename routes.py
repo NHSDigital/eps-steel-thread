@@ -157,8 +157,7 @@ def get_load():
     return render_client("load")
 
 
-FILEPATH = '/change/it/to/any_file.path'
-@app.route('/download', methods=['GET'])
+@app.route('/test-pack/download', methods=['GET'])
 def download():
     zFile = io.BytesIO()
     with zipfile.ZipFile(zFile, 'w') as zip_file:
