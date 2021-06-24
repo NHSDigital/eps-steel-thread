@@ -831,8 +831,8 @@ function createPrescriptions(xlsxRows) {
     console.log(row);
 
     if (getPrescriptionType(row) === "repeat-dispensing") {
-      const repeats = getNumberOfRepeatsAllowed(row);
-      for (let repeatsIssued = 0; repeatsIssued < repeats.length; repeatsIssued++) {
+      const repeatsAllowed = getNumberOfRepeatsAllowed(row);
+      for (let repeatsIssued = 0; repeatsIssued < repeatsAllowed; repeatsIssued++) {
         createPrescription(row, repeatsIssued, repeatNumber);
       }
     }
