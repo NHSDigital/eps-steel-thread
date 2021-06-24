@@ -872,6 +872,15 @@ function createRepeatDispensingExtensionIfRequired(
   };
 }
 
+function getMedicationQuantity(row) {
+  return {
+    value: row["Qty"],
+    unit: row["UoM"],
+    system: "http://snomed.info/sct",
+    code: "385024007",
+  };
+}
+
 function createPrescription(row, repeatsIssued = 0, maxRepeatsAllowed = 0) {
   const prescription = {
     resourceType: "Bundle",
@@ -923,7 +932,11 @@ function createPrescription(row, repeatsIssued = 0, maxRepeatsAllowed = 0) {
         resource: {
           resourceType: "MedicationRequest",
           id: "a54219b8-f741-4c47-b662-e4f8dfa49ab6",
-          extension: getMedicationRequestExtensions(row, repeatsIssued, maxRepeatsAllowed),
+          extension: getMedicationRequestExtensions(
+            row,
+            repeatsIssued,
+            maxRepeatsAllowed
+          ),
           identifier: [
             {
               system: "https://fhir.nhs.uk/Id/prescription-order-item-number",
@@ -949,7 +962,7 @@ function createPrescription(row, repeatsIssued = 0, maxRepeatsAllowed = 0) {
               {
                 system: "http://snomed.info/sct",
                 code: "13892511000001100",
-                display: "Amlodipine 5mg/5ml oral solution",
+                display: getMedicationDisplay(row),
               },
             ],
           },
@@ -979,39 +992,7 @@ function createPrescription(row, repeatsIssued = 0, maxRepeatsAllowed = 0) {
           },
           dosageInstruction: [
             {
-              text: "Once daily",
-              timing: {
-                repeat: {
-                  frequency: 5,
-                  period: 1,
-                  periodUnit: "d",
-                  boundsDuration: {
-                    value: 10,
-                    unit: "day",
-                    system: "http://unitsofmeasure.org",
-                    code: "d",
-                  },
-                },
-              },
-              route: {
-                coding: [
-                  {
-                    system: "http://snomed.info/sct",
-                    code: "26643006",
-                    display: "Oral",
-                  },
-                ],
-              },
-              doseAndRate: [
-                {
-                  doseQuantity: {
-                    value: 5,
-                    unit: "milligram",
-                    system: "http://unitsofmeasure.org",
-                    code: "mg",
-                  },
-                },
-              ],
+              text: getDosageInstructionText(row),
             },
           ],
           dispenseRequest: {
@@ -1032,12 +1013,7 @@ function createPrescription(row, repeatsIssued = 0, maxRepeatsAllowed = 0) {
                 value: "VNCEL",
               },
             },
-            quantity: {
-              value: 5,
-              unit: "ml",
-              system: "http://snomed.info/sct",
-              code: "385024007",
-            },
+            quantity: getMedicationQuantity(row),
           },
           substitution: {
             allowedBoolean: false,
@@ -1273,27 +1249,41 @@ function createPrescription(row, repeatsIssued = 0, maxRepeatsAllowed = 0) {
   console.log(prescription);
 }
 
+function getDosageInstructionText(row) {
+  return row["Dosage Instructions"];
+}
+
+function getMedicationDisplay(row) {
+  return row["Medication"];
+}
+
 function getMedicationRequestExtensions(row, repeatsIssued, maxRepeatsAllowed) {
+  const prescriberTypeParts = row["Prescriber Type"].split(" - ");
+  const prescriberTypeDisplay = prescriberTypeParts[0];
+  const prescriberTypeCode = prescriberTypeParts[1];
   const extension = [
     {
-      url: "https://fhir.nhs.uk/StructureDefinition/Extension-DM-PrescriptionType",
+      url:
+        "https://fhir.nhs.uk/StructureDefinition/Extension-DM-PrescriptionType",
       valueCoding: {
         system: "https://fhir.nhs.uk/CodeSystem/prescription-type",
-        code: "1201",
-        display: "Outpatient Homecare Prescriber - Medical Prescriber",
+        code: prescriberTypeCode,
+        display: prescriberTypeDisplay,
       },
     },
     ,
   ];
 
   if (maxRepeatsAllowed) {
-    extension.push(createRepeatDispensingExtensionIfRequired(
-      repeatsIssued,
-      maxRepeatsAllowed
-    ))
+    extension.push(
+      createRepeatDispensingExtensionIfRequired(
+        repeatsIssued,
+        maxRepeatsAllowed
+      )
+    );
   }
 
-  return extension
+  return extension;
 }
 
 function getPrescriptionType(row) {
