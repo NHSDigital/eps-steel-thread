@@ -166,7 +166,7 @@ def download():
     zFile.seek(0)
 
     return flask.send_file(
-        zfile,
+        zFile,
         mimetype='application/zip',
         as_attachment=True,
         attachment_filename='send_requests.zip')
