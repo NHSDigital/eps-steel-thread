@@ -1290,7 +1290,7 @@ function getPrescriptionType(row) {
 }
 
 function getNumberOfRepeatsAllowed(row) {
-  return int.parse(row["Prescription Type"].split(" ")[0]);
+  return parseInt(row["Prescription Type"].split(" ")[0]);
 }
 
 function createPrescriptionType(code) {
