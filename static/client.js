@@ -1246,7 +1246,7 @@ function createPrescription(row, repeatsIssued = 0, maxRepeatsAllowed = 0) {
     ],
   };
   updateBundleIds(prescription);
-  console.log(prescription);
+  return prescription;
 }
 
 function getDosageInstructionText(row) {
