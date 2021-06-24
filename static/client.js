@@ -848,9 +848,6 @@ function createRepeatDispensingExtensionIfRequired(
   repeatsIssued,
   maxRepeatsAllowed
 ) {
-  if (maxRepeatsAllowed === 0) {
-    return;
-  }
   const extension = [
     {
       url: "numberOfRepeatPrescriptionsAllowed",
@@ -862,7 +859,7 @@ function createRepeatDispensingExtensionIfRequired(
     },
   ];
 
-  if (repeatNumber > 0) {
+  if (repeatsIssued > 0) {
     extension.push({
       url: "numberOfRepeatPrescriptionsIssued",
       valueUnsignedInt: repeatsIssued,
