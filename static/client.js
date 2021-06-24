@@ -1179,11 +1179,11 @@ function createPrescription(
       },
     ],
   };
-  prescription.entry.push(createMedicationRequests(
+  createMedicationRequests(
     xlsxRowGroup,
     repeatsIssued,
     maxRepeatsAllowed
-  ))
+  ).forEach(medicationRequest => prescription.entry.push(medicationRequest))
   updateBundleIds(prescription);
   console.log(prescription);
   return JSON.stringify(prescription);
