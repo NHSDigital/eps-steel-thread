@@ -941,7 +941,7 @@ function createPrescriptions(patients, rows) {
       const repeatsAllowed = getNumberOfRepeatsAllowed(prescription);
       for (
         let repeatsIssued = 0;
-        repeatsIssued < repeatsAllowed - 1;
+        repeatsIssued < repeatsAllowed;
         repeatsIssued++
       ) {
         pageData.payloads.push(
@@ -954,7 +954,9 @@ function createPrescriptions(patients, rows) {
         );
       }
     }
-    pageData.payloads.push(createPrescription(patients, prescriptionRows));
+    else {
+      pageData.payloads.push(createPrescription(patients, prescriptionRows));
+    }
   });
 }
 
