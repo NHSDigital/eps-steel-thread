@@ -832,7 +832,11 @@ function createPrescriptions(xlsxRows) {
 
     if (getPrescriptionType(row) === "repeat-dispensing") {
       const repeatsAllowed = getNumberOfRepeatsAllowed(row);
-      for (let repeatsIssued = 0; repeatsIssued < repeatsAllowed - 1; repeatsIssued++) {
+      for (
+        let repeatsIssued = 0;
+        repeatsIssued < repeatsAllowed - 1;
+        repeatsIssued++
+      ) {
         createPrescription(row, repeatsIssued, repeatsAllowed);
       }
     }
@@ -841,32 +845,34 @@ function createPrescriptions(xlsxRows) {
 }
 
 function createRepeatDispensingExtensionIfRequired(
-  row,
   repeatsIssued,
   maxRepeatsAllowed
 ) {
-  if (maxRepeatsAllowed > 0) {
-    return {
-      url:
-        "https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-MedicationRepeatInformation",
-      extension: [
-        {
-          url: "numberOfRepeatPrescriptionsAllowed",
-          valueUnsignedInt: maxRepeatsAllowed,
-        },
-        repeatNumber > 0
-          ? {
-              url: "numberOfRepeatPrescriptionsIssued",
-              valueUnsignedInt: repeatsIssued,
-            }
-          : undefined,
-        {
-          url: "authorisationExpiryDate",
-          valueDateTime: new Date("2025", "01", "01").toISOString().slice(0, 10), // todo: work this out from "days treatment"
-        },
-      ],
-    };
+  if (maxRepeatsAllowed === 0) {
+    return;
   }
+  const extension = [
+    {
+      url: "numberOfRepeatPrescriptionsAllowed",
+      valueUnsignedInt: maxRepeatsAllowed,
+    },
+    {
+      url: "authorisationExpiryDate",
+      valueDateTime: new Date("2025", "01", "01").toISOString().slice(0, 10), // todo: work this out from "days treatment"
+    },
+  ];
+
+  if (repeatNumber > 0) {
+    extension.push({
+      url: "numberOfRepeatPrescriptionsIssued",
+      valueUnsignedInt: repeatsIssued,
+    });
+  }
+  return {
+    url:
+      "https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-MedicationRepeatInformation",
+    extension: extension,
+  };
 }
 
 function createPrescription(row, repeatsIssued = 0, maxRepeatsAllowed = 0) {
@@ -930,7 +936,10 @@ function createPrescription(row, repeatsIssued = 0, maxRepeatsAllowed = 0) {
                 display: "Outpatient Homecare Prescriber - Medical Prescriber",
               },
             },
-            createRepeatDispensingExtensionIfRequired(repeatsIssued, maxRepeatsAllowed),
+            createRepeatDispensingExtensionIfRequired(
+              repeatsIssued,
+              maxRepeatsAllowed
+            ),
           ],
           identifier: [
             {
@@ -1274,10 +1283,10 @@ function createPrescription(row, repeatsIssued = 0, maxRepeatsAllowed = 0) {
             postalCode: "TA1 5DA",
           },
         },
-      }
+      },
     ],
   };
-  updateBundleIds(prescription)
+  updateBundleIds(prescription);
   console.log(prescription);
 }
 
