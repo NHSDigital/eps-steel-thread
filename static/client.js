@@ -1194,7 +1194,7 @@ function createMedicationRequests(
   repeatsIssued,
   maxRepeatsAllowed
 ) {
-  xlsxRowGroup.forEach((xlsxRow) => {
+  return xlsxRowGroup.map((xlsxRow) => {
     return {
       fullUrl: "urn:uuid:a54219b8-f741-4c47-b662-e4f8dfa49ab6",
       resource: {
