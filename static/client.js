@@ -928,12 +928,12 @@ function createPrescriptions(patients, rows) {
         repeatsIssued < repeatsAllowed - 1;
         repeatsIssued++
       ) {
-        createPrescription(
+        pageData.payloads.push(createPrescription(
           patients,
           prescriptionRows,
           repeatsIssued,
           repeatsAllowed
-        );
+        ));
       }
     }
     pageData.payloads.push(createPrescription(patients, prescriptionRows));
