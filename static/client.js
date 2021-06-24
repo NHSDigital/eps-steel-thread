@@ -985,8 +985,6 @@ function createPrescription(
   repeatsIssued = 0,
   maxRepeatsAllowed = 0
 ) {
-  console.log(patients)
-  console.log(prescription)
   const fhirPrescription = {
     resourceType: "Bundle",
     id: "aef77afb-7e3c-427a-8657-2c427f71a272",
@@ -1245,7 +1243,7 @@ function createMedicationRequests(
   repeatsIssued,
   maxRepeatsAllowed
 ) {
-  return xlsxRowGroup.map((xlsxRow) => {
+  return xlsxRowGroup.map((row) => {
     const id = uuidv4()
     return {
       fullUrl: `urn:uuid:${id}`,
@@ -1253,7 +1251,7 @@ function createMedicationRequests(
         resourceType: "MedicationRequest",
         id: id,
         extension: getMedicationRequestExtensions(
-          xlsxRow,
+          row,
           repeatsIssued,
           maxRepeatsAllowed
         ),
@@ -1282,7 +1280,7 @@ function createMedicationRequests(
             {
               system: "http://snomed.info/sct",
               code: "13892511000001100",
-              display: getMedicationDisplay(xlsxRow),
+              display: getMedicationDisplay(row),
             },
           ],
         },
@@ -1308,11 +1306,11 @@ function createMedicationRequests(
           value: "A0548B-A99968-451485",
         },
         courseOfTherapyType: {
-          coding: [createPrescriptionType(getPrescriptionType(xlsxRow))],
+          coding: [createPrescriptionType(getPrescriptionType(row))],
         },
         dosageInstruction: [
           {
-            text: getDosageInstructionText(xlsxRow),
+            text: getDosageInstructionText(row),
           },
         ],
         dispenseRequest: {
@@ -1333,7 +1331,7 @@ function createMedicationRequests(
               value: "VNCEL",
             },
           },
-          quantity: getMedicationQuantity(xlsxRow),
+          quantity: getMedicationQuantity(row),
         },
         substitution: {
           allowedBoolean: false,
@@ -1353,8 +1351,9 @@ function getMedicationDisplay(row) {
 
 function getMedicationRequestExtensions(row, repeatsIssued, maxRepeatsAllowed) {
   const prescriberTypeParts = row["Prescriber Type"].split(" - ");
-  const prescriberTypeDisplay = prescriberTypeParts[0];
   const prescriberTypeCode = prescriberTypeParts[1];
+  let prescriberTypeDisplay = prescriberTypeParts[0];
+  prescriberTypeDisplay = prescriberTypeDisplay[0].toUpperCase() + prescriberTypeDisplay.slice(1);
   const extension = [
     {
       url:
