@@ -809,7 +809,16 @@ var ExcelToJSON = function () {
         var XL_row_object = XLSX.utils.sheet_to_row_object_array(
           workbook.Sheets[sheetName]
         );
-        createPrescriptions(XL_row_object);
+
+        const patients = []
+        switch(sheetName.toLowerCase()) {
+          case "patients":
+            createPatients(XL_row_object).map(patient => patients.push(patient))
+            break;
+          case "prescriptions":
+            createPrescriptions(patients, XL_row_object)
+            break;
+        }
       });
     };
 
@@ -841,11 +850,74 @@ function groupBy(list, keyGetter) {
   return map;
 }
 
-function createPrescriptions(xlsxRows) {
+function createPatients(xlsxRows) {
+  return xlsxRows.map(row => {
+    return {
+      "fullUrl": "urn:uuid:78d3c2eb-009e-4ec8-a358-b042954aa9b2",
+      "resource": {
+        "resourceType": "Patient",
+        "identifier": [
+          {
+            "extension": [
+              {
+                "url": "https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-NHSNumberVerificationStatus",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "https://fhir.hl7.org.uk/CodeSystem/UKCore-NHSNumberVerificationStatus",
+                      "code": "01",
+                      "display": "Number present and verified"
+                    }
+                  ]
+                }
+              }
+            ],
+            "system": "https://fhir.nhs.uk/Id/nhs-number",
+            "value": "9449305552"
+          }
+        ],
+        "name": [
+          {
+            "use": "usual",
+            "family": "CHISLETT",
+            "given": [
+              "OCTAVIA"
+            ],
+            "prefix": [
+              "MS"
+            ]
+          }
+        ],
+        "gender": "female",
+        "birthDate": "2008-09-20",
+        "address": [
+          {
+            "use": "home",
+            "line": [
+              "1 RAVENSFIELD GARDENS",
+              "EPSOM",
+              "SURREY"
+            ],
+            "postalCode": "KT19 0ST"
+          }
+        ],
+        "generalPractitioner": [
+          {
+            "identifier": {
+              "system": "https://fhir.nhs.uk/Id/ods-organization-code",
+              "value": "A83008"
+            }
+          }
+        ]
+      }
+    }
+  })
+}
+
+function createPrescriptions(patients, xlsxRows) {
   pageData.payloads = [];
   const xlsxRowGroup = groupBy(xlsxRows, row => row["Test"]);
   xlsxRowGroup.forEach((xlsxRowGroup) => {
-    console.log(xlsxRowGroup);
     const xlsxPrescription = xlsxRowGroup[0];
 
     if (getPrescriptionType(xlsxPrescription) === "repeat-dispensing") {
@@ -856,14 +928,14 @@ function createPrescriptions(xlsxRows) {
         repeatsIssued++
       ) {
         createPrescription(
-          xlsxPrescription,
+          patients,
           xlsxRowGroup,
           repeatsIssued,
           repeatsAllowed
         );
       }
     }
-    pageData.payloads.push(createPrescription(xlsxPrescription, xlsxRowGroup));
+    pageData.payloads.push(createPrescription(patients, xlsxRowGroup));
   });
 }
 
@@ -904,12 +976,19 @@ function getMedicationQuantity(row) {
   };
 }
 
+function getPatient(patients, testNumber) {
+  return patients[testNumber - 1]
+}
+
 function createPrescription(
-  row,
+  patients,
   xlsxRowGroup,
   repeatsIssued = 0,
   maxRepeatsAllowed = 0
 ) {
+  console.log(patients)
+  console.log(xlsxRowGroup)
+  const testNumber = 0
   const prescription = {
     resourceType: "Bundle",
     id: "aef77afb-7e3c-427a-8657-2c427f71a272",
@@ -955,65 +1034,7 @@ function createPrescription(
           focus: [],
         },
       },
-      {
-        fullUrl: "urn:uuid:78d3c2eb-009e-4ec8-a358-b042954aa9b2",
-        resource: {
-          resourceType: "Patient",
-          identifier: [
-            {
-              extension: [
-                {
-                  url:
-                    "https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-NHSNumberVerificationStatus",
-                  valueCodeableConcept: {
-                    coding: [
-                      {
-                        system:
-                          "https://fhir.hl7.org.uk/CodeSystem/UKCore-NHSNumberVerificationStatus",
-                        code: "01",
-                        display: "Number present and verified",
-                      },
-                    ],
-                  },
-                },
-              ],
-              system: "https://fhir.nhs.uk/Id/nhs-number",
-              value: "9449307571",
-            },
-          ],
-          name: [
-            {
-              use: "usual",
-              family: "PIMPL",
-              given: ["TETTY"],
-              prefix: ["MS"],
-            },
-          ],
-          gender: "female",
-          birthDate: "1949-07-13",
-          address: [
-            {
-              use: "home",
-              line: [
-                "COPTHORNE",
-                "BURNHAMS ROAD",
-                "BOOKHAM",
-                "LEATHERHEAD",
-                "SURREY",
-              ],
-              postalCode: "KT23 3BB",
-            },
-          ],
-          generalPractitioner: [
-            {
-              identifier: {
-                system: "https://fhir.nhs.uk/Id/ods-organization-code",
-                value: "B81001",
-              },
-            },
-          ],
-        },
-      },
+      getPatient(patients, testNumber),
       {
         fullUrl: "urn:uuid:56166769-c1c4-4d07-afa8-132b5dfca666",
         resource: {
@@ -1218,7 +1239,6 @@ function createPrescription(
     maxRepeatsAllowed
   ).forEach(medicationRequest => prescription.entry.push(medicationRequest))
   updateBundleIds(prescription);
-  console.log(prescription);
   return JSON.stringify(prescription);
 }
 
