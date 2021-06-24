@@ -921,7 +921,7 @@ function createPrescriptions(patients, rows) {
   prescriptionRows.forEach((prescriptionRows) => {
     const prescription = prescriptionRows[0];
 
-    if (getPrescriptionTypeCode(prescription) === "repeat-dispensing") {
+    if (getPrescriptionTypeCode(prescription) === "continuous-repeat-dispensing") {
       const repeatsAllowed = getNumberOfRepeatsAllowed(prescription);
       for (
         let repeatsIssued = 0;
