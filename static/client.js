@@ -954,11 +954,6 @@ function createPrescription(
           focus: [],
         },
       },
-      createMedicationRequests(
-        xlsxRowGroup,
-        repeatsIssued,
-        maxRepeatsAllowed
-      ),
       {
         fullUrl: "urn:uuid:78d3c2eb-009e-4ec8-a358-b042954aa9b2",
         resource: {
@@ -1184,6 +1179,11 @@ function createPrescription(
       },
     ],
   };
+  prescription.entry.push(createMedicationRequests(
+    xlsxRowGroup,
+    repeatsIssued,
+    maxRepeatsAllowed
+  ))
   updateBundleIds(prescription);
   console.log(prescription);
   return JSON.stringify(prescription);
