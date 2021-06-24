@@ -1201,7 +1201,7 @@ function createMedicationRequests(
         resourceType: "MedicationRequest",
         id: "a54219b8-f741-4c47-b662-e4f8dfa49ab6",
         extension: getMedicationRequestExtensions(
-          row,
+          xlsxRow,
           repeatsIssued,
           maxRepeatsAllowed
         ),
