@@ -80,6 +80,7 @@ const pageData = {
   mode: "home",
   signature: "",
   loggedIn: Cookies.get("Access-Token-Set") === "true",
+  loggedInToCis2: Cookies.get("Access-Token-Set") === "true" && Cookies.get("Auth-Method") === "cis2",
   showCustomExampleInput: false,
   showCustomPharmacyInput: false,
   selectedExampleId: "1",
@@ -1177,6 +1178,38 @@ function createPrescription(
           },
         },
       },
+      {
+        fullUrl: "urn:uuid:51793ac0-112f-46c7-a891-9af8cefb206e",
+        resource: {
+          resourceType: "CommunicationRequest",
+          status: "unknown",
+          subject: {
+            reference: "urn:uuid:78d3c2eb-009e-4ec8-a358-b042954aa9b2"
+          },
+          payload: [
+            {
+              contentString: "TEST PRESCRIPTION - DO NOT DISPENSE"
+            }
+          ],
+          requester: {
+            type: "Organization",
+            identifier: {
+              system: "https://fhir.nhs.uk/Id/ods-organization-code",
+              value: "RBA"
+            },
+            display: "TAUNTON AND SOMERSET NHS FOUNDATION TRUST"
+          },
+          recipient: [
+            {
+              type: "Patient",
+              identifier: {
+                system: "https://fhir.nhs.uk/Id/nhs-number",
+                value: "9449307571"
+              }
+            }
+          ]
+        }
+      }
     ],
   };
   createMedicationRequests(
