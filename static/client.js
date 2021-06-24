@@ -977,7 +977,8 @@ function getMedicationQuantity(row) {
   };
 }
 
-function getPatient(patients, prescription) {
+function getPatient(patients, prescriptionRows) {
+  const prescription = prescriptionRows[0]
   const testNumber = prescription["Test"]
   return patients[testNumber - 1]
 }
