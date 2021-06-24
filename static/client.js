@@ -826,16 +826,23 @@ function handleFileSelect(evt) {
   xl2json.parseExcel(files[0]);
 }
 
-var groupBy = function (xs, key) {
-  return xs.reduce(function (rv, x) {
-    (rv[x[key]] = rv[x[key]] || []).push(x);
-    return rv;
-  }, {});
-};
+function groupBy(list, keyGetter) {
+  const map = new Map();
+  list.forEach((item) => {
+       const key = keyGetter(item);
+       const collection = map.get(key);
+       if (!collection) {
+           map.set(key, [item]);
+       } else {
+           collection.push(item);
+       }
+  });
+  return map;
+}
 
 function createPrescriptions(xlsxRows) {
   pageData.payloads = [];
-  const xlsxRowGroup = groupBy(xlsxRows, "Test");
+  const xlsxRowGroup = groupBy(xlsxRows, row => row["Test"]);
   xlsxRowGroup.forEach((xlsxRowGroup) => {
     console.log(xlsxRowGroup);
     const xlsxPrescription = xlsxRowGroup[0];
