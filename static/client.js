@@ -316,8 +316,7 @@ function sendLoadRequest() {
   const payloads = filePayloads
     .concat(textPayloads)
     .filter(Boolean)
-    .map((payload) => JSON.parse(payload));
-  payloads.forEach((payload) => updateBundleIds(payload));
+    .map((payload) => JSON.parse(payload))
   if (isCustom && !payloads.length) {
     addError("Unable to parse custom prescription(s)");
   } else {
@@ -371,6 +370,7 @@ function sendEditRequest() {
   try {
     const bundles = getPayloads();
     bundles.forEach((bundle) => {
+      updateBundleIds(bundle)
       updateNominatedPharmacy(bundle, getOdsCode());
     });
     const response = makeRequest(
@@ -1259,7 +1259,6 @@ function createPrescription(
   ).forEach((medicationRequest) =>
     fhirPrescription.entry.push(medicationRequest)
   );
-  updateBundleIds(fhirPrescription);
   return JSON.stringify(fhirPrescription);
 }
 
