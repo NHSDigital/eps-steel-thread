@@ -317,7 +317,7 @@ function sendLoadRequest() {
     .concat(textPayloads)
     .filter(Boolean)
     .map((payload) => JSON.parse(payload));
-  payloads.forEach(payload => updateBundleIds(payload))
+  payloads.forEach((payload) => updateBundleIds(payload));
   if (isCustom && !payloads.length) {
     addError("Unable to parse custom prescription(s)");
   } else {
@@ -1259,6 +1259,7 @@ function createPrescription(
   ).forEach((medicationRequest) =>
     fhirPrescription.entry.push(medicationRequest)
   );
+  updateBundleIds(fhirPrescription);
   return JSON.stringify(fhirPrescription);
 }
 
@@ -1442,19 +1443,21 @@ function getMedicationRequestExtensions(row, repeatsIssued, maxRepeatsAllowed) {
     );
   }
 
-   row["Instructions for Prescribing"]?.split(", ").forEach(endorsement => extension.push(
-    {
-      url: "https://fhir.nhs.uk/StructureDefinition/Extension-DM-PrescriptionEndorsement",
+  row["Instructions for Prescribing"]?.split(", ").forEach((endorsement) =>
+    extension.push({
+      url:
+        "https://fhir.nhs.uk/StructureDefinition/Extension-DM-PrescriptionEndorsement",
       valueCodeableConcept: {
         coding: [
           {
-            system: "https://fhir.nhs.uk/CodeSystem/medicationrequest-endorsement",
-            code: endorsement
-          }
-        ]
-      }
-    }
-  ))
+            system:
+              "https://fhir.nhs.uk/CodeSystem/medicationrequest-endorsement",
+            code: endorsement,
+          },
+        ],
+      },
+    })
+  );
 
   return extension;
 }
