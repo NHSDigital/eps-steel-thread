@@ -516,7 +516,6 @@ function getPrescriber(cancelResponse, success) {
     return {
       name: null,
       code: null,
-      role: null,
     };
   }
   const medicationRequest = getResourcesOfType(
@@ -544,9 +543,6 @@ function getPrescriber(cancelResponse, success) {
   return {
     name: `${practitionerName.prefix[0]} ${practitionerName.given[0]} ${practitionerName.family}`,
     code: practitionerRoleSdsRole.code,
-    role: practitionerRoleSdsRole.display
-      ? practitionerRoleSdsRole.display
-      : "???",
   };
 }
 
@@ -555,7 +551,6 @@ function getCanceller(cancelResponse, success) {
     return {
       name: null,
       code: null,
-      role: null,
     };
   }
 
@@ -593,9 +588,6 @@ function getCanceller(cancelResponse, success) {
   return {
     name: `${practitionerName.prefix[0]} ${practitionerName.given[0]} ${practitionerName.family}`,
     code: practitionerRoleSdsRole.code,
-    role: practitionerRoleSdsRole.display
-      ? practitionerRoleSdsRole.display
-      : "???",
   };
 }
 
@@ -740,20 +732,30 @@ function getSummary(payload) {
   const startDate =
     medicationRequests[0].dispenseRequest.validityPeriod?.start ??
     new Date().toISOString().slice(0, 10);
-  const medicationRepeatInformation = medicationRequests[0].extension.filter(e => e.url === "https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-MedicationRepeatInformation")
+  const medicationRepeatInformation = medicationRequests[0].extension.filter(
+    (e) =>
+      e.url ===
+      "https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-MedicationRepeatInformation"
+  );
   const numberOfRepeatPrescriptionsIssuedExtension = medicationRepeatInformation.length
-    ? medicationRepeatInformation[0].extension.filter(e => e.url === "numberOfRepeatPrescriptionsIssued")
-    : null
-  const numberOfRepeatPrescriptionsIssued = medicationRepeatInformation.length && !numberOfRepeatPrescriptionsIssuedExtension.length
-    ? 0
-    : medicationRepeatInformation.length
+    ? medicationRepeatInformation[0].extension.filter(
+        (e) => e.url === "numberOfRepeatPrescriptionsIssued"
+      )
+    : null;
+  const numberOfRepeatPrescriptionsIssued =
+    medicationRepeatInformation.length &&
+    !numberOfRepeatPrescriptionsIssuedExtension.length
+      ? 0
+      : medicationRepeatInformation.length
       ? numberOfRepeatPrescriptionsIssuedExtension[0].valueUnsignedInt
-      : null
+      : null;
   return {
     author: {
       startDate: startDate,
     },
-    repeatNumber: Number.isInteger(numberOfRepeatPrescriptionsIssued) ? numberOfRepeatPrescriptionsIssued + 1 : null,
+    repeatNumber: Number.isInteger(numberOfRepeatPrescriptionsIssued)
+      ? numberOfRepeatPrescriptionsIssued + 1
+      : null,
     patient: patient,
     practitioner: practitioner,
     encounter: encounter,
@@ -950,8 +952,7 @@ function createPrescriptions(patients, rows) {
           )
         );
       }
-    }
-    else {
+    } else {
       pageData.payloads.push(createPrescription(patients, prescriptionRows));
     }
   });
@@ -1372,14 +1373,14 @@ function getDispenseRequest(row) {
       quantity: getMedicationQuantity(row),
       validityPeriod: {
         start: "2021-05-07",
-        end: "2021-07-04"
+        end: "2021-07-04",
       },
       expectedSupplyDuration: {
-        "value": 30,
-        "unit": "day",
-        "system": "http://unitsofmeasure.org",
-        "code": "d"
-      }
+        value: 30,
+        unit: "day",
+        system: "http://unitsofmeasure.org",
+        code: "d",
+      },
     };
   }
 
@@ -1440,6 +1441,20 @@ function getMedicationRequestExtensions(row, repeatsIssued, maxRepeatsAllowed) {
       )
     );
   }
+
+  row["Instructions for Prescribing"].split(", ").forEach(endorsement => extension.push(
+    {
+      url: "https://fhir.nhs.uk/StructureDefinition/Extension-DM-PrescriptionEndorsement",
+      valueCodeableConcept: {
+        coding: [
+          {
+            system: "https://fhir.nhs.uk/CodeSystem/medicationrequest-endorsement",
+            code: endorsement
+          }
+        ]
+      }
+    }
+  ))
 
   return extension;
 }
