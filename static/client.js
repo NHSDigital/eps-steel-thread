@@ -1441,7 +1441,7 @@ function getMedicationRequestExtensions(row, repeatsIssued, maxRepeatsAllowed) {
     );
   }
 
-  row["Instructions for Prescribing"].split(", ")?.forEach(endorsement => extension.push(
+   row["Instructions for Prescribing"]?.split(", ").forEach(endorsement => extension.push(
     {
       url: "https://fhir.nhs.uk/StructureDefinition/Extension-DM-PrescriptionEndorsement",
       valueCodeableConcept: {
