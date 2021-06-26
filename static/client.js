@@ -750,6 +750,7 @@ function getSummary(payload) {
       ? numberOfRepeatPrescriptionsIssuedExtension[0].valueUnsignedInt
       : null;
   return {
+    id: medicationRequests[0].groupIdentifier.value,
     author: {
       startDate: startDate,
     },
