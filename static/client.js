@@ -1303,7 +1303,7 @@ function createMedicationRequests(
           coding: [
             {
               system: "http://snomed.info/sct",
-              code: "13892511000001100",
+              code: getMedicationSnomedCode(row),
               display: getMedicationDisplay(row),
             },
           ],
@@ -1409,6 +1409,10 @@ function getDosageInstructionText(row) {
   return row["Dosage Instructions"]
     ? row["Dosage Instructions"]
     : "As directed";
+}
+
+function getMedicationSnomedCode(row) {
+  return row["Snomed"].toLowerCase().replace("snomed code ", "")
 }
 
 function getMedicationDisplay(row) {
