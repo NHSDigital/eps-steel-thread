@@ -82,6 +82,7 @@ const pageData = {
       "Secetary"
     ),
   ],
+  environment: "prod",
   mode: "home",
   signature: "",
   loggedIn: Cookies.get("Access-Token-Set") === "true",
@@ -251,6 +252,9 @@ rivets.formatters.fullAddress = function (address) {
 };
 
 // IE compatibility, unable to use "=>" operator
+rivets.formatters.isProd = function (environment) {
+  return environment === "prod";
+};
 rivets.formatters.isLogin = function (mode) {
   return mode === "login";
 };
