@@ -367,7 +367,8 @@ function getEditRequest(previousOrNext) {
       "GET",
       `/prescribe/edit?prescription_id=${prescriptionId}`
     );
-    resetPageData("sign");
+    pageData.previous_prescription_id = Cookies.get("Previous-Prescription-Id");
+    pageData.next_prescription_id = Cookies.get("Next-Prescription-Id");
     pageData.signRequestSummary = getSummary(response);
   } catch (e) {
     console.log(e);
@@ -1672,16 +1673,6 @@ function resetPageData(pageMode) {
     pageMode === "edit" || pageMode === "release-nominated-pharmacy"
       ? pageData.selectedPharmacy ?? "VNFKT"
       : null;
-  if (pageData.mode == "sign") {
-    const prescriptionId = Cookies.get("Current-Prescription-Id");
-    const response = makeRequest(
-      "GET",
-      `/prescribe/edit?prescription_id=${prescriptionId}`
-    );
-    pageData.signRequestSummary = getSummary(response);
-    pageData.previous_prescription_id = Cookies.get("Previous-Prescription-Id");
-    pageData.next_prescription_id = Cookies.get("Next-Prescription-Id");
-  }
 }
 
 function bind() {
