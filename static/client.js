@@ -369,6 +369,7 @@ function getEditRequest(previousOrNext) {
     );
     pageData.previous_prescription_id = Cookies.get("Previous-Prescription-Id");
     pageData.next_prescription_id = Cookies.get("Next-Prescription-Id");
+    resetPageData("sign");
     pageData.signRequestSummary = getSummary(response);
   } catch (e) {
     console.log(e);
@@ -1673,6 +1674,10 @@ function resetPageData(pageMode) {
     pageMode === "edit" || pageMode === "release-nominated-pharmacy"
       ? pageData.selectedPharmacy ?? "VNFKT"
       : null;
+  if (pageData.mode == "sign") {
+    pageData.previous_prescription_id = Cookies.get("Previous-Prescription-Id");
+    pageData.next_prescription_id = Cookies.get("Next-Prescription-Id");
+  }
 }
 
 function bind() {
