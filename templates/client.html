@@ -418,6 +418,19 @@
               </div>
             </fieldset>
           </div>
+          <div class="nhsuk-form-group">
+            <fieldset class="nhsuk-fieldset" aria-describedby="canceler-hint">
+              <div>
+                <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m">Select a medication to cancel</legend>
+              </div>
+              <div class="nhsuk-radios">
+                <div class="nhsuk-radios__item" rv-each-medication="signRequestSummary.medicationRequests">
+                  <input class="nhsuk-radios__input" rv-id="medication.medicationCodeableConcept.coding | snomedCode" type="radio" rv-value="medication.medicationCodeableConcept.coding | snomedCode">
+                  <label class="nhsuk-label nhsuk-radios__label" rv-for="medication.medicationCodeableConcept.coding | snomedCode">{medication.medicationCodeableConcept.coding | snomedCodeDescription}</label>
+                </div>
+              </div>
+            </fieldset>
+          </div>
         </div>
       </div>
       <div class="nhsuk-grid-row" rv-show="cancelResponse">
