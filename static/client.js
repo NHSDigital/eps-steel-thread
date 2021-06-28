@@ -1412,7 +1412,7 @@ function getDosageInstructionText(row) {
 }
 
 function getMedicationSnomedCode(row) {
-  return row["Snomed"].toLowerCase().replace("snomed code ", "")
+  return row["Snomed"].toLowerCase().replace("snomed code\t ", "")
 }
 
 function getMedicationDisplay(row) {
