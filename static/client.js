@@ -1417,10 +1417,7 @@ function getDosageInstructionText(row) {
 }
 
 function getMedicationSnomedCode(row) {
-  return row["Snomed"]
-    .toLowerCase()
-    .replace("snomed code", "")
-    .trim()
+  return row["Snomed"].trim()
 }
 
 function getMedicationDisplay(row) {
@@ -1428,9 +1425,8 @@ function getMedicationDisplay(row) {
 }
 
 function getMedicationRequestExtensions(row, repeatsIssued, maxRepeatsAllowed) {
-  const prescriberTypeParts = row["Prescriber Type"].split(" - ");
-  const prescriberTypeCode = prescriberTypeParts[1];
-  let prescriberTypeDisplay = prescriberTypeParts[0];
+  const prescriberTypeCode = row["Prescriber  Code"]
+  let prescriberTypeDisplay = row["Prescriber Description"]
   prescriberTypeDisplay =
     prescriberTypeDisplay[0].toUpperCase() + prescriberTypeDisplay.slice(1);
   const extension = [
