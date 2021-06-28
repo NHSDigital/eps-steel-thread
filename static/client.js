@@ -451,10 +451,6 @@ function sendPrescriptionRequest() {
 
 function sendCancelRequest() {
   try {
-    var markedCheckbox = document.querySelectorAll('input[name="cancel-medications"]:checked');
-    for (var checkbox of markedCheckbox) {
-      console.log(`Checked: ${checkbox.value}`);
-    }
     const prescriptionId = Cookies.get("Current-Prescription-Id");
     const prescription = makeRequest(
       "GET",
@@ -727,8 +723,8 @@ function getLongFormIdExtension(extensions) {
 }
 
 window.onerror = function (msg, url, line, col, error) {
-  // todo: fix cancelation page checkbox, prevent rivets from publishing checkbox values
-  if (msg === "Uncaught TypeError: Cannot read property 'length' of undefined") {
+  // todo: fix cancellation page checkbox, prevent rivets from publishing checkbox values
+  if (pageData.mode === "cancel" && msg === "Uncaught TypeError: Cannot read property 'length' of undefined") {
     return true;
   }
   addError(
@@ -1545,11 +1541,15 @@ function createCancellation(bundle) {
   messageHeader.focus = [];
   // ****************************************
 
+  var medicationToCancelSnomed = document.querySelectorAll('input[name="cancel-medications"]:checked')[0];
   const medicationRequestEntries = bundle.entry.filter(
     (entry) => entry.resource.resourceType === "MedicationRequest"
   );
+
+  const medicationEntryToCancel = medicationRequestEntries.filter(e => e.resource.medicationCodeableConcept.coding.some(c => c.code === medicationToCancelSnomed))[0]
+
   const clonedMedicationRequestEntry = JSON.parse(
-    JSON.stringify(medicationRequestEntries[0])
+    JSON.stringify(medicationEntryToCancel)
   );
   const medicationRequest = clonedMedicationRequestEntry.resource;
   medicationRequest.status = "cancelled";

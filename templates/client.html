@@ -410,12 +410,12 @@
           <div class="nhsuk-form-group">
             <fieldset class="nhsuk-fieldset" aria-describedby="canceler-hint">
               <div>
-                <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m">Choose medication(s) to cancel</legend>
+                <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m">Choose a medication to cancel</legend>
               </div>
               <div class="nhsuk-checkboxes">
                 <div class="nhsuk-checkboxes__item" rv-each-medication="signRequestSummary.medicationRequests">
-                  <input class="nhsuk-checkboxes__input" name="cancel-medications" type="checkbox" rv-value="medication.medicationCodeableConcept.coding | snomedCode">
-                  <label class="nhsuk-label nhsuk-checkboxes__label" rv-for="medication.medicationCodeableConcept.coding | snomedCode">
+                  <input class="nhsuk-radios__input" name="cancel-medications" type="radio" rv-value="medication.medicationCodeableConcept.coding | snomedCode">
+                  <label class="nhsuk-label nhsuk-radios__label" rv-for="medication.medicationCodeableConcept.coding | snomedCode">
                     {medication.medicationCodeableConcept.coding | snomedCodeDescription}
                   </label>
                 </div>
