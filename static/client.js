@@ -729,7 +729,7 @@ function getLongFormIdExtension(extensions) {
 window.onerror = function (msg, url, line, col, error) {
   // todo: fix cancelation page checkbox, prevent rivets from publishing checkbox values
   if (msg === "Uncaught TypeError: Cannot read property 'length' of undefined") {
-    return false;
+    return true;
   }
   addError(
     "Unhandled error: " + msg + " at " + url + ":" + line + " col " + col
