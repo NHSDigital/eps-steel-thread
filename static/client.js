@@ -1426,9 +1426,7 @@ function getMedicationDisplay(row) {
 
 function getMedicationRequestExtensions(row, repeatsIssued, maxRepeatsAllowed) {
   const prescriberTypeCode = row["Prescriber  Code"]
-  let prescriberTypeDisplay = row["Prescriber Description"]
-  prescriberTypeDisplay =
-    prescriberTypeDisplay[0].toUpperCase() + prescriberTypeDisplay.slice(1);
+  const prescriberTypeDisplay = row["Prescriber Description"]
   const extension = [
     {
       url:
