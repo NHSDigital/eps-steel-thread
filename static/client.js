@@ -17,15 +17,20 @@ const pageData = {
       "Secondary Care - Acute (nominated)",
       SECONDARY_CARE_COMMUNITY_ACUTE_NOMINATED
     ),
-    //new Prescription("5", "Secondary Care - Repeat Dispensing (nominated)", SECONDARY_CARE_REPEAT_DISPENSING_NOMINATED),
-    //new Prescription("6", "Secondary Care - Repeat Prescribing (nominated)", SECONDARY_CARE_REPEAT_PRESCRIBING_NOMINATED),
     new Prescription(
-      "7",
+      "5",
+      "Secondary Care - Acute",
+      SECONDARY_CARE_COMMUNITY_ACUTE_NON_NOMINATED
+    ),
+    //new Prescription("6", "Secondary Care - Repeat Dispensing (nominated)", SECONDARY_CARE_REPEAT_DISPENSING_NOMINATED),
+    //new Prescription("7", "Secondary Care - Repeat Prescribing (nominated)", SECONDARY_CARE_REPEAT_PRESCRIBING_NOMINATED),
+    new Prescription(
+      "8",
       "Homecare - Acute (nominated)",
       HOMECARE_ACUTE_NOMINATED
     ),
-    //new Prescription("8", "Homecare - Repeat Dispensing (nominated)", HOMECARE_REPEAT_DISPENSING_NOMINATED),
-    //new Prescription("9", "Homecare - Repeat Prescribing (nominated)", HOMECARE_REPEAT_PRESCRIBING_NOMINATED),
+    //new Prescription("9", "Homecare - Repeat Dispensing (nominated)", HOMECARE_REPEAT_DISPENSING_NOMINATED),
+    //new Prescription("10", "Homecare - Repeat Prescribing (nominated)", HOMECARE_REPEAT_PRESCRIBING_NOMINATED),
     new Prescription("custom", "Custom", null),
   ],
   pharmacies: [
