@@ -173,12 +173,15 @@ rivets.formatters.snomedCode = {
     publish: function(codings) {return []}
 };
 
-rivets.formatters.snomedCodeDescription = function (codings) {
-  return codings
+rivets.formatters.snomedCodeDescription = {
+  read: function(codings) {
+    return codings.length
     ? codings.filter(function (coding) {
         return coding.system === "http://snomed.info/sct";
       })[0].display
     : "";
+  },
+  publish: function(codings) {return []}
 };
 
 rivets.formatters.prescriptionEndorsements = function (extensions) {
