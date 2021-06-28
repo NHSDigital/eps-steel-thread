@@ -11,10 +11,11 @@ from functools import wraps
 from urllib.parse import urlencode
 from api import (
     make_eps_api_prepare_request,
-    make_eps_api_send_request,
+    make_eps_api_process_message_request,
     make_eps_api_release_nominated_pharmacy_request,
     make_sign_api_signature_upload_request,
     make_sign_api_signature_download_request,
+    make_eps_api_convert_message_request,
 )
 from app import app, db, fernet
 from auth import exchange_code_for_token, get_access_token, redirect_and_set_cookies
@@ -30,6 +31,7 @@ from cookies import (
     get_prescription_ids_from_cookie,
     get_auth_method_from_cookie,
     set_auth_method_cookie,
+    set_skip_signature_page_cookie,
 )
 from client import render_client
 from database import (
@@ -56,6 +58,7 @@ LOAD_URL = "/prescribe/load"
 EDIT_URL = "/prescribe/edit"
 SIGN_URL = "/prescribe/sign"
 SEND_URL = "/prescribe/send"
+CANCEL_URL = "/prescribe/cancel"
 DISPENSE_RELEASE_NOMINATED_PHARMACY_URL = "/dispense/release-nominated-pharmacy"
 
 
@@ -198,6 +201,8 @@ def get_sign():
 
 @app.route(SIGN_URL, methods=["POST"])
 def post_sign():
+    sign_request = flask.request.json
+    skip_signature_page = sign_request["skipSignaturePage"]
     short_prescription_id = get_prescription_id_from_cookie()
     prepare_request = load_prepare_request(short_prescription_id)
     prepare_response = make_eps_api_prepare_request(get_access_token(), prepare_request)
@@ -208,6 +213,7 @@ def post_sign():
     print("Response from Signing Service signature upload request...")
     print(json.dumps(sign_response))
     response = app.make_response({"redirectUri": sign_response["redirectUri"]})
+    set_skip_signature_page_cookie(response, str(skip_signature_page))
     add_prepare_response(short_prescription_id, prepare_response)
     return response
 
@@ -247,16 +253,38 @@ def get_send():
 def post_send():
     short_prescription_id = get_prescription_id_from_cookie()
     send_request = load_send_request(short_prescription_id)
-    send_prescription_response = make_eps_api_send_request(get_access_token(), send_request)
-    print("Send Request to EPS...")
-    print(send_request)
-    print("Send Response from EPS...")
-    print(send_prescription_response.json())
-    if send_prescription_response.status_code == 200:
-        status = "Success"
-    else:
-        status = "Failure"
-    return {"prescription_id": short_prescription_id, "status": status}
+    send_request_xml = make_eps_api_convert_message_request(get_access_token(), send_request)
+    send_prescription_response = make_eps_api_process_message_request(get_access_token(), send_request)
+    return {
+        "prescription_id": short_prescription_id,
+        "success": send_prescription_response.status_code == 200,
+        "request_xml": send_request_xml.text,
+        "request": json.dumps(send_request),
+        "response": json.dumps(send_prescription_response.json()),
+    }
+
+
+@app.route(CANCEL_URL, methods=["GET"])
+def get_cancel():
+    return render_client("cancel")
+
+
+@app.route(CANCEL_URL, methods=["POST"])
+def post_cancel():
+    cancel_request = flask.request.json
+    short_prescription_id = get_prescription_id(cancel_request)
+    cancel_request_xml = make_eps_api_convert_message_request(get_access_token(), cancel_request)
+    cancel_response = make_eps_api_process_message_request(get_access_token(), cancel_request)
+    response = app.make_response(
+        {
+            "prescription_id": short_prescription_id,
+            "success": cancel_response.status_code == 200,
+            "request": json.dumps(cancel_request),
+            "request_xml": cancel_request_xml.text,
+            "response": json.dumps(cancel_response.json()),
+        }
+    )
+    return response
 
 
 @app.route(DISPENSE_RELEASE_NOMINATED_PHARMACY_URL, methods=["GET"])
@@ -282,11 +310,7 @@ def post_nominated_pharmacy():
             ],
         },
     )
-    if response.status_code == 200:
-        status = "Success"
-    else:
-        status = "Failure"
-    return {"body": json.dumps(response.json()), "status": status}
+    return {"body": json.dumps(response.json()), "success": response.status_code == 200}
 
 
 @app.route("/logout", methods=["GET"])

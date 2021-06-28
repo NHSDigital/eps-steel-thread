@@ -1,4 +1,5 @@
 flask
+flask-compress
 flask_sqlalchemy
 flask_migrate
 httpx
