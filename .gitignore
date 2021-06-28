@@ -1,3 +1,4 @@
 .vscode/
 get-pip.py
 *.pyc
+.idea/

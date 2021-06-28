@@ -13,6 +13,7 @@
   <script type="application/javascript" src="../static/client.js"></script>
   <script type="application/javascript">
     pageData.mode = "{{page_mode}}"
+    pageData.environment = "{{environment}}"
   </script>
   {% if sign_response is not none and page_mode == "send" %}
   <script type="text/javascript">
@@ -50,6 +51,15 @@
   </header>
   <div class="nhsuk-width-container">
     <main class="nhsuk-main-wrapper" id="main-content" style="display:none;">
+      <div class="nhsuk-warning-callout" rv-show="environment | isProd">
+        <h3 class="nhsuk-warning-callout__label">
+          <span role="text">
+            <span class="nhsuk-u-visually-hidden">Important: </span>
+            Production Environment!
+          </span>
+        </h3>
+        <p>You are currently in the production environment and messages sent will have actions on the live EPS system.</p>
+      </div>
       <div class="nhsuk-grid-row">
         <div class="nhsuk-grid-column-three-quarters">
           <fieldset class="nhsuk-fieldset">
@@ -548,7 +558,7 @@
           <div class="nhsuk-grid-column-full">
             <button class="nhsuk-button" type="submit" onclick="updateAuthMethod('cis2')">Using CIS
               2</button>
-            <button class="nhsuk-button" type="submit" onclick="updateAuthMethod('simulated')">Simulate
+            <button class="nhsuk-button" type="submit" onclick="updateAuthMethod('simulated')" rv-hide="environment | isProd">Simulate
               auth</button>
           </div>
         </div>
@@ -557,7 +567,7 @@
         <div class="nhsuk-grid-row">
           <div class="nhsuk-grid-column-full">
             <a href="/prescribe/load" class="nhsuk-button">Prescribe</a>
-            <a href="/dispense/release-nominated-pharmacy" class="nhsuk-button">Dispense</a>
+            <a href="/dispense/release-nominated-pharmacy" class="nhsuk-button" rv-hide="environment | isProd">Dispense</a>
           </div>
         </div>
       </div>
