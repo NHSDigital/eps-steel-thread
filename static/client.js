@@ -170,7 +170,7 @@ rivets.formatters.snomedCode = {
         })[0].code
       : "";
     },
-    publish: function(codings) {}
+    publish: function(codings) {return []}
 };
 
 rivets.formatters.snomedCodeDescription = function (codings) {
