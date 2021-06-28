@@ -71,7 +71,7 @@
                 <h1 class="nhsuk-fieldset__heading">Edit prescription</h1>
               </div>
               <div rv-show="mode | isCancel">
-                <h1 class="nhsuk-fieldset__heading">Cancel prescription</h1>
+                <h1 class="nhsuk-fieldset__heading">Cancel prescription medication(s)</h1>
               </div>
               <div rv-show="mode | isSign">
                 <h1 class="nhsuk-fieldset__heading">Prescription
@@ -393,7 +393,7 @@
           <div class="nhsuk-form-group">
             <fieldset class="nhsuk-fieldset" aria-describedby="cancel-reason-hint">
               <div>
-                <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m">Select a reason for cancellation</legend>
+                <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m">Choose a reason for cancellation</legend>
               </div>
               <div class="nhsuk-radios">
                 <div class="nhsuk-radios__item" rv-each-reason="reasons">
@@ -407,7 +407,7 @@
           <div class="nhsuk-form-group">
             <fieldset class="nhsuk-fieldset" aria-describedby="canceler-hint">
               <div>
-                <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m">Select a cancellation user</legend>
+                <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m">Choose a cancellation user</legend>
               </div>
               <div class="nhsuk-radios">
                 <div class="nhsuk-radios__item" rv-each-canceller="cancellers">
@@ -421,12 +421,14 @@
           <div class="nhsuk-form-group">
             <fieldset class="nhsuk-fieldset" aria-describedby="canceler-hint">
               <div>
-                <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m">Select a medication to cancel</legend>
+                <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m">Choose medication(s) to cancel</legend>
               </div>
-              <div class="nhsuk-radios">
-                <div class="nhsuk-radios__item" rv-each-medication="signRequestSummary.medicationRequests">
-                  <input class="nhsuk-radios__input" rv-id="medication.medicationCodeableConcept.coding | snomedCode" type="radio" rv-value="medication.medicationCodeableConcept.coding | snomedCode">
-                  <label class="nhsuk-label nhsuk-radios__label" rv-for="medication.medicationCodeableConcept.coding | snomedCode">{medication.medicationCodeableConcept.coding | snomedCodeDescription}</label>
+              <div class="nhsuk-checkboxes">
+                <div class="nhsuk-checkboxes__item" rv-each-medication="signRequestSummary.medicationRequests">
+                  <input class="nhsuk-checkboxes__input" rv-id="medication.medicationCodeableConcept.coding | snomedCode" name="cancel-medications" type="checkbox" rv-value="medication.medicationCodeableConcept.coding | snomedCode">
+                  <label class="nhsuk-label nhsuk-checkboxes__label" rv-for="medication.medicationCodeableConcept.coding | snomedCode">
+                    {medication.medicationCodeableConcept.coding | snomedCodeDescription}
+                  </label>
                 </div>
               </div>
             </fieldset>

@@ -445,6 +445,10 @@ function sendPrescriptionRequest() {
 
 function sendCancelRequest() {
   try {
+    var markedCheckbox = document.querySelectorAll('input[name="cancel-medications"]:checked');
+    for (var checkbox of markedCheckbox) {
+      console.log(`Checked: ${checkbox.value}`);
+    }
     const prescriptionId = Cookies.get("Current-Prescription-Id");
     const prescription = makeRequest(
       "GET",
