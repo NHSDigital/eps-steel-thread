@@ -170,7 +170,7 @@ rivets.formatters.snomedCode = {
         })[0].code
       : "";
     },
-    publish: function(codings) {return []}
+    publish: function(value, binding) {return binding}
 };
 
 rivets.formatters.snomedCodeDescription = {
@@ -181,7 +181,7 @@ rivets.formatters.snomedCodeDescription = {
       })[0].display
     : "";
   },
-  publish: function(codings) {return []}
+  publish: function(value, binding) {return binding}
 };
 
 rivets.formatters.prescriptionEndorsements = function (extensions) {
