@@ -1643,6 +1643,14 @@ function onLoad() {
   document
     .getElementById("prescription-test-pack")
     .addEventListener("change", handleFileSelect, false);
+  if (pageData.mode === "cancel") {
+    const prescriptionId = Cookies.get("Current-Prescription-Id");
+    const response = makeRequest(
+      "GET",
+      `/prescribe/edit?prescription_id=${prescriptionId}`
+    );
+    pageData.signRequestSummary = getSummary(response);
+  }
   document.querySelector("#main-content").style.display = "";
 }
 
@@ -1673,14 +1681,6 @@ function resetPageData(pageMode) {
     pageData.signRequestSummary = getSummary(response);
     pageData.previous_prescription_id = Cookies.get("Previous-Prescription-Id");
     pageData.next_prescription_id = Cookies.get("Next-Prescription-Id");
-  }
-  if (pageData.mode === "cancel") {
-    const prescriptionId = Cookies.get("Current-Prescription-Id");
-    const response = makeRequest(
-      "GET",
-      `/prescribe/edit?prescription_id=${prescriptionId}`
-    );
-    pageData.signRequestSummary = getSummary(response);
   }
 }
 
