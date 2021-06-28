@@ -316,11 +316,7 @@ function sendLoadRequest() {
   const payloads = filePayloads
     .concat(textPayloads)
     .filter(Boolean)
-<<<<<<< HEAD
     .map((payload) => JSON.parse(payload))
-=======
-    .map((payload) => JSON.parse(payload));
->>>>>>> a5ecbca... Aea 1481 add cancellations (first medication request only) (#33)
   if (isCustom && !payloads.length) {
     addError("Unable to parse custom prescription(s)");
   } else {
