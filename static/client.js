@@ -316,7 +316,11 @@ function sendLoadRequest() {
   const payloads = filePayloads
     .concat(textPayloads)
     .filter(Boolean)
+<<<<<<< HEAD
     .map((payload) => JSON.parse(payload))
+=======
+    .map((payload) => JSON.parse(payload));
+>>>>>>> a5ecbca... Aea 1481 add cancellations (first medication request only) (#33)
   if (isCustom && !payloads.length) {
     addError("Unable to parse custom prescription(s)");
   } else {
@@ -450,6 +454,7 @@ function sendCancelRequest() {
     pageData.cancelResponse.prescriptionId = response.prescription_id;
     pageData.cancelResponse.success = response.success;
     const parsedCancelResponse = JSON.parse(response.response);
+<<<<<<< HEAD
     pageData.cancelResponse.prescriber = getPrescriber(
       parsedCancelResponse,
       response.success
@@ -458,6 +463,10 @@ function sendCancelRequest() {
       parsedCancelResponse,
       response.success
     );
+=======
+    pageData.cancelResponse.prescriber = getPrescriber(parsedCancelResponse);
+    pageData.cancelResponse.canceller = getCanceller(parsedCancelResponse);
+>>>>>>> a5ecbca... Aea 1481 add cancellations (first medication request only) (#33)
     document.getElementById(
       "cancel-request-download-fhir"
     ).href = `data:application/json,${encodeURI(
@@ -511,6 +520,7 @@ function sendDispenseNominatedPharmacyReleaseRequest() {
   }
 }
 
+<<<<<<< HEAD
 function getPrescriber(cancelResponse, success) {
   if (!success) {
     return {
@@ -518,6 +528,9 @@ function getPrescriber(cancelResponse, success) {
       code: null,
     };
   }
+=======
+function getPrescriber(cancelResponse) {
+>>>>>>> a5ecbca... Aea 1481 add cancellations (first medication request only) (#33)
   const medicationRequest = getResourcesOfType(
     cancelResponse,
     "MedicationRequest"
@@ -543,6 +556,7 @@ function getPrescriber(cancelResponse, success) {
   return {
     name: `${practitionerName.prefix[0]} ${practitionerName.given[0]} ${practitionerName.family}`,
     code: practitionerRoleSdsRole.code,
+<<<<<<< HEAD
   };
 }
 
@@ -554,6 +568,13 @@ function getCanceller(cancelResponse, success) {
     };
   }
 
+=======
+    role: practitionerRoleSdsRole.display ? practitionerRoleSdsRole.display : "???",
+  };
+}
+
+function getCanceller(cancelResponse) {
+>>>>>>> a5ecbca... Aea 1481 add cancellations (first medication request only) (#33)
   const medicationRequest = getResourcesOfType(
     cancelResponse,
     "MedicationRequest"
@@ -588,6 +609,10 @@ function getCanceller(cancelResponse, success) {
   return {
     name: `${practitionerName.prefix[0]} ${practitionerName.given[0]} ${practitionerName.family}`,
     code: practitionerRoleSdsRole.code,
+<<<<<<< HEAD
+=======
+    role: practitionerRoleSdsRole.display ? practitionerRoleSdsRole.display : "???",
+>>>>>>> a5ecbca... Aea 1481 add cancellations (first medication request only) (#33)
   };
 }
 
@@ -805,6 +830,7 @@ function getResourcesOfType(prescriptionBundle, resourceType) {
   });
 }
 
+<<<<<<< HEAD
 var ExcelToJSON = function () {
   this.parseExcel = function (file) {
     var reader = new FileReader();
@@ -1489,6 +1515,8 @@ function createPrescriptionType(system, code) {
   };
 }
 
+=======
+>>>>>>> a5ecbca... Aea 1481 add cancellations (first medication request only) (#33)
 function doPrescriptionAction(select) {
   const value = select.value;
   const prescriptionId = Cookies.get("Current-Prescription-Id");
@@ -1630,9 +1658,12 @@ function onLoad() {
   ) {
     sendPrescriptionRequest();
   }
+<<<<<<< HEAD
   document
     .getElementById("prescription-test-pack")
     .addEventListener("change", handleFileSelect, false);
+=======
+>>>>>>> a5ecbca... Aea 1481 add cancellations (first medication request only) (#33)
   document.querySelector("#main-content").style.display = "";
 }
 
