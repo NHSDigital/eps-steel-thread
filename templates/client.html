@@ -414,8 +414,8 @@
               </div>
               <div class="nhsuk-checkboxes">
                 <div class="nhsuk-checkboxes__item" rv-each-medication="signRequestSummary.medicationRequests">
-                  <input class="nhsuk-checkboxes__input" name="cancel-medications" type="checkbox" rv-value="medication.medicationCodeableConcept.coding" rv-on-click="logCancelMedication">
-                  <label class="nhsuk-label nhsuk-checkboxes__label">
+                  <input class="nhsuk-checkboxes__input" name="cancel-medications" type="checkbox" rv-value="medication.medicationCodeableConcept.coding | snomedCode">
+                  <label class="nhsuk-label nhsuk-checkboxes__label" rv-for="medication.medicationCodeableConcept.coding | snomedCode">
                     {medication.medicationCodeableConcept.coding | snomedCodeDescription}
                   </label>
                 </div>

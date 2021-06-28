@@ -163,7 +163,7 @@ function Canceller(
 // handle cases when no data is present without using "?." operator for IE compatibility
 // handle filter with function as IE will not accept "=>" operator
 rivets.formatters.snomedCode = function (codings) {
-  return codings
+  return codings.length
     ? codings.filter(function (coding) {
         return coding.system === "http://snomed.info/sct";
       })[0].code
@@ -171,7 +171,7 @@ rivets.formatters.snomedCode = function (codings) {
 };
 
 rivets.formatters.snomedCodeDescription = function (codings) {
-  return codings
+  return codings.length
     ? codings.filter(function (coding) {
         return coding.system === "http://snomed.info/sct";
       })[0].display
@@ -441,10 +441,6 @@ function sendPrescriptionRequest() {
     console.log(e);
     addError("Communication error");
   }
-}
-
-function logCancelMedication(event, rivetsBinding) {
-  console.log(rivetsBinding.medication)
 }
 
 function sendCancelRequest() {
