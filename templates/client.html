@@ -71,7 +71,7 @@
                 <h1 class="nhsuk-fieldset__heading">Edit prescription</h1>
               </div>
               <div rv-show="mode | isCancel">
-                <h1 class="nhsuk-fieldset__heading">Cancel prescription medication(s)</h1>
+                <h1 class="nhsuk-fieldset__heading">Cancel prescription</h1>
               </div>
               <div rv-show="mode | isSign">
                 <h1 class="nhsuk-fieldset__heading">Prescription
@@ -233,17 +233,6 @@
             </li>
           </ul>
         </nav>
-        <div class="nhsuk-grid-column-full">
-          <div class="nhsuk-panel-with-label">
-            <h3 class="nhsuk-panel-with-label__label">Author</h3>
-            <dl class="nhsuk-summary-list">
-              <div class="nhsuk-summary-list__row">
-                <dt class="nhsuk-summary-list__key">Start Date</dt>
-                <dd class="nhsuk-summary-list__value">{signRequestSummary.author.startDate}</dd>
-              </div>
-            </dl>
-          </div>
-        </div>
         <div class="nhsuk-grid-column-full">
           <div class="nhsuk-panel-with-label">
             <h3 class="nhsuk-panel-with-label__label">Patient</h3>
@@ -425,7 +414,7 @@
               </div>
               <div class="nhsuk-checkboxes">
                 <div class="nhsuk-checkboxes__item" rv-each-medication="signRequestSummary.medicationRequests">
-                  <input class="nhsuk-checkboxes__input" rv-id="medication.medicationCodeableConcept.coding | snomedCode" name="cancel-medications" type="checkbox" rv-value="medication.medicationCodeableConcept.coding | snomedCode">
+                  <input class="nhsuk-checkboxes__input" name="cancel-medications" type="checkbox" rv-value="medication.medicationCodeableConcept.coding | snomedCode">
                   <label class="nhsuk-label nhsuk-checkboxes__label" rv-for="medication.medicationCodeableConcept.coding | snomedCode">
                     {medication.medicationCodeableConcept.coding | snomedCodeDescription}
                   </label>
