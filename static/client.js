@@ -443,6 +443,10 @@ function sendPrescriptionRequest() {
   }
 }
 
+function logCancelMedication(event, rivetsBinding) {
+  console.log(rivetsBinding.medication)
+}
+
 function sendCancelRequest() {
   try {
     var markedCheckbox = document.querySelectorAll('input[name="cancel-medications"]:checked');
