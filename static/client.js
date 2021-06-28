@@ -1530,8 +1530,6 @@ function createCancellation(bundle) {
   bundle.identifier.value = uuidv4();
   // ****************************************
 
-  // cheat and get first medicationrequest to cancel
-  // todo: cancellations should be at medication level, not prescription level
   const messageHeader = getResourcesOfType(bundle, "MessageHeader")[0];
   messageHeader.eventCoding.code = "prescription-order-update";
   messageHeader.eventCoding.display = "Prescription Order Update";
@@ -1541,7 +1539,7 @@ function createCancellation(bundle) {
   messageHeader.focus = [];
   // ****************************************
 
-  var medicationToCancelSnomed = document.querySelectorAll('input[name="cancel-medications"]:checked')[0];
+  var medicationToCancelSnomed = document.querySelectorAll('input[name="cancel-medications"]:checked')[0].value;
   const medicationRequestEntries = bundle.entry.filter(
     (entry) => entry.resource.resourceType === "MedicationRequest"
   );
