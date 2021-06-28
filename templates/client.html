@@ -615,6 +615,8 @@
           <div class="nhsuk-grid-column-full">
             <button class="nhsuk-button" type="submit" rv-hide="cancelResponse"
               onclick="sendCancelRequest()">Send</button>
+              <button class="nhsuk-button nhsuk-button" type="submit" rv-show="cancelResponse"
+              onclick="resetPageData('cancel');">Back</button>
             <button class="nhsuk-button nhsuk-button--secondary" type="submit" rv-show="cancelResponse"
               onclick="resetPageData('home');">Reset</button>
           </div>
