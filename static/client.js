@@ -163,29 +163,25 @@ function Canceller(
 // handle cases when no data is present without using "?." operator for IE compatibility
 // handle filter with function as IE will not accept "=>" operator
 rivets.formatters.snomedCode = {
-  read: function (codings) {
-    return codings.length
+    read: function(codings) {
+      return codings.length
       ? codings.filter(function (coding) {
           return coding.system === "http://snomed.info/sct";
         })[0].code
       : "";
-  },
-  publish: function (value, binding) {
-    return binding;
-  },
+    },
+    publish: function(value, binding) {return binding}
 };
 
 rivets.formatters.snomedCodeDescription = {
-  read: function (codings) {
+  read: function(codings) {
     return codings.length
-      ? codings.filter(function (coding) {
-          return coding.system === "http://snomed.info/sct";
-        })[0].display
-      : "";
+    ? codings.filter(function (coding) {
+        return coding.system === "http://snomed.info/sct";
+      })[0].display
+    : "";
   },
-  publish: function (value, binding) {
-    return binding;
-  },
+  publish: function(value, binding) {return binding}
 };
 
 rivets.formatters.prescriptionEndorsements = function (extensions) {
@@ -728,10 +724,7 @@ function getLongFormIdExtension(extensions) {
 
 window.onerror = function (msg, url, line, col, error) {
   // todo: fix cancellation page checkbox, prevent rivets from publishing checkbox values
-  if (
-    pageData.mode === "cancel" &&
-    msg === "Uncaught TypeError: Cannot read property 'length' of undefined"
-  ) {
+  if (pageData.mode === "cancel" && msg === "Uncaught TypeError: Cannot read property 'length' of undefined") {
     return true;
   }
   addError(
@@ -1542,7 +1535,7 @@ function getDosageInstructionText(row) {
 }
 
 function getMedicationSnomedCode(row) {
-  return row["Snomed"].trim();
+  return row["Snomed"].trim()
 }
 
 function getMedicationDisplay(row) {
@@ -1661,11 +1654,7 @@ function createCancellation(bundle) {
     (entry) => entry.resource.resourceType === "MedicationRequest"
   );
 
-  const medicationEntryToCancel = medicationRequestEntries.filter((e) =>
-    e.resource.medicationCodeableConcept.coding.some(
-      (c) => c.code === medicationToCancelSnomed
-    )
-  )[0];
+  const medicationEntryToCancel = medicationRequestEntries.filter(e => e.resource.medicationCodeableConcept.coding.some(c => c.code === medicationToCancelSnomed))[0]
 
   const clonedMedicationRequestEntry = JSON.parse(
     JSON.stringify(medicationEntryToCancel)
