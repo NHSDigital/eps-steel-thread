@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" id="main-content" style="display:none;">
 <head>
   <meta charset="UTF-8">
   <title>EPS Assurance Tool</title>
@@ -21,8 +21,11 @@
     pageData.signResponse.signature = "{{sign_response.signature}}"
   </script>
   {% endif %}
+  <style rv-if="environment | isProd">
+    body{background-color: #f6b8b8;}
+  </style>
 </head>
-<body onload="onLoad()" id="main-content" style="display:none;">
+<body onload="onLoad()">
   <header class="nhsuk-header nhsuk-header--transactional" role="banner">
     <div class="nhsuk-width-container nhsuk-header__container">
       <div class="nhsuk-header__logo nhsuk-header__logo--only">
