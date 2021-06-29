@@ -1128,12 +1128,7 @@ function createPrescription(
               ],
             },
           ],
-          healthcareService: [
-            {
-              reference: "urn:uuid:54b0506d-49af-4245-9d40-d7d64902055e",
-              display: "SOMERSET BOWEL CANCER SCREENING CENTRE",
-            },
-          ],
+          healthcareService: createHealthcareServices(careSetting),
           telecom: [
             {
               system: "phone",
@@ -1232,6 +1227,16 @@ function getCareSetting(prescriptionRows) {
     case "1001":
       return "Secondary-Care"
   }
+}
+
+function createHealthcareServices(careSetting) {
+  if (careSetting === "Secondary-Care") {
+    return {
+      reference: "urn:uuid:54b0506d-49af-4245-9d40-d7d64902055e",
+      display: "SOMERSET BOWEL CANCER SCREENING CENTRE",
+    }
+  }
+  return []
 }
 
 function createPlaceResources(careSetting, fhirPrescription) {
