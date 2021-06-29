@@ -1585,7 +1585,7 @@ function getMedicationRequestExtensions(row, repeatsIssued, maxRepeatsAllowed) {
 }
 
 function getNhsNumber(fhirPatient) {
-  return fhirPatient.identifier.filter(i => i.system === "https://fhir.nhs.uk/Id/nhs-number")[0].value
+  return fhirPatient.resource.identifier.filter(i => i.system === "https://fhir.nhs.uk/Id/nhs-number")[0].value
 }
 
 function getPrescriptionTypeCode(row) {
