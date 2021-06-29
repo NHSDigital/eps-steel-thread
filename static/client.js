@@ -338,6 +338,16 @@ rivets.formatters.appendPageMode = function (string) {
   return string + pageData.mode;
 };
 
+rivets.formatters.displayEnvironment = function (environment) {
+  if (environment === "prod") {
+    return "Production"
+  } else if (environment === "int") {
+    return "Integration"
+  } else {
+    return environment
+  }
+};
+
 function concatenateIfPresent(fields) {
   return fields.filter(Boolean).reduce(function (currentValues, valuesToAdd) {
     return currentValues.concat(valuesToAdd);
