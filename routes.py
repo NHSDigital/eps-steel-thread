@@ -37,6 +37,7 @@ from cookies import (
     set_skip_signature_page_cookie,
 )
 from client import render_client
+import config
 from database import (
     PrepareRequest,
     PrepareResponse,
@@ -309,11 +310,15 @@ def post_cancel():
 
 @app.route(DISPENSE_RELEASE_NOMINATED_PHARMACY_URL, methods=["GET"])
 def get_nominated_pharmacy():
+    if (config.ENVIRONMENT == "prod"):
+        return app.make_response("Bad Request", 400)
     return render_client("release-nominated-pharmacy")
 
 
 @app.route(DISPENSE_RELEASE_NOMINATED_PHARMACY_URL, methods=["POST"])
 def post_nominated_pharmacy():
+    if (config.ENVIRONMENT == "prod"):
+        return app.make_response("Bad Request", 400)
     nominated_pharmacy_release = flask.request.json
     ods_code = nominated_pharmacy_release["odsCode"]
     response = make_eps_api_release_nominated_pharmacy_request(

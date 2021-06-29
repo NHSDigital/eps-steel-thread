@@ -13,6 +13,7 @@
   <script type="application/javascript" src="../static/client.js"></script>
   <script type="application/javascript">
     pageData.mode = "{{page_mode}}"
+    pageData.environment = "{{environment}}"
   </script>
   {% if sign_response is not none and page_mode == "send" %}
   <script type="text/javascript">
@@ -21,8 +22,7 @@
   </script>
   {% endif %}
 </head>
-
-<body onload="onLoad()">
+<body onload="onLoad()" id="main-content" style="display:none;">
   <header class="nhsuk-header nhsuk-header--transactional" role="banner">
     <div class="nhsuk-width-container nhsuk-header__container">
       <div class="nhsuk-header__logo nhsuk-header__logo--only">
@@ -40,16 +40,20 @@
       <div class="nhsuk-header__transactional-service-name">
         <a class="nhsuk-header__transactional-service-name--link" href="/">EPS Assurance Tool</a>
       </div>
-      <div class="nhsuk-header__transactional-environment" style="float: right;">
-        <label class="nhsuk-label nhsuk-select__label" style="display: inline;color: #ffffff;">Environment:</label>
-        <select class="nhsuk-select" name="environment" id="environment">
-          <option value="int">Integration</option>
-        </select>
-      </div>
+      <div class="nhsuk-label" style="float: right; color: #ffffff;"><span>Environment: </span><span>{environment}</span></div>
     </div>
   </header>
   <div class="nhsuk-width-container">
-    <main class="nhsuk-main-wrapper" id="main-content" style="display:none;">
+    <main class="nhsuk-main-wrapper">
+      <div class="nhsuk-warning-callout" rv-show="environment | isProd">
+        <h3 class="nhsuk-warning-callout__label">
+          <span role="text">
+            <span class="nhsuk-u-visually-hidden">Important: </span>
+            Production Environment!
+          </span>
+        </h3>
+        <p>You are currently in the production environment and messages sent will have actions on the live EPS system.</p>
+      </div>
       <div class="nhsuk-grid-row">
         <div class="nhsuk-grid-column-three-quarters">
           <fieldset class="nhsuk-fieldset">
@@ -231,17 +235,6 @@
         </nav>
         <div class="nhsuk-grid-column-full">
           <div class="nhsuk-panel-with-label">
-            <h3 class="nhsuk-panel-with-label__label">Author</h3>
-            <dl class="nhsuk-summary-list">
-              <div class="nhsuk-summary-list__row">
-                <dt class="nhsuk-summary-list__key">Start Date</dt>
-                <dd class="nhsuk-summary-list__value">{signRequestSummary.author.startDate}</dd>
-              </div>
-            </dl>
-          </div>
-        </div>
-        <div class="nhsuk-grid-column-full">
-          <div class="nhsuk-panel-with-label">
             <h3 class="nhsuk-panel-with-label__label">Patient</h3>
             <dl class="nhsuk-summary-list">
               <div class="nhsuk-summary-list__row" rv-each-name="signRequestSummary.patient.name">
@@ -389,7 +382,7 @@
           <div class="nhsuk-form-group">
             <fieldset class="nhsuk-fieldset" aria-describedby="cancel-reason-hint">
               <div>
-                <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m">Select a reason for cancellation</legend>
+                <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m">Choose a reason for cancellation</legend>
               </div>
               <div class="nhsuk-radios">
                 <div class="nhsuk-radios__item" rv-each-reason="reasons">
@@ -403,13 +396,28 @@
           <div class="nhsuk-form-group">
             <fieldset class="nhsuk-fieldset" aria-describedby="canceler-hint">
               <div>
-                <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m">Select a cancellation user</legend>
+                <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m">Choose a cancellation user</legend>
               </div>
               <div class="nhsuk-radios">
                 <div class="nhsuk-radios__item" rv-each-canceller="cancellers">
                   <input class="nhsuk-radios__input" rv-id="canceller.id" type="radio" name="cancellers"
                     rv-value="canceller.id" rv-checked="selectedCancellerId" rv-on-click="canceller.select">
                   <label class="nhsuk-label nhsuk-radios__label" rv-for="canceller.id">{canceller.description}</label>
+                </div>
+              </div>
+            </fieldset>
+          </div>
+          <div class="nhsuk-form-group">
+            <fieldset class="nhsuk-fieldset" aria-describedby="canceler-hint">
+              <div>
+                <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m">Choose a medication to cancel</legend>
+              </div>
+              <div class="nhsuk-checkboxes">
+                <div class="nhsuk-checkboxes__item" rv-each-medication="signRequestSummary.medicationRequests">
+                  <input class="nhsuk-radios__input" name="cancel-medications" type="radio" rv-value="medication.medicationCodeableConcept.coding | snomedCode">
+                  <label class="nhsuk-label nhsuk-radios__label" rv-for="medication.medicationCodeableConcept.coding | snomedCode">
+                    {medication.medicationCodeableConcept.coding | snomedCodeDescription}
+                  </label>
                 </div>
               </div>
             </fieldset>
@@ -548,7 +556,7 @@
           <div class="nhsuk-grid-column-full">
             <button class="nhsuk-button" type="submit" onclick="updateAuthMethod('cis2')">Using CIS
               2</button>
-            <button class="nhsuk-button" type="submit" onclick="updateAuthMethod('simulated')">Simulate
+            <button class="nhsuk-button" type="submit" onclick="updateAuthMethod('simulated')" rv-hide="environment | isProd">Simulate
               auth</button>
           </div>
         </div>
@@ -557,7 +565,7 @@
         <div class="nhsuk-grid-row">
           <div class="nhsuk-grid-column-full">
             <a href="/prescribe/load" class="nhsuk-button">Prescribe</a>
-            <a href="/dispense/release-nominated-pharmacy" class="nhsuk-button">Dispense</a>
+            <a href="/dispense/release-nominated-pharmacy" class="nhsuk-button" rv-hide="environment | isProd">Dispense</a>
           </div>
         </div>
       </div>
@@ -607,8 +615,9 @@
           <div class="nhsuk-grid-column-full">
             <button class="nhsuk-button" type="submit" rv-hide="cancelResponse"
               onclick="sendCancelRequest()">Send</button>
-            <button class="nhsuk-button nhsuk-button--secondary" type="submit" rv-show="cancelResponse"
-              onclick="resetPageData('home');">Reset</button>
+            <button class="nhsuk-button nhsuk-button" type="submit" rv-show="cancelResponse"
+              onclick="resetPageData('cancel');">Back</button>
+            <button class="nhsuk-button nhsuk-button--secondary" type="submit" onclick="resetPageData('home');">Reset</button>
           </div>
         </div>
       </div>

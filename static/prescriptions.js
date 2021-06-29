@@ -27,6 +27,9 @@ let PRIMARY_CARE_REPEAT_PRESCRIBING_NOMINATED = getPrescription(
 let SECONDARY_CARE_COMMUNITY_ACUTE_NOMINATED = getPrescription(
   "secondary-care/community/acute/nominated-pharmacy/clinical-practitioner/1-Prepare-Request-200_OK.json"
 );
+let SECONDARY_CARE_COMMUNITY_ACUTE_NON_NOMINATED = getPrescription(
+  "secondary-care/community/acute/no-nominated-pharmacy/clinical-practitioner/1-Prepare-Request-200_OK.json"
+);
 let SECONDARY_CARE_REPEAT_DISPENSING_NOMINATED = getPrescription(
   "secondary-care/community/repeat-dispensing/nominated-pharmacy/clinical-practitioner/multiple-medication-requests/prescriber-endorsed/1-Prepare-Request-200_OK.json"
 );

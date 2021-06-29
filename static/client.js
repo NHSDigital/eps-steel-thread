@@ -17,15 +17,20 @@ const pageData = {
       "Secondary Care - Acute (nominated)",
       SECONDARY_CARE_COMMUNITY_ACUTE_NOMINATED
     ),
-    //new Prescription("5", "Secondary Care - Repeat Dispensing (nominated)", SECONDARY_CARE_REPEAT_DISPENSING_NOMINATED),
-    //new Prescription("6", "Secondary Care - Repeat Prescribing (nominated)", SECONDARY_CARE_REPEAT_PRESCRIBING_NOMINATED),
     new Prescription(
-      "7",
+      "5",
+      "Secondary Care - Acute",
+      SECONDARY_CARE_COMMUNITY_ACUTE_NON_NOMINATED
+    ),
+    //new Prescription("6", "Secondary Care - Repeat Dispensing (nominated)", SECONDARY_CARE_REPEAT_DISPENSING_NOMINATED),
+    //new Prescription("7", "Secondary Care - Repeat Prescribing (nominated)", SECONDARY_CARE_REPEAT_PRESCRIBING_NOMINATED),
+    new Prescription(
+      "8",
       "Homecare - Acute (nominated)",
       HOMECARE_ACUTE_NOMINATED
     ),
-    //new Prescription("8", "Homecare - Repeat Dispensing (nominated)", HOMECARE_REPEAT_DISPENSING_NOMINATED),
-    //new Prescription("9", "Homecare - Repeat Prescribing (nominated)", HOMECARE_REPEAT_PRESCRIBING_NOMINATED),
+    //new Prescription("9", "Homecare - Repeat Dispensing (nominated)", HOMECARE_REPEAT_DISPENSING_NOMINATED),
+    //new Prescription("10", "Homecare - Repeat Prescribing (nominated)", HOMECARE_REPEAT_PRESCRIBING_NOMINATED),
     new Prescription("custom", "Custom", null),
   ],
   pharmacies: [
@@ -77,6 +82,7 @@ const pageData = {
       "Secetary"
     ),
   ],
+  environment: "prod",
   mode: "home",
   signature: "",
   loggedIn: Cookies.get("Access-Token-Set") === "true",
@@ -156,20 +162,26 @@ function Canceller(
 
 // handle cases when no data is present without using "?." operator for IE compatibility
 // handle filter with function as IE will not accept "=>" operator
-rivets.formatters.snomedCode = function (codings) {
-  return codings
-    ? codings.filter(function (coding) {
-        return coding.system === "http://snomed.info/sct";
-      })[0].code
-    : "";
+rivets.formatters.snomedCode = {
+    read: function(codings) {
+      return codings.length
+      ? codings.filter(function (coding) {
+          return coding.system === "http://snomed.info/sct";
+        })[0].code
+      : "";
+    },
+    publish: function(value, binding) {return binding}
 };
 
-rivets.formatters.snomedCodeDescription = function (codings) {
-  return codings
+rivets.formatters.snomedCodeDescription = {
+  read: function(codings) {
+    return codings.length
     ? codings.filter(function (coding) {
         return coding.system === "http://snomed.info/sct";
       })[0].display
     : "";
+  },
+  publish: function(value, binding) {return binding}
 };
 
 rivets.formatters.prescriptionEndorsements = function (extensions) {
@@ -246,6 +258,9 @@ rivets.formatters.fullAddress = function (address) {
 };
 
 // IE compatibility, unable to use "=>" operator
+rivets.formatters.isProd = function (environment) {
+  return environment === "prod";
+};
 rivets.formatters.isLogin = function (mode) {
   return mode === "login";
 };
@@ -358,6 +373,8 @@ function getEditRequest(previousOrNext) {
       "GET",
       `/prescribe/edit?prescription_id=${prescriptionId}`
     );
+    pageData.previous_prescription_id = Cookies.get("Previous-Prescription-Id");
+    pageData.next_prescription_id = Cookies.get("Next-Prescription-Id");
     resetPageData("sign");
     pageData.signRequestSummary = getSummary(response);
   } catch (e) {
@@ -706,6 +723,10 @@ function getLongFormIdExtension(extensions) {
 }
 
 window.onerror = function (msg, url, line, col, error) {
+  // todo: fix cancellation page checkbox, prevent rivets from publishing checkbox values
+  if (pageData.mode === "cancel" && msg === "Uncaught TypeError: Cannot read property 'length' of undefined") {
+    return true;
+  }
   addError(
     "Unhandled error: " + msg + " at " + url + ":" + line + " col " + col
   );
@@ -1303,7 +1324,7 @@ function createMedicationRequests(
           coding: [
             {
               system: "http://snomed.info/sct",
-              code: "13892511000001100",
+              code: getMedicationSnomedCode(row),
               display: getMedicationDisplay(row),
             },
           ],
@@ -1411,16 +1432,17 @@ function getDosageInstructionText(row) {
     : "As directed";
 }
 
+function getMedicationSnomedCode(row) {
+  return row["Snomed"].trim()
+}
+
 function getMedicationDisplay(row) {
   return row["Medication"];
 }
 
 function getMedicationRequestExtensions(row, repeatsIssued, maxRepeatsAllowed) {
-  const prescriberTypeParts = row["Prescriber Type"].split(" - ");
-  const prescriberTypeCode = prescriberTypeParts[1];
-  let prescriberTypeDisplay = prescriberTypeParts[0];
-  prescriberTypeDisplay =
-    prescriberTypeDisplay[0].toUpperCase() + prescriberTypeDisplay.slice(1);
+  const prescriberTypeCode = row["Prescriber  Code"]
+  const prescriberTypeDisplay = row["Prescriber Description"]
   const extension = [
     {
       url:
@@ -1508,8 +1530,6 @@ function createCancellation(bundle) {
   bundle.identifier.value = uuidv4();
   // ****************************************
 
-  // cheat and get first medicationrequest to cancel
-  // todo: cancellations should be at medication level, not prescription level
   const messageHeader = getResourcesOfType(bundle, "MessageHeader")[0];
   messageHeader.eventCoding.code = "prescription-order-update";
   messageHeader.eventCoding.display = "Prescription Order Update";
@@ -1519,11 +1539,15 @@ function createCancellation(bundle) {
   messageHeader.focus = [];
   // ****************************************
 
+  var medicationToCancelSnomed = document.querySelectorAll('input[name="cancel-medications"]:checked')[0].value;
   const medicationRequestEntries = bundle.entry.filter(
     (entry) => entry.resource.resourceType === "MedicationRequest"
   );
+
+  const medicationEntryToCancel = medicationRequestEntries.filter(e => e.resource.medicationCodeableConcept.coding.some(c => c.code === medicationToCancelSnomed))[0]
+
   const clonedMedicationRequestEntry = JSON.parse(
-    JSON.stringify(medicationRequestEntries[0])
+    JSON.stringify(medicationEntryToCancel)
   );
   const medicationRequest = clonedMedicationRequestEntry.resource;
   medicationRequest.status = "cancelled";
@@ -1633,6 +1657,14 @@ function onLoad() {
   document
     .getElementById("prescription-test-pack")
     .addEventListener("change", handleFileSelect, false);
+  if (pageData.mode === "cancel") {
+    const prescriptionId = Cookies.get("Current-Prescription-Id");
+    const response = makeRequest(
+      "GET",
+      `/prescribe/edit?prescription_id=${prescriptionId}`
+    );
+    pageData.signRequestSummary = getSummary(response);
+  }
   document.querySelector("#main-content").style.display = "";
 }
 
@@ -1655,12 +1687,6 @@ function resetPageData(pageMode) {
       ? pageData.selectedPharmacy ?? "VNFKT"
       : null;
   if (pageData.mode == "sign") {
-    const prescriptionId = Cookies.get("Current-Prescription-Id");
-    const response = makeRequest(
-      "GET",
-      `/prescribe/edit?prescription_id=${prescriptionId}`
-    );
-    pageData.signRequestSummary = getSummary(response);
     pageData.previous_prescription_id = Cookies.get("Previous-Prescription-Id");
     pageData.next_prescription_id = Cookies.get("Next-Prescription-Id");
   }
