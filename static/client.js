@@ -1027,18 +1027,28 @@ function getMedicationQuantity(row) {
 // todo: move this code to new column in test-pack or can we do snomed lookups?
 function getMedicationQuantityCode(unitsOfMeasure) {
   switch (unitsOfMeasure) {
-    case "tablet":
-      return "428673006";
-    case "dose":
-      return "3317411000001100";
-    case "capsule":
-      return "428641000";
     case "ampoule":
       return "413516001";
-    case "vial":
-      return "415818006";
+    case "capsule":
+      return "428641000";
+    case "cartridge":
+      return "732988008";
+    case "dose":
+      return "3317411000001100";
     case "enema":
       return "700476008";
+    case "patch":
+      return "419702001";
+    case "plaster":
+      return "733010002";
+    case "pre-filled disposable injection":
+      return "3318611000001103";
+    case "sachet":
+      return "733013000";
+    case "tablet":
+      return "428673006";
+    case "vial":
+      return "415818006";
     case "device":
     default:
       return "999999999";
