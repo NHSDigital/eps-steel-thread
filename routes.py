@@ -193,6 +193,7 @@ def update_pagination(response, short_prescription_ids, current_short_prescripti
 
 
 @app.route(EDIT_URL, methods=["GET"])
+@exclude_from_auth()
 def get_edit():
     current_short_prescription_id = flask.request.args.get("prescription_id")
     bundle = load_prepare_request(current_short_prescription_id)
