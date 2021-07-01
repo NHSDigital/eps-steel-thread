@@ -89,7 +89,7 @@
             </legend>
           </fieldset>
         </div>
-        <div class="nhsuk-grid-column-one-quarter">
+        <div rv-hide="mode | isLogin" class="nhsuk-grid-column-one-quarter">
           <div class="nhsuk-action-link" style="float: right;">
             <a class="nhsuk-action-link__link" rv-show="loggedIn" rv-href="'/logout?state=' | appendPageMode">
               <svg class="nhsuk-icon nhsuk-icon__arrow-right-circle" xmlns="http://www.w3.org/2000/svg"
