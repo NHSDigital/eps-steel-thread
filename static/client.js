@@ -163,25 +163,29 @@ function Canceller(
 // handle cases when no data is present without using "?." operator for IE compatibility
 // handle filter with function as IE will not accept "=>" operator
 rivets.formatters.snomedCode = {
-    read: function(codings) {
-      return codings.length
+  read: function (codings) {
+    return codings.length
       ? codings.filter(function (coding) {
           return coding.system === "http://snomed.info/sct";
         })[0].code
       : "";
-    },
-    publish: function(value, binding) {return binding}
+  },
+  publish: function (value, binding) {
+    return binding;
+  },
 };
 
 rivets.formatters.snomedCodeDescription = {
-  read: function(codings) {
+  read: function (codings) {
     return codings.length
-    ? codings.filter(function (coding) {
-        return coding.system === "http://snomed.info/sct";
-      })[0].display
-    : "";
+      ? codings.filter(function (coding) {
+          return coding.system === "http://snomed.info/sct";
+        })[0].display
+      : "";
   },
-  publish: function(value, binding) {return binding}
+  publish: function (value, binding) {
+    return binding;
+  },
 };
 
 rivets.formatters.prescriptionEndorsements = function (extensions) {
@@ -331,7 +335,7 @@ function sendLoadRequest() {
   const payloads = filePayloads
     .concat(textPayloads)
     .filter(Boolean)
-    .map((payload) => JSON.parse(payload))
+    .map((payload) => JSON.parse(payload));
   if (isCustom && !payloads.length) {
     addError("Unable to parse custom prescription(s)");
   } else {
@@ -387,7 +391,7 @@ function sendEditRequest() {
   try {
     const bundles = getPayloads();
     bundles.forEach((bundle) => {
-      updateBundleIds(bundle)
+      updateBundleIds(bundle);
       updateNominatedPharmacy(bundle, getOdsCode());
     });
     const response = makeRequest(
@@ -724,7 +728,10 @@ function getLongFormIdExtension(extensions) {
 
 window.onerror = function (msg, url, line, col, error) {
   // todo: fix cancellation page checkbox, prevent rivets from publishing checkbox values
-  if (pageData.mode === "cancel" && msg === "Uncaught TypeError: Cannot read property 'length' of undefined") {
+  if (
+    pageData.mode === "cancel" &&
+    msg === "Uncaught TypeError: Cannot read property 'length' of undefined"
+  ) {
     return true;
   }
   addError(
@@ -862,7 +869,7 @@ var ExcelToJSON = function () {
 };
 
 function handleFileSelect(evt) {
-  var files = evt.target.files; // FileList object
+  var files = evt.target.files;
   var xl2json = new ExcelToJSON();
   xl2json.parseExcel(files[0]);
 }
@@ -1013,8 +1020,39 @@ function getMedicationQuantity(row) {
     value: row["Qty"],
     unit: row["UoM"],
     system: "http://snomed.info/sct",
-    code: "385024007",
+    code: getMedicationQuantityCode(row["UoM"]),
   };
+}
+
+// todo: move this code to new column in test-pack or can we do snomed lookups?
+function getMedicationQuantityCode(unitsOfMeasure) {
+  switch (unitsOfMeasure) {
+    case "ampoule":
+      return "413516001";
+    case "capsule":
+      return "428641000";
+    case "cartridge":
+      return "732988008";
+    case "dose":
+      return "3317411000001100";
+    case "enema":
+      return "700476008";
+    case "patch":
+      return "419702001";
+    case "plaster":
+      return "733010002";
+    case "pre-filled disposable injection":
+      return "3318611000001103";
+    case "sachet":
+      return "733013000";
+    case "tablet":
+      return "428673006";
+    case "vial":
+      return "415818006";
+    case "device":
+    default:
+      return "999999999";
+  }
 }
 
 function getPatient(patients, prescriptionRows) {
@@ -1025,10 +1063,61 @@ function getPatient(patients, prescriptionRows) {
 
 function createPrescription(
   patients,
-  prescription,
+  prescriptionRows,
   repeatsIssued = 0,
   maxRepeatsAllowed = 0
 ) {
+  const careSetting = getCareSetting(prescriptionRows);
+
+  const fhirPatient = getPatient(patients, prescriptionRows);
+
+  const fhirPractitionerRole = {
+    fullUrl: "urn:uuid:56166769-c1c4-4d07-afa8-132b5dfca666",
+    resource: {
+      resourceType: "PractitionerRole",
+      id: "56166769-c1c4-4d07-afa8-132b5dfca666",
+      identifier: [
+        {
+          system: "https://fhir.nhs.uk/Id/sds-role-profile-id",
+          value: "100102238986",
+        },
+      ],
+      practitioner: {
+        reference: "urn:uuid:a8c85454-f8cb-498d-9629-78e2cb5fa47a",
+      },
+      organization: {
+        reference: "urn:uuid:3b4b03a5-52ba-4ba6-9b82-70350aa109d8",
+      },
+      code: [
+        {
+          coding: [
+            {
+              system:
+                "https://fhir.hl7.org.uk/CodeSystem/UKCore-SDSJobRoleName",
+              code: "R8000", // todo: remove hardcoding?
+              display: "Clinical Practitioner Access Role",
+            },
+          ],
+        },
+      ],
+      telecom: [
+        {
+          system: "phone",
+          value: "01234567890",
+          use: "work",
+        },
+      ],
+    },
+  };
+
+  if (careSetting === "Secondary-Care") {
+    fhirPractitionerRole.resource.healthcareService = [
+      {
+        reference: "urn:uuid:54b0506d-49af-4245-9d40-d7d64902055e",
+      },
+    ];
+  }
+
   const fhirPrescription = {
     resourceType: "Bundle",
     id: "aef77afb-7e3c-427a-8657-2c427f71a272",
@@ -1061,8 +1150,9 @@ function createPrescription(
           },
           destination: [
             {
-              endpoint:
-                "https://sandbox.api.service.nhs.uk/electronic-prescriptions/$post-message",
+              endpoint: `https://${
+                pageData.environment === "int" ? "int." : ""
+              }api.service.nhs.uk/electronic-prescriptions/$post-message`,
               receiver: {
                 identifier: {
                   system: "https://fhir.nhs.uk/Id/ods-organization-code",
@@ -1074,51 +1164,8 @@ function createPrescription(
           focus: [],
         },
       },
-      getPatient(patients, prescription),
-      {
-        fullUrl: "urn:uuid:56166769-c1c4-4d07-afa8-132b5dfca666",
-        resource: {
-          resourceType: "PractitionerRole",
-          id: "56166769-c1c4-4d07-afa8-132b5dfca666",
-          identifier: [
-            {
-              system: "https://fhir.nhs.uk/Id/sds-role-profile-id",
-              value: "100102238986",
-            },
-          ],
-          practitioner: {
-            reference: "urn:uuid:a8c85454-f8cb-498d-9629-78e2cb5fa47a",
-          },
-          organization: {
-            reference: "urn:uuid:3b4b03a5-52ba-4ba6-9b82-70350aa109d8",
-          },
-          code: [
-            {
-              coding: [
-                {
-                  system:
-                    "https://fhir.hl7.org.uk/CodeSystem/UKCore-SDSJobRoleName",
-                  code: "R8000",
-                  display: "Clinical Practitioner Access Role",
-                },
-              ],
-            },
-          ],
-          healthcareService: [
-            {
-              reference: "urn:uuid:54b0506d-49af-4245-9d40-d7d64902055e",
-              display: "SOMERSET BOWEL CANCER SCREENING CENTRE",
-            },
-          ],
-          telecom: [
-            {
-              system: "phone",
-              value: "01234567890",
-              use: "work",
-            },
-          ],
-        },
-      },
+      fhirPatient,
+      fhirPractitionerRole,
       {
         fullUrl: "urn:uuid:a8c85454-f8cb-498d-9629-78e2cb5fa47a",
         resource: {
@@ -1148,98 +1195,6 @@ function createPrescription(
         },
       },
       {
-        fullUrl: "urn:uuid:3b4b03a5-52ba-4ba6-9b82-70350aa109d8",
-        resource: {
-          resourceType: "Organization",
-          id: "3b4b03a5-52ba-4ba6-9b82-70350aa109d8",
-          identifier: [
-            {
-              system: "https://fhir.nhs.uk/Id/ods-organization-code",
-              value: "RBA",
-            },
-          ],
-          type: [
-            {
-              coding: [
-                {
-                  system: "https://fhir.nhs.uk/CodeSystem/organisation-role",
-                  code: "197",
-                  display: "NHS TRUST",
-                },
-              ],
-            },
-          ],
-          name: "TAUNTON AND SOMERSET NHS FOUNDATION TRUST",
-          address: [
-            {
-              line: ["MUSGROVE PARK HOSPITAL", "PARKFIELD DRIVE", "TAUNTON"],
-              postalCode: "TA1 5DA",
-            },
-          ],
-          telecom: [
-            {
-              system: "phone",
-              value: "01823333444",
-              use: "work",
-            },
-          ],
-        },
-      },
-      {
-        fullUrl: "urn:uuid:54b0506d-49af-4245-9d40-d7d64902055e",
-        resource: {
-          resourceType: "HealthcareService",
-          id: "54b0506d-49af-4245-9d40-d7d64902055e",
-          identifier: [
-            {
-              use: "usual",
-              system: "https://fhir.nhs.uk/Id/ods-organization-code",
-              value: "A99968",
-            },
-          ],
-          active: true,
-          providedBy: {
-            identifier: {
-              system: "https://fhir.nhs.uk/Id/ods-organization-code",
-              value: "RBA",
-            },
-          },
-          location: [
-            {
-              reference: "urn:uuid:8a5d7d67-64fb-44ec-9802-2dc214bb3dcb",
-            },
-          ],
-          name: "SOMERSET BOWEL CANCER SCREENING CENTRE",
-          telecom: [
-            {
-              system: "phone",
-              value: "01823 333444",
-              use: "work",
-            },
-          ],
-        },
-      },
-      {
-        fullUrl: "urn:uuid:8a5d7d67-64fb-44ec-9802-2dc214bb3dcb",
-        resource: {
-          resourceType: "Location",
-          id: "8a5d7d67-64fb-44ec-9802-2dc214bb3dcb",
-          identifier: [
-            {
-              value: "10008800708",
-            },
-          ],
-          status: "active",
-          mode: "instance",
-          address: {
-            use: "work",
-            line: ["MUSGROVE PARK HOSPITAL"],
-            city: "TAUNTON",
-            postalCode: "TA1 5DA",
-          },
-        },
-      },
-      {
         fullUrl: "urn:uuid:51793ac0-112f-46c7-a891-9af8cefb206e",
         resource: {
           resourceType: "CommunicationRequest",
@@ -1256,16 +1211,15 @@ function createPrescription(
             type: "Organization",
             identifier: {
               system: "https://fhir.nhs.uk/Id/ods-organization-code",
-              value: "RBA",
+              value: "RBA", // todo: remove hardcoded
             },
-            display: "TAUNTON AND SOMERSET NHS FOUNDATION TRUST",
           },
           recipient: [
             {
               type: "Patient",
               identifier: {
                 system: "https://fhir.nhs.uk/Id/nhs-number",
-                value: "9449307571",
+                value: getNhsNumber(fhirPatient),
               },
             },
           ],
@@ -1274,13 +1228,178 @@ function createPrescription(
     ],
   };
   createMedicationRequests(
-    prescription,
+    prescriptionRows,
     repeatsIssued,
     maxRepeatsAllowed
   ).forEach((medicationRequest) =>
     fhirPrescription.entry.push(medicationRequest)
   );
+  createPlaceResources(careSetting, fhirPrescription);
   return JSON.stringify(fhirPrescription);
+}
+
+function getCareSetting(prescriptionRows) {
+  const row = prescriptionRows[0];
+  const prescriberTypeCode = row["Prescriber  Code"];
+  switch (prescriberTypeCode) {
+    // https://simplifier.net/guide/DigitalMedicines/DM-Prescription-Type
+    case "0108":
+    case "0101":
+    case "0113":
+    case "0125":
+    case "0105":
+    case "0113":
+      return "Primary-Care";
+    case "1004":
+    case "1001":
+      return "Secondary-Care";
+  }
+}
+
+function createPlaceResources(careSetting, fhirPrescription) {
+  if (careSetting === "Primary-Care") {
+    fhirPrescription.entry.push({
+      fullUrl: "urn:uuid:3b4b03a5-52ba-4ba6-9b82-70350aa109d8",
+      resource: {
+        resourceType: "Organization",
+        identifier: [
+          {
+            system: "https://fhir.nhs.uk/Id/ods-organization-code",
+            value: "A83008",
+          },
+        ],
+        type: [
+          {
+            coding: [
+              {
+                system: "https://fhir.nhs.uk/CodeSystem/organisation-role",
+                code: "76",
+                display: "GP PRACTICE",
+              },
+            ],
+          },
+        ],
+        name: "HALLGARTH SURGERY",
+        address: [
+          {
+            use: "work",
+            type: "both",
+            line: ["HALLGARTH SURGERY", "CHEAPSIDE"],
+            city: "SHILDON",
+            district: "COUNTY DURHAM",
+            postalCode: "DL4 2HP",
+          },
+        ],
+        telecom: [
+          {
+            system: "phone",
+            value: "0115 9737320",
+            use: "work",
+          },
+        ],
+        partOf: {
+          identifier: {
+            system: "https://fhir.nhs.uk/Id/ods-organization-code",
+            value: "84H",
+          },
+          display: "NHS COUNTY DURHAM CCG",
+        },
+      },
+    });
+  } else if (careSetting === "Secondary-Care") {
+    fhirPrescription.entry.push({
+      fullUrl: "urn:uuid:3b4b03a5-52ba-4ba6-9b82-70350aa109d8",
+      resource: {
+        resourceType: "Organization",
+        id: "3b4b03a5-52ba-4ba6-9b82-70350aa109d8",
+        identifier: [
+          {
+            system: "https://fhir.nhs.uk/Id/ods-organization-code",
+            value: "RBA",
+          },
+        ],
+        type: [
+          {
+            coding: [
+              {
+                system: "https://fhir.nhs.uk/CodeSystem/organisation-role",
+                code: "197",
+                display: "NHS TRUST",
+              },
+            ],
+          },
+        ],
+        name: "TAUNTON AND SOMERSET NHS FOUNDATION TRUST",
+        address: [
+          {
+            line: ["MUSGROVE PARK HOSPITAL", "PARKFIELD DRIVE", "TAUNTON"],
+            postalCode: "TA1 5DA",
+          },
+        ],
+        telecom: [
+          {
+            system: "phone",
+            value: "01823333444",
+            use: "work",
+          },
+        ],
+      },
+    });
+    fhirPrescription.entry.push({
+      fullUrl: "urn:uuid:54b0506d-49af-4245-9d40-d7d64902055e",
+      resource: {
+        resourceType: "HealthcareService",
+        id: "54b0506d-49af-4245-9d40-d7d64902055e",
+        identifier: [
+          {
+            use: "usual",
+            system: "https://fhir.nhs.uk/Id/ods-organization-code",
+            value: "A99968",
+          },
+        ],
+        active: true,
+        providedBy: {
+          identifier: {
+            system: "https://fhir.nhs.uk/Id/ods-organization-code",
+            value: "RBA",
+          },
+        },
+        location: [
+          {
+            reference: "urn:uuid:8a5d7d67-64fb-44ec-9802-2dc214bb3dcb",
+          },
+        ],
+        name: "SOMERSET BOWEL CANCER SCREENING CENTRE",
+        telecom: [
+          {
+            system: "phone",
+            value: "01823 333444",
+            use: "work",
+          },
+        ],
+      },
+    });
+    fhirPrescription.entry.push({
+      fullUrl: "urn:uuid:8a5d7d67-64fb-44ec-9802-2dc214bb3dcb",
+      resource: {
+        resourceType: "Location",
+        id: "8a5d7d67-64fb-44ec-9802-2dc214bb3dcb",
+        identifier: [
+          {
+            value: "10008800708",
+          },
+        ],
+        status: "active",
+        mode: "instance",
+        address: {
+          use: "work",
+          line: ["MUSGROVE PARK HOSPITAL"],
+          city: "TAUNTON",
+          postalCode: "TA1 5DA",
+        },
+      },
+    });
+  }
 }
 
 function createMedicationRequests(
@@ -1433,7 +1552,7 @@ function getDosageInstructionText(row) {
 }
 
 function getMedicationSnomedCode(row) {
-  return row["Snomed"].trim()
+  return row["Snomed"].trim();
 }
 
 function getMedicationDisplay(row) {
@@ -1441,8 +1560,8 @@ function getMedicationDisplay(row) {
 }
 
 function getMedicationRequestExtensions(row, repeatsIssued, maxRepeatsAllowed) {
-  const prescriberTypeCode = row["Prescriber  Code"]
-  const prescriberTypeDisplay = row["Prescriber Description"]
+  const prescriberTypeCode = row["Prescriber  Code"];
+  const prescriberTypeDisplay = row["Prescriber Description"];
   const extension = [
     {
       url:
@@ -1481,6 +1600,12 @@ function getMedicationRequestExtensions(row, repeatsIssued, maxRepeatsAllowed) {
   );
 
   return extension;
+}
+
+function getNhsNumber(fhirPatient) {
+  return fhirPatient.resource.identifier.filter(
+    (i) => i.system === "https://fhir.nhs.uk/Id/nhs-number"
+  )[0].value;
 }
 
 function getPrescriptionTypeCode(row) {
@@ -1539,12 +1664,18 @@ function createCancellation(bundle) {
   messageHeader.focus = [];
   // ****************************************
 
-  var medicationToCancelSnomed = document.querySelectorAll('input[name="cancel-medications"]:checked')[0].value;
+  var medicationToCancelSnomed = document.querySelectorAll(
+    'input[name="cancel-medications"]:checked'
+  )[0].value;
   const medicationRequestEntries = bundle.entry.filter(
     (entry) => entry.resource.resourceType === "MedicationRequest"
   );
 
-  const medicationEntryToCancel = medicationRequestEntries.filter(e => e.resource.medicationCodeableConcept.coding.some(c => c.code === medicationToCancelSnomed))[0]
+  const medicationEntryToCancel = medicationRequestEntries.filter((e) =>
+    e.resource.medicationCodeableConcept.coding.some(
+      (c) => c.code === medicationToCancelSnomed
+    )
+  )[0];
 
   const clonedMedicationRequestEntry = JSON.parse(
     JSON.stringify(medicationEntryToCancel)
