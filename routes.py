@@ -149,11 +149,13 @@ def post_login():
 
 @app.route("/", methods=["GET"])
 @app.route("/home", methods=["GET"])
+@exclude_from_auth()
 def get_home():
     return render_client("home")
 
 
 @app.route(LOAD_URL, methods=["GET"])
+@exclude_from_auth()
 def get_load():
     return render_client("load")
 
