@@ -89,7 +89,7 @@
             </legend>
           </fieldset>
         </div>
-        <div class="nhsuk-grid-column-one-quarter">
+        <div rv-hide="mode | isLogin" class="nhsuk-grid-column-one-quarter">
           <div class="nhsuk-action-link" style="float: right;">
             <a class="nhsuk-action-link__link" rv-show="loggedIn" rv-href="'/logout?state=' | appendPageMode">
               <svg class="nhsuk-icon nhsuk-icon__arrow-right-circle" xmlns="http://www.w3.org/2000/svg"
@@ -100,6 +100,16 @@
                 </path>
               </svg>
               <span class="nhsuk-action-link__text">Change auth</span>
+            </a>
+            <a class="nhsuk-action-link__link" rv-hide="loggedIn" rv-href="'/logout?state=' | appendPageMode">
+              <svg class="nhsuk-icon nhsuk-icon__arrow-right-circle" xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M0 0h24v24H0z" fill="none"></path>
+                <path
+                  d="M12 2a10 10 0 0 0-9.95 9h11.64L9.74 7.05a1 1 0 0 1 1.41-1.41l5.66 5.65a1 1 0 0 1 0 1.42l-5.66 5.65a1 1 0 0 1-1.41 0 1 1 0 0 1 0-1.41L13.69 13H2.05A10 10 0 1 0 12 2z">
+                </path>
+              </svg>
+              <span class="nhsuk-action-link__text">Login</span>
             </a>
           </div>
         </div>
@@ -563,9 +573,12 @@
       </div>
       <div rv-show="mode | isHome">
         <div class="nhsuk-grid-row">
-          <div class="nhsuk-grid-column-full">
+          <div rv-show="loggedIn" class="nhsuk-grid-column-full" >
             <a href="/prescribe/load" class="nhsuk-button">Prescribe</a>
             <a href="/dispense/release-nominated-pharmacy" class="nhsuk-button" rv-hide="environment | isProd">Dispense</a>
+          </div>
+          <div rv-hide="loggedIn" class="nhsuk-grid-column-full">
+            <a href="/prescribe/load" class="nhsuk-button">View Prescription(s)</a>
           </div>
         </div>
       </div>
@@ -573,7 +586,7 @@
         <div class="nhsuk-grid-row">
           <div class="nhsuk-grid-column-full">
             <button class="nhsuk-button" type="submit" onclick="sendEditRequest()">View</button>
-            <button class="nhsuk-button nhsuk-button--reverse" type="submit" onclick="sendLoadRequest()">Edit</button>
+            <button rv-show="loggedIn" class="nhsuk-button nhsuk-button--reverse" type="submit" onclick="sendLoadRequest()">Edit</button>
             <button class="nhsuk-button nhsuk-button--secondary" type="submit"
               onclick="resetPageData('home');">Back</button>
           </div>
@@ -591,8 +604,8 @@
       <div rv-show="mode | isSign">
         <div class="nhsuk-grid-row">
           <div class="nhsuk-grid-column-full">
-            <button class="nhsuk-button" type="submit" onclick="sendSignRequest(true)">Send</button>
-            <button class="nhsuk-button nhsuk-button--reverse" type="submit" onclick="sendSignRequest(false)">Sign</button>
+            <button rv-show="loggedIn" class="nhsuk-button" type="submit" onclick="sendSignRequest(true)">Send</button>
+            <button rv-show="loggedIn" class="nhsuk-button nhsuk-button--reverse" type="submit" onclick="sendSignRequest(false)">Sign</button>
             <button class="nhsuk-button nhsuk-button--secondary" type="submit"
               onclick="resetPageData('load');">Back</button>
           </div>
