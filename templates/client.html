@@ -166,8 +166,8 @@
           </fieldset>
         </div>
       </div>
-      <div class="nhsuk-grid-row" rv-show="mode | isRelease">
-        <div class="nhsuk-grid-column-full">
+      <div class="nhsuk-grid-row" rv-show="mode | isRelease" style="margin-bottom:20px;">
+        <div class="nhsuk-grid-column-full" rv-hide="releaseResponse">
           <div class="nhsuk-radios">
             <div class="nhsuk-radios__item" rv-each-release="releases">
               <input class="nhsuk-radios__input" rv-id="release.id" type="radio" name="release"
@@ -194,7 +194,7 @@
               <div>
                 <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m" rv-show="mode | isEdit">Nominate a pharmacy</legend>
                 <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m"
-                  rv-show="mode | isRelease">Pharmacy to release prescriptions for
+                  rv-show="mode | isRelease">Pharmacy to release prescriptions to
                 </legend>
               </div>
               <div class="nhsuk-radios">
