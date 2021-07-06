@@ -121,6 +121,16 @@ function Pharmacy(id, name) {
   };
 }
 
+function Release(id, description) {
+  this.id = id;
+  this.description = description;
+  this.select = function () {
+    pageData.selectedReleaseId = id;
+    pageData.showCustomPrescriptionIdInput = id === "custom";
+    resetPageData(pageData.mode);
+  };
+}
+
 function PrescriptionAction(id, description) {
   this.id = id;
   this.description = description;
