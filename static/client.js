@@ -242,8 +242,8 @@ rivets.formatters.dosageInstruction = function (dosageInstructions) {
   return dosageInstructions ? dosageInstructions[0].text : "";
 };
 
-rivets.formatters.dispenserNotes = function (note) {
-  return note.filter(note => note.text).map(note => note.text).join(". ");
+rivets.formatters.dispenserNotes = function (notes) {
+  return notes.filter(note => note.text).map(note => note.text).join(". ");
 };
 
 rivets.formatters.fullName = function (name) {
