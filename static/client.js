@@ -533,7 +533,7 @@ function sendCancelRequest() {
 function sendDispenseNominatedPharmacyReleaseRequest() {
   try {
     const prescriptionId =
-      selectedReleaseId === "custom"
+      pageData.selectedReleaseId === "custom"
         ? document.getElementById("prescription-id-input").value
         : undefined;
     const request = {
