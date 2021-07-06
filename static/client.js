@@ -764,13 +764,10 @@ function getSummary(payload) {
 
   const communicationRequests = getResourcesOfType(payload, "CommunicationRequest");
   const patientInstructions = communicationRequests
-  .map(communicationRequest => {
-    const payload = communicationRequest.payload
-    if (payload && payload.contentString) {
-      return payload.contentString;
-    }
-    return "";
-  })
+  .flatMap(communicationRequest => communicationRequest.payload)
+  .filter(Boolean)
+  .filter(payload => payload.contentString)
+  .map(payload => payload.contentString)  
   .join()
 
   const startDate =
