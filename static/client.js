@@ -551,7 +551,6 @@ function sendReleaseRequest() {
       JSON.stringify(request)
     );
     pageData.showCustomPharmacyInput = false;
-    pageData.apiResponse = true;
     pageData.releaseResponse = {};
     pageData.releaseResponse.body = !response.success ? response.body : "";
     pageData.releaseResponse.prescriptions = response.success
@@ -571,27 +570,19 @@ function sendReleaseRequest() {
 
 function sendDispenseRequest() {
   try {
-    // const prescriptionId =
-    //   pageData.selectedReleaseId === "custom"
-    //     ? document.getElementById("prescription-id-input").value
-    //     : undefined;
+    const prescriptionId = Cookies.get("Current-Prescription-Id");
+    const bundle = makeRequest(
+      "GET",
+      `/prescribe/edit?prescription_id=${prescriptionId}`
+    );
+    const dispenseRequest = createDispenseRequest(bundle)
     const response = makeRequest(
       "POST",
       "/dispense/dispense",
-      {}
+      JSON.stringify(dispenseRequest)
     );
-    pageData.showCustomPharmacyInput = false;
-    pageData.apiResponse = true;
     pageData.dispenseResponse = {};
-    pageData.dispenseResponse.body = !response.success ? response.body : "";
-    pageData.dispenseResponse.prescriptions = response.success
-      ? JSON.parse(response.body).entry.map(function (entry) {
-          const bundle = entry.resource;
-          const originalShortFormId = getMedicationRequests(bundle)[0]
-            .groupIdentifier.value;
-          return { id: originalShortFormId };
-        })
-      : null;
+    pageData.dispenseResponse.body = response.body;
     pageData.dispenseResponse.success = response.success;
   } catch (e) {
     console.log(e);
@@ -1872,6 +1863,135 @@ function createCancellation(bundle) {
   return bundle;
 }
 
+function createDispenseRequest(bundle) {
+  // Fixes duplicate hl7v3 identifier error
+  // this is not an obvious error for a supplier to resolve as
+  // there is no mention of the fhir field it relates to
+  // can we improve our returned error message here??
+  bundle.identifier.value = uuidv4();
+  // ****************************************
+
+  const messageHeader = getResourcesOfType(bundle, "MessageHeader")[0];
+  messageHeader.eventCoding.code = "prescription-order-update";
+  messageHeader.eventCoding.display = "Prescription Order Update";
+
+  // cheat and remove focus references as references not in bundle causes validation errors
+  // but no references always passes
+  messageHeader.focus = [];
+  // ****************************************
+
+  var medicationToCancelSnomed = document.querySelectorAll(
+    'input[name="cancel-medications"]:checked'
+  )[0].value;
+  const medicationRequestEntries = bundle.entry.filter(
+    (entry) => entry.resource.resourceType === "MedicationRequest"
+  );
+
+  const medicationEntryToCancel = medicationRequestEntries.filter((e) =>
+    e.resource.medicationCodeableConcept.coding.some(
+      (c) => c.code === medicationToCancelSnomed
+    )
+  )[0];
+
+  const clonedMedicationRequestEntry = JSON.parse(
+    JSON.stringify(medicationEntryToCancel)
+  );
+  const medicationRequest = clonedMedicationRequestEntry.resource;
+  medicationRequest.status = "cancelled";
+  const cancellationReason = pageData.reasons.filter(
+    (r) => r.id === pageData.selectedCancellationReasonId
+  )[0];
+  medicationRequest.statusReason = {
+    coding: [
+      {
+        system:
+          "https://fhir.nhs.uk/CodeSystem/medicationrequest-status-reason",
+        code: cancellationReason.id,
+        display: cancellationReason.display,
+      },
+    ],
+  };
+  bundle.entry = bundle.entry.filter(
+    (entry) => entry.resource.resourceType !== "MedicationRequest"
+  );
+  bundle.entry.push(clonedMedicationRequestEntry);
+
+  const canceller = pageData.cancellers.filter(
+    (canceller) => canceller.id === pageData.selectedCancellerId
+  )[0];
+
+  if (canceller.id !== "same-as-original-author") {
+    const cancelPractitionerRoleIdentifier = uuidv4();
+    const cancelPractitionerIdentifier = uuidv4();
+
+    medicationRequest.extension.push({
+      url:
+        "https://fhir.nhs.uk/StructureDefinition/Extension-DM-ResponsiblePractitioner",
+      valueReference: {
+        reference: `urn:uuid:${cancelPractitionerRoleIdentifier}`,
+      },
+    });
+
+    const practitionerRoleEntry = bundle.entry.filter(
+      (entry) => entry.resource.resourceType === "PractitionerRole"
+    )[0];
+    const cancelPractitionerRoleEntry = JSON.parse(
+      JSON.stringify(practitionerRoleEntry)
+    );
+
+    cancelPractitionerRoleEntry.fullUrl = `urn:uuid:${cancelPractitionerRoleIdentifier}`;
+    const cancelPractitionerRole = cancelPractitionerRoleEntry.resource;
+    cancelPractitionerRole.practitioner.reference = `urn:uuid:${cancelPractitionerIdentifier}`;
+    cancelPractitionerRole.identifier = [
+      {
+        system: "https://fhir.nhs.uk/Id/sds-role-profile-id",
+        value: canceller.sdsRoleProfileId,
+      },
+    ];
+    cancelPractitionerRole.code.forEach((code) =>
+      code.coding
+        .filter(
+          (coding) =>
+            coding.system ===
+            "https://fhir.hl7.org.uk/CodeSystem/UKCore-SDSJobRoleName"
+        )
+        .forEach((coding) => {
+          (coding.code = canceller.id), (coding.display = canceller.display);
+        })
+    );
+    bundle.entry.push(cancelPractitionerRoleEntry);
+
+    const practitionerEntry = bundle.entry.filter(
+      (entry) => entry.resource.resourceType === "Practitioner"
+    )[0];
+    const cancelPractitionerEntry = JSON.parse(
+      JSON.stringify(practitionerEntry)
+    );
+    cancelPractitionerEntry.fullUrl = `urn:uuid:${cancelPractitionerIdentifier}`;
+    const cancelPractitioner = cancelPractitionerEntry.resource;
+    cancelPractitioner.identifier = [
+      {
+        system: "https://fhir.nhs.uk/Id/sds-user-id",
+        value: canceller.sdsUserId,
+      },
+      {
+        system: canceller.professionalCodeSystem,
+        value: canceller.professionalCodeValue,
+      },
+    ];
+    cancelPractitioner.name = [
+      {
+        family: canceller.lastName,
+        given: [canceller.firstName],
+        prefix: [canceller.title],
+      },
+    ];
+    bundle.entry.push(cancelPractitionerEntry);
+  }
+
+  return bundle;
+}
+
 function onLoad() {
   if (pageData.mode === "release" && pageData.prescriptionId) {
     pageData.selectedReleaseId = "custom";
@@ -1919,7 +2039,6 @@ function resetPageData(pageMode) {
     pageMode === "release"
       ? pageData.selectedReleaseId === "custom"
       : pageMode === "dispense";
-  pageData.apiResponse = false;
   pageData.releaseResponse = null;
   pageData.dispenseResponse = null;
   pageData.selectedPharmacy =
