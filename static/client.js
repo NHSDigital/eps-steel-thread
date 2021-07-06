@@ -532,7 +532,7 @@ function sendCancelRequest() {
   }
 }
 
-function sendDispenseNominatedPharmacyReleaseRequest() {
+function sendReleaseRequest() {
   try {
     const prescriptionId =
       pageData.selectedReleaseId === "custom"
@@ -559,6 +559,35 @@ function sendDispenseNominatedPharmacyReleaseRequest() {
         })
       : null;
     pageData.releaseResponse.success = response.success;
+  } catch (e) {
+    console.log(e);
+    addError("Communication error");
+  }
+}
+
+function sendDispenseRequest() {
+  try {
+    // const prescriptionId =
+    //   pageData.selectedReleaseId === "custom"
+    //     ? document.getElementById("prescription-id-input").value
+    //     : undefined;
+    const response = makeRequest(
+      "POST",
+      "/dispense/dispense",
+      {}
+    );
+    pageData.showCustomPharmacyInput = false;
+    pageData.dispenseResponse = {};
+    pageData.dispenseResponse.body = !response.success ? response.body : "";
+    pageData.dispenseResponse.prescriptions = response.success
+      ? JSON.parse(response.body).entry.map(function (entry) {
+          const bundle = entry.resource;
+          const originalShortFormId = getMedicationRequests(bundle)[0]
+            .groupIdentifier.value;
+          return { id: originalShortFormId };
+        })
+      : null;
+    pageData.dispenseResponse.success = response.success;
   } catch (e) {
     console.log(e);
     addError("Communication error");
@@ -1879,7 +1908,9 @@ function resetPageData(pageMode) {
       ? pageData.selectedPharmacy === "custom"
       : false;
   pageData.showCustomPrescriptionIdInput =
-    pageMode === "release" ? pageData.selectedReleaseId === "custom" : false;
+    pageMode === "release"
+      ? pageData.selectedReleaseId === "custom"
+      : pageMode === "dispense";
   pageData.releaseResponse = null;
   pageData.selectedPharmacy =
     pageMode === "edit" || pageMode === "release"
