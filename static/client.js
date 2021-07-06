@@ -238,6 +238,10 @@ rivets.formatters.titleCase = function (string) {
     : "";
 };
 
+rivets.formatters.dosageInstruction = function (dosageInstructions) {
+  return dosageInstructions ? dosageInstructions[0].text : "";
+};
+
 rivets.formatters.fullName = function (name) {
   if (!name) {
     return "";

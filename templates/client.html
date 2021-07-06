@@ -290,6 +290,7 @@
                     <th class="nhsuk-table__header" scope="col">Name</th>
                     <th class="nhsuk-table__header" scope="col">Quantity</th>
                     <th class="nhsuk-table__header" scope="col">Unit</th>
+                    <th class="nhsuk-table__header" scope="col">Dosage Instructions</th>
                   </tr>
                 </thead>
                 <tbody class="nhsuk-table__body">
@@ -301,6 +302,7 @@
                     </td>
                     <td class="nhsuk-table__cell">{medication.dispenseRequest.quantity.value}</td>
                     <td class="nhsuk-table__cell">{medication.dispenseRequest.quantity.unit}</td>
+                    <td class="nhsuk-table__cell">{medication.dosageInstruction | dosageInstruction}</td>
                   </tr>
                 </tbody>
               </table>
