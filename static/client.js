@@ -764,7 +764,7 @@ function getSummary(payload) {
 
   const communicationRequests = getResourcesOfType(payload, "CommunicationRequest");
   const patientInstructions = communicationRequests
-  .forEach(communicationRequest => {
+  .map(communicationRequest => {
     const payload = communicationRequest.payload
     if (payload && payload.contentString) {
       return payload.contentString;
