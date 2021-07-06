@@ -182,7 +182,17 @@
       </div>
       <div class="nhsuk-grid-row" id="prescription-id-container" rv-show="showCustomPrescriptionIdInput">
         <div class="nhsuk-grid-column-full" rv-hide="releaseResponse">
-          <fieldset class="nhsuk-fieldset" rv-hide="dispenseResponse">
+          <fieldset class="nhsuk-fieldset">
+            <div class="nhsuk-form-group">
+              <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m">Prescription Id</legend>
+              <input class="nhsuk-input" rv-value="prescriptionId" type="text" id="prescription-id-input" name="prescription-id-input" />
+            </div>
+          </fieldset>
+        </div>
+      </div>
+      <div class="nhsuk-grid-row" id="prescription-id-container" rv-show="showCustomPrescriptionIdInput">
+        <div class="nhsuk-grid-column-full" rv-hide="dispenseResponse">
+          <fieldset class="nhsuk-fieldset">
             <div class="nhsuk-form-group">
               <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m">Prescription Id</legend>
               <input class="nhsuk-input" rv-value="prescriptionId" type="text" id="prescription-id-input" name="prescription-id-input" />

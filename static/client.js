@@ -1915,6 +1915,7 @@ function resetPageData(pageMode) {
       ? pageData.selectedReleaseId === "custom"
       : pageMode === "dispense";
   pageData.releaseResponse = null;
+  pageData.dispenseResponse = null;
   pageData.selectedPharmacy =
     pageMode === "edit" || pageMode === "release"
       ? pageData.selectedPharmacy ?? "VNFKT"
