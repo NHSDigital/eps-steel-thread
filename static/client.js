@@ -1875,6 +1875,9 @@ function onLoad() {
     pageData.selectedReleaseId = "custom";
     resetPageData("release");
   }
+  if (pageData.mode === "dispense") {
+    resetPageData("dispense");
+  }
   if (
     pageData.mode === "send" &&
     !pageData.sendResponse &&
