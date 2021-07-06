@@ -95,7 +95,9 @@ const pageData = {
   selectedCancellationReasonId: "0001",
   selectedCancellerId: "same-as-original-author",
   selectedReleaseId: "all",
-  prescriptionId: new URLSearchParams(window.location.search).get("prescription_id"),
+  prescriptionId: new URLSearchParams(window.location.search).get(
+    "prescription_id"
+  ),
   payloads: [],
 };
 
@@ -1838,7 +1840,8 @@ function createCancellation(bundle) {
 
 function onLoad() {
   if (pageData.mode === "release" && pageData.prescriptionId) {
-    pageData.selectedReleaseId = "custom"
+    pageData.selectedReleaseId = "custom";
+    resetPageData("release");
   }
   if (
     pageData.mode === "send" &&
@@ -1876,9 +1879,7 @@ function resetPageData(pageMode) {
       ? pageData.selectedPharmacy === "custom"
       : false;
   pageData.showCustomPrescriptionIdInput =
-    pageMode === "release"
-      ? pageData.selectedReleaseId === "custom"
-      : false;
+    pageMode === "release" ? pageData.selectedReleaseId === "custom" : false;
   pageData.releaseResponse = null;
   pageData.selectedPharmacy =
     pageMode === "edit" || pageMode === "release"
