@@ -33,7 +33,7 @@ const pageData = {
     //new Prescription("10", "Homecare - Repeat Prescribing (nominated)", HOMECARE_REPEAT_PRESCRIBING_NOMINATED),
     new Prescription("custom", "Custom", null),
   ],
-  releases: [new Release("all", "All"), new Release("custom", "Custom")],
+  releases: [new Release("all", "All nominated"), new Release("custom", "Custom")],
   pharmacies: [
     new Pharmacy("VNFKT", "FIVE STAR HOMECARE LEEDS LTD"),
     new Pharmacy("YGM1E", "MBBM HEALTHCARE TECHNOLOGIES LTD"),
