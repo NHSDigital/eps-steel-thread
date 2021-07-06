@@ -320,6 +320,9 @@ rivets.formatters.isCancel = function (mode) {
 rivets.formatters.isRelease = function (mode) {
   return mode === "release";
 };
+rivets.formatters.isDispense = function (mode) {
+  return mode === "dispense";
+};
 rivets.formatters.showPharmacyList = function (mode) {
   return mode === "edit" || mode === "release";
 };
