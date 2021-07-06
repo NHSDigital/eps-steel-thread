@@ -243,7 +243,7 @@ rivets.formatters.dosageInstruction = function (dosageInstructions) {
 };
 
 rivets.formatters.dispenserNotes = function (notes) {
-  return notes.filter(note => note.text).map(note => note.text).join(". ");
+  return notes?.filter(note => note.text).map(note => note.text).join(". ");
 };
 
 rivets.formatters.fullName = function (name) {
@@ -771,7 +771,7 @@ function getSummary(payload) {
   .flatMap(communicationRequest => communicationRequest.payload)
   .filter(Boolean)
   .filter(payload => payload.contentString)
-  .map(payload => payload.contentString)  
+  .map(payload => payload.contentString)
   .join("\n")
 
   const startDate =
