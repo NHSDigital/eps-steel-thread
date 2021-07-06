@@ -761,6 +761,15 @@ function getSummary(payload) {
   const prescribingOrganization = organizations[0]; // todo: add logic to handle primary/secondary-care
   const parentOrganization = organizations[0];
   const medicationRequests = getResourcesOfType(payload, "MedicationRequest");
+
+  const communicationRequests = getResourcesOfType(payload, "CommunicationRequest");
+  const patientInstructions = communicationRequests
+  .flatMap(communicationRequest => communicationRequest.payload)
+  .filter(isTruthy)
+  .filter(fhir.isContentStringPayload)
+  .map(payload => payload.contentString)
+  .map(contentString => new hl7V3.Text(contentString))
+
   const startDate =
     medicationRequests[0].dispenseRequest.validityPeriod?.start ??
     new Date().toISOString().slice(0, 10);
@@ -786,6 +795,7 @@ function getSummary(payload) {
     author: {
       startDate: startDate,
     },
+    patientInstructions: patientInstructions,
     repeatNumber: Number.isInteger(numberOfRepeatPrescriptionsIssued)
       ? numberOfRepeatPrescriptionsIssued + 1
       : null,
