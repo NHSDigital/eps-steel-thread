@@ -177,10 +177,8 @@
         <div class="nhsuk-grid-column-full">
           <fieldset class="nhsuk-fieldset">
             <div class="nhsuk-form-group">
-              <div class="nhsuk-hint" id="pharmacy-input-hint">
-                Prescription Id
-              </div>
-              <input class="nhsuk-text" rv-value="currentPrescriptionId" type="text" id="prescription-id-input" name="prescription-id-input" />
+              <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m" rv-show="mode | isEdit">Prescription Id</legend>
+              <input class="nhsuk-input" rv-value="currentPrescriptionId" type="text" id="prescription-id-input" name="prescription-id-input"  />
             </div>
           </fieldset>
         </div>
@@ -191,7 +189,6 @@
             <fieldset class="nhsuk-fieldset" aria-describedby="pharmacy-hint">
               <div>
                 <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m" rv-show="mode | isEdit">Nominate a pharmacy</legend>
-                <input class="nhsuk-input" rv-value="currentPrescriptionId" type="text" />
                 <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m"
                   rv-show="mode | isRelease">Pharmacy to release prescriptions for
                 </legend>
