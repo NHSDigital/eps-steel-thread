@@ -166,11 +166,15 @@
           </fieldset>
         </div>
       </div>
-      <div class="nhsuk-radios" rv-show="mode | isRelease">
-        <div class="nhsuk-radios__item" rv-each-release="releases">
-          <input class="nhsuk-radios__input" rv-id="release.id" type="radio" name="release"
-            rv-value="release.id" rv-checked="selectedReleaseId" rv-on-click="release.select">
-          <label class="nhsuk-label nhsuk-radios__label" rv-for="release.id">{release.description}</label>
+      <div class="nhsuk-grid-row" rv-show="mode | isRelease">
+        <div class="nhsuk-grid-column-full">
+          <div class="nhsuk-radios">
+            <div class="nhsuk-radios__item" rv-each-release="releases">
+              <input class="nhsuk-radios__input" rv-id="release.id" type="radio" name="release"
+                rv-value="release.id" rv-checked="selectedReleaseId" rv-on-click="release.select">
+              <label class="nhsuk-label nhsuk-radios__label" rv-for="release.id">{release.description}</label>
+            </div>
+          </div>
         </div>
       </div>
       <div class="nhsuk-grid-row" id="prescription-id-container" rv-show="showCustomPrescriptionIdInput">
