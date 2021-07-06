@@ -764,11 +764,14 @@ function getSummary(payload) {
 
   const communicationRequests = getResourcesOfType(payload, "CommunicationRequest");
   const patientInstructions = communicationRequests
-  .flatMap(communicationRequest => communicationRequest.payload)
-  .filter(isTruthy)
-  .filter(fhir.isContentStringPayload)
-  .map(payload => payload.contentString)
-  .map(contentString => new hl7V3.Text(contentString))
+  .forEach(communicationRequest => {
+    const payload = communicationRequest.payload
+    if (payload && payload.contentString) {
+      return payload.contentString;
+    }
+    return "";
+  })
+  .join()
 
   const startDate =
     medicationRequests[0].dispenseRequest.validityPeriod?.start ??
