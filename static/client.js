@@ -768,7 +768,7 @@ function getSummary(payload) {
   .filter(Boolean)
   .filter(payload => payload.contentString)
   .map(payload => payload.contentString)  
-  .join()
+  .join("\n")
 
   const startDate =
     medicationRequests[0].dispenseRequest.validityPeriod?.start ??
