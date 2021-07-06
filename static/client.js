@@ -33,6 +33,7 @@ const pageData = {
     //new Prescription("10", "Homecare - Repeat Prescribing (nominated)", HOMECARE_REPEAT_PRESCRIBING_NOMINATED),
     new Prescription("custom", "Custom", null),
   ],
+  releases: [new Release("all", "All"), new Release("custom", "Custom")],
   pharmacies: [
     new Pharmacy("VNFKT", "FIVE STAR HOMECARE LEEDS LTD"),
     new Pharmacy("YGM1E", "MBBM HEALTHCARE TECHNOLOGIES LTD"),
@@ -93,6 +94,7 @@ const pageData = {
   selectedExampleId: "1",
   selectedCancellationReasonId: "0001",
   selectedCancellerId: "same-as-original-author",
+  selectedReleaseId: "all",
   currentPrescriptionId: Cookies.get("Current-Prescription-Id"),
   payloads: [],
 };
@@ -246,7 +248,10 @@ rivets.formatters.dosageInstruction = function (dosageInstructions) {
 };
 
 rivets.formatters.dispenserNotes = function (notes) {
-  return notes?.filter(note => note.text).map(note => note.text).join(". ");
+  return notes
+    ?.filter((note) => note.text)
+    .map((note) => note.text)
+    .join(". ");
 };
 
 rivets.formatters.fullName = function (name) {
@@ -517,7 +522,12 @@ function sendCancelRequest() {
 
 function sendDispenseNominatedPharmacyReleaseRequest() {
   try {
+    const prescriptionId =
+      selectedReleaseId === "custom"
+        ? document.getElementById("prescription-id-input").value
+        : undefined;
     const request = {
+      prescriptionId,
       odsCode: getOdsCode(),
     };
     const response = makeRequest(
@@ -769,13 +779,16 @@ function getSummary(payload) {
   const parentOrganization = organizations[0];
   const medicationRequests = getResourcesOfType(payload, "MedicationRequest");
 
-  const communicationRequests = getResourcesOfType(payload, "CommunicationRequest");
+  const communicationRequests = getResourcesOfType(
+    payload,
+    "CommunicationRequest"
+  );
   const patientInstructions = communicationRequests
-  .flatMap(communicationRequest => communicationRequest.payload)
-  .filter(Boolean)
-  .filter(payload => payload.contentString)
-  .map(payload => payload.contentString)
-  .join("\n")
+    .flatMap((communicationRequest) => communicationRequest.payload)
+    .filter(Boolean)
+    .filter((payload) => payload.contentString)
+    .map((payload) => payload.contentString)
+    .join("\n");
 
   const startDate =
     medicationRequests[0].dispenseRequest.validityPeriod?.start ??
@@ -1664,7 +1677,7 @@ function doPrescriptionAction(select) {
     case "cancel":
       window.open(
         `/prescribe/cancel?prescription_id=${prescriptionId}`,
-        '_blank'
+        "_blank"
       );
       break;
     case "release":
@@ -1692,7 +1705,7 @@ function doPrescriptionAction(select) {
     case "dispense":
       window.open(
         `/dispense/dispense?prescription_id=${prescriptionId}`,
-        '_blank'
+        "_blank"
       );
       break;
     default:
@@ -1864,6 +1877,10 @@ function resetPageData(pageMode) {
   pageData.showCustomPharmacyInput =
     pageMode === "edit" || pageMode === "release"
       ? pageData.selectedPharmacy === "custom"
+      : false;
+  pageData.showCustomPrescriptionIdInput =
+    pageMode === "release"
+      ? pageData.selectedReleaseId === "custom"
       : false;
   pageData.releaseResponse = null;
   pageData.selectedPharmacy =

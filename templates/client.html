@@ -166,16 +166,31 @@
           </fieldset>
         </div>
       </div>
+      <div class="nhsuk-radios" rv-show="mode | isRelease">
+        <div class="nhsuk-radios__item" rv-each-release="releases">
+          <input class="nhsuk-radios__input" rv-id="release.id" type="radio" name="release"
+            rv-value="release.id" rv-checked="selectedReleaseId" rv-on-click="release.select">
+          <label class="nhsuk-label nhsuk-radios__label" rv-for="release.id">{release.description}</label>
+        </div>
+      </div>
+      <div class="nhsuk-grid-row" id="prescription-id-container" rv-show="showCustomPrescriptionIdInput">
+        <div class="nhsuk-grid-column-full">
+          <fieldset class="nhsuk-fieldset">
+            <div class="nhsuk-form-group">
+              <div class="nhsuk-hint" id="pharmacy-input-hint">
+                Prescription Id
+              </div>
+              <input class="nhsuk-text" rv-value="currentPrescriptionId" type="text" id="prescription-id-input" name="prescription-id-input" />
+            </div>
+          </fieldset>
+        </div>
+      </div>
       <div class="nhsuk-grid-row" rv-show="mode | showPharmacyList">
         <div class="nhsuk-grid-column-full" rv-hide="releaseResponse">
           <div class="nhsuk-form-group">
             <fieldset class="nhsuk-fieldset" aria-describedby="pharmacy-hint">
               <div>
-                <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m" rv-show="mode | isEdit">Nominate a
-                  pharmacy</legend>
-                  <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m"
-                  rv-show="mode | isRelease">Prescription Id (optional):
-                </legend>
+                <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m" rv-show="mode | isEdit">Nominate a pharmacy</legend>
                 <input class="nhsuk-input" rv-value="currentPrescriptionId" type="text" />
                 <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m"
                   rv-show="mode | isRelease">Pharmacy to release prescriptions for
