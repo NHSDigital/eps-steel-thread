@@ -41,6 +41,8 @@ const pageData = {
   actions: [
     new PrescriptionAction("", ""),
     new PrescriptionAction("cancel", "Cancel"),
+    new PrescriptionAction("release", "Release"),
+    new PrescriptionAction("dispense", "Dispense"),
   ],
   reasons: [
     new CancellationReason("0001", "Prescribing Error"),
@@ -1659,7 +1661,23 @@ function doPrescriptionAction(select) {
   const prescriptionId = Cookies.get("Current-Prescription-Id");
   switch (value) {
     case "cancel":
-      window.location.href = `/prescribe/cancel?prescription_id=${prescriptionId}`;
+      window.open(
+        `/prescribe/cancel?prescription_id=${prescriptionId}`,
+        '_blank'
+      );
+      break;
+    case "release":
+      window.open(
+        `/dispense/release?prescription_id=${prescriptionId}`,
+        '_blank'
+      );
+      break;
+    case "dispense":
+      window.open(
+        `/dispense/dispense?prescription_id=${prescriptionId}`,
+        '_blank'
+      );
+      break;
     default:
       return;
   }
