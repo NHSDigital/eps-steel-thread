@@ -1692,7 +1692,7 @@ function doPrescriptionAction(select) {
       break;
     case "release":
       window.open(
-        `/prescribe/release?prescription_id=${prescriptionId}`,
+        `/dispense/release?prescription_id=${prescriptionId}`,
         "_blank"
       );
       break;
