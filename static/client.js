@@ -551,6 +551,7 @@ function sendReleaseRequest() {
       JSON.stringify(request)
     );
     pageData.showCustomPharmacyInput = false;
+    pageData.apiResponse = true;
     pageData.releaseResponse = {};
     pageData.releaseResponse.body = !response.success ? response.body : "";
     pageData.releaseResponse.prescriptions = response.success
@@ -580,6 +581,7 @@ function sendDispenseRequest() {
       {}
     );
     pageData.showCustomPharmacyInput = false;
+    pageData.apiResponse = true;
     pageData.dispenseResponse = {};
     pageData.dispenseResponse.body = !response.success ? response.body : "";
     pageData.dispenseResponse.prescriptions = response.success
@@ -1917,6 +1919,7 @@ function resetPageData(pageMode) {
     pageMode === "release"
       ? pageData.selectedReleaseId === "custom"
       : pageMode === "dispense";
+  pageData.apiResponse = false;
   pageData.releaseResponse = null;
   pageData.dispenseResponse = null;
   pageData.selectedPharmacy =
