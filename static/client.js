@@ -1858,6 +1858,7 @@ function onLoad() {
   }
   if (pageData.mode === "release" && pageData.prescriptionId) {
     pageData.selectedReleaseId = "custom"
+    resetPageData("release")
   }
   document.querySelector("#main-content").style.display = "";
 }
