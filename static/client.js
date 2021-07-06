@@ -95,7 +95,7 @@ const pageData = {
   selectedCancellationReasonId: "0001",
   selectedCancellerId: "same-as-original-author",
   selectedReleaseId: "all",
-  currentPrescriptionId: Cookies.get("Current-Prescription-Id"),
+  prescriptionId: new URLSearchParams(window.location.search).get("prescription_id"),
   payloads: [],
 };
 
@@ -1691,26 +1691,10 @@ function doPrescriptionAction(select) {
       );
       break;
     case "release":
-      const request = {
-        prescriptionId: prescriptionId,
-      };
-      const response = makeRequest(
-        "POST",
-        "/dispense/release",
-        JSON.stringify(request)
+      window.open(
+        `/prescribe/release?prescription_id=${prescriptionId}`,
+        "_blank"
       );
-      pageData.showCustomPharmacyInput = false;
-      pageData.releaseResponse = {};
-      pageData.releaseResponse.body = !response.success ? response.body : "";
-      pageData.releaseResponse.prescriptions = response.success
-        ? JSON.parse(response.body).entry.map(function (entry) {
-            const bundle = entry.resource;
-            const originalShortFormId = getMedicationRequests(bundle)[0]
-              .groupIdentifier.value;
-            return { id: originalShortFormId };
-          })
-        : null;
-      pageData.releaseResponse.success = response.success;
       break;
     case "dispense":
       window.open(
