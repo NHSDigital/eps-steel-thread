@@ -303,7 +303,7 @@
                     <td class="nhsuk-table__cell">
                       <div class="nhsuk-label nhsuk-label--s">{medication.medicationCodeableConcept.coding | snomedCodeDescription}</div>
                       <div rv-show="medication.extension | prescriptionEndorsements">Endorsements: {medication.extension | prescriptionEndorsements}</div>
-                      <div rv-show="medication.note | patientInstructions">Patient Instructions: {medication.note | patientInstructions}</div>
+                      <div rv-show="medication.note | dispenserNotes">Dispenser Notes: {medication.note | dispenserNotes}</div>
                     </td>
                     <td class="nhsuk-table__cell">{medication.dispenseRequest.quantity.value}</td>
                     <td class="nhsuk-table__cell">{medication.dispenseRequest.quantity.unit}</td>

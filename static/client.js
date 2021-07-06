@@ -242,7 +242,7 @@ rivets.formatters.dosageInstruction = function (dosageInstructions) {
   return dosageInstructions ? dosageInstructions[0].text : "";
 };
 
-rivets.formatters.patientInstructions = function (note) {
+rivets.formatters.dispenserNotes = function (note) {
   return note.filter(note => note.text).map(note => note.text).join(". ");
 };
 
