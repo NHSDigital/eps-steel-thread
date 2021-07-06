@@ -1667,10 +1667,26 @@ function doPrescriptionAction(select) {
       );
       break;
     case "release":
-      window.open(
-        `/dispense/release?prescription_id=${prescriptionId}`,
-        '_blank'
+      const request = {
+        prescriptionId: prescriptionId,
+      };
+      const response = makeRequest(
+        "POST",
+        "/dispense/release",
+        JSON.stringify(request)
       );
+      pageData.showCustomPharmacyInput = false;
+      pageData.releaseResponse = {};
+      pageData.releaseResponse.body = !response.success ? response.body : "";
+      pageData.releaseResponse.prescriptions = response.success
+        ? JSON.parse(response.body).entry.map(function (entry) {
+            const bundle = entry.resource;
+            const originalShortFormId = getMedicationRequests(bundle)[0]
+              .groupIdentifier.value;
+            return { id: originalShortFormId };
+          })
+        : null;
+      pageData.releaseResponse.success = response.success;
       break;
     case "dispense":
       window.open(

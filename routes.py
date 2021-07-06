@@ -15,7 +15,7 @@ from urllib.parse import urlencode
 from api import (
     make_eps_api_prepare_request,
     make_eps_api_process_message_request,
-    make_eps_api_release_nominated_pharmacy_request,
+    make_eps_api_release_request,
     make_sign_api_signature_upload_request,
     make_sign_api_signature_download_request,
     make_eps_api_convert_message_request,
@@ -64,6 +64,8 @@ SIGN_URL = "/prescribe/sign"
 SEND_URL = "/prescribe/send"
 CANCEL_URL = "/prescribe/cancel"
 DISPENSE_RELEASE_NOMINATED_PHARMACY_URL = "/dispense/release-nominated-pharmacy"
+DISPENSE_RELEASE_PRESCRIPTION_URL = "/dispense/release"
+DISPENSE_PRESCRIPTION_URL = "/dispense/dispense"
 
 
 def exclude_from_auth(*args, **kw):
@@ -325,7 +327,7 @@ def post_nominated_pharmacy():
         return app.make_response("Bad Request", 400)
     nominated_pharmacy_release = flask.request.json
     ods_code = nominated_pharmacy_release["odsCode"]
-    response = make_eps_api_release_nominated_pharmacy_request(
+    response = make_eps_api_release_request(
         get_access_token(),
         {
             "resourceType": "Parameters",
@@ -338,6 +340,41 @@ def post_nominated_pharmacy():
                 {"name": "status", "valueCode": "accepted"},
             ],
         },
+    )
+    return {"body": json.dumps(response.json()), "success": response.status_code == 200}
+
+
+@app.route(DISPENSE_RELEASE_PRESCRIPTION_URL, methods=["POST"])
+def post_release_prescription():
+    if (config.ENVIRONMENT == "prod"):
+        return app.make_response("Bad Request", 400)
+    prescription_release = flask.request.json
+    short_prescription_id = prescription_release["prescriptionId"]
+    response = make_eps_api_release_request(
+        get_access_token(),
+        {
+            "resourceType": "Parameters",
+            "id": str(uuid.uuid4()),
+            "parameter": [
+            {
+                "name": "owner",
+                "valueIdentifier": {
+                "system": "https://fhir.nhs.uk/Id/ods-organization-code",
+                "value": "VNE51"
+                }
+            },
+            {
+                "name": "group-identifier",
+                "valueIdentifier": {
+                    "system": "https://fhir.nhs.uk/Id/prescription-order-number",
+                    "value": short_prescription_id
+                }
+            },
+            {
+                "name": "status",
+                "valueCode": "accepted"
+            }]
+        }
     )
     return {"body": json.dumps(response.json()), "success": response.status_code == 200}
 
