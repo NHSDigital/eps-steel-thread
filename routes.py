@@ -63,9 +63,8 @@ EDIT_URL = "/prescribe/edit"
 SIGN_URL = "/prescribe/sign"
 SEND_URL = "/prescribe/send"
 CANCEL_URL = "/prescribe/cancel"
-DISPENSE_RELEASE_NOMINATED_PHARMACY_URL = "/dispense/release-nominated-pharmacy"
-DISPENSE_RELEASE_PRESCRIPTION_URL = "/dispense/release"
-DISPENSE_PRESCRIPTION_URL = "/dispense/dispense"
+RELEASE_URL = "/dispense/release"
+DISPENSE_URL = "/dispense/dispense"
 
 
 def exclude_from_auth(*args, **kw):
@@ -314,53 +313,30 @@ def post_cancel():
     return response
 
 
-@app.route(DISPENSE_RELEASE_NOMINATED_PHARMACY_URL, methods=["GET"])
-def get_nominated_pharmacy():
+@app.route(RELEASE_URL, methods=["GET"])
+def get_release():
     if (config.ENVIRONMENT == "prod"):
         return app.make_response("Bad Request", 400)
-    return render_client("release-nominated-pharmacy")
+    return render_client("release")
 
 
-@app.route(DISPENSE_RELEASE_NOMINATED_PHARMACY_URL, methods=["POST"])
-def post_nominated_pharmacy():
+@app.route(RELEASE_URL, methods=["POST"])
+def post_release():
     if (config.ENVIRONMENT == "prod"):
         return app.make_response("Bad Request", 400)
     nominated_pharmacy_release = flask.request.json
+    short_prescription_id = nominated_pharmacy_release.get("prescriptionId")
     ods_code = nominated_pharmacy_release["odsCode"]
-    response = make_eps_api_release_request(
-        get_access_token(),
-        {
-            "resourceType": "Parameters",
-            "id": str(uuid.uuid4()),
-            "parameter": [
-                {
-                    "name": "owner",
-                    "valueIdentifier": {"system": "https://fhir.nhs.uk/Id/ods-organization-code", "value": ods_code},
-                },
-                {"name": "status", "valueCode": "accepted"},
-            ],
-        },
-    )
-    return {"body": json.dumps(response.json()), "success": response.status_code == 200}
-
-
-@app.route(DISPENSE_RELEASE_PRESCRIPTION_URL, methods=["POST"])
-def post_release_prescription():
-    if (config.ENVIRONMENT == "prod"):
-        return app.make_response("Bad Request", 400)
-    prescription_release = flask.request.json
-    short_prescription_id = prescription_release["prescriptionId"]
-    response = make_eps_api_release_request(
-        get_access_token(),
-        {
+    if short_prescription_id:
+        release_request_body = {
             "resourceType": "Parameters",
             "id": str(uuid.uuid4()),
             "parameter": [
             {
                 "name": "owner",
                 "valueIdentifier": {
-                "system": "https://fhir.nhs.uk/Id/ods-organization-code",
-                "value": "VNE51"
+                    "system": "https://fhir.nhs.uk/Id/ods-organization-code",
+                    "value": ods_code
                 }
             },
             {
@@ -375,6 +351,21 @@ def post_release_prescription():
                 "valueCode": "accepted"
             }]
         }
+    else:
+        release_request_body = {
+            "resourceType": "Parameters",
+            "id": str(uuid.uuid4()),
+            "parameter": [
+                {
+                    "name": "owner",
+                    "valueIdentifier": {"system": "https://fhir.nhs.uk/Id/ods-organization-code", "value": ods_code},
+                },
+                {"name": "status", "valueCode": "accepted"},
+            ],
+        }
+    response = make_eps_api_release_request(
+        get_access_token(),
+        release_request_body,
     )
     return {"body": json.dumps(response.json()), "success": response.status_code == 200}
 

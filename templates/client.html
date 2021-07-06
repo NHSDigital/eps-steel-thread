@@ -83,8 +83,8 @@
               <div rv-show="mode | isSend">
                 <h1 class="nhsuk-fieldset__heading">Send prescription</h1>
               </div>
-              <div rv-show="mode | isReleaseNominatedPharmacy">
-                <h1 class="nhsuk-fieldset__heading">Release prescriptions</h1>
+              <div rv-show="mode | isRelease">
+                <h1 class="nhsuk-fieldset__heading">Release prescription(s)</h1>
               </div>
             </legend>
           </fieldset>
@@ -173,8 +173,12 @@
               <div>
                 <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m" rv-show="mode | isEdit">Nominate a
                   pharmacy</legend>
+                  <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m"
+                  rv-show="mode | isRelease">Prescription Id (optional):
+                </legend>
+                <input class="nhsuk-input" rv-value="currentPrescriptionId" type="text" />
                 <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m"
-                  rv-show="mode | isReleaseNominatedPharmacy">Pharmacy to release prescriptions from
+                  rv-show="mode | isRelease">Pharmacy to release prescriptions for
                 </legend>
               </div>
               <div class="nhsuk-radios">
@@ -580,7 +584,7 @@
         <div class="nhsuk-grid-row">
           <div rv-show="loggedIn" class="nhsuk-grid-column-full" >
             <a href="/prescribe/load" class="nhsuk-button">Prescribe</a>
-            <a href="/dispense/release-nominated-pharmacy" class="nhsuk-button" rv-hide="environment | isProd">Dispense</a>
+            <a href="/dispense/release" class="nhsuk-button" rv-hide="environment | isProd">Dispense</a>
           </div>
           <div rv-hide="loggedIn" class="nhsuk-grid-column-full">
             <a href="/prescribe/load" class="nhsuk-button">View Prescription(s)</a>
@@ -639,7 +643,7 @@
           </div>
         </div>
       </div>
-      <div rv-show="mode | isReleaseNominatedPharmacy">
+      <div rv-show="mode | isRelease">
         <div class="nhsuk-grid-row">
           <div class="nhsuk-grid-column-full">
             <button class="nhsuk-button" type="submit" rv-hide="releaseResponse"

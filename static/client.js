@@ -93,6 +93,7 @@ const pageData = {
   selectedExampleId: "1",
   selectedCancellationReasonId: "0001",
   selectedCancellerId: "same-as-original-author",
+  currentPrescriptionId: Cookies.get("Current-Prescription-Id"),
   payloads: [],
 };
 
@@ -299,11 +300,11 @@ rivets.formatters.isSend = function (mode) {
 rivets.formatters.isCancel = function (mode) {
   return mode === "cancel";
 };
-rivets.formatters.isReleaseNominatedPharmacy = function (mode) {
-  return mode === "release-nominated-pharmacy";
+rivets.formatters.isRelease = function (mode) {
+  return mode === "release";
 };
 rivets.formatters.showPharmacyList = function (mode) {
-  return mode === "edit" || mode === "release-nominated-pharmacy";
+  return mode === "edit" || mode === "release";
 };
 
 rivets.formatters.joinWithSpaces = function (strings) {
@@ -521,7 +522,7 @@ function sendDispenseNominatedPharmacyReleaseRequest() {
     };
     const response = makeRequest(
       "POST",
-      "/dispense/release-nominated-pharmacy",
+      "/dispense/release",
       JSON.stringify(request)
     );
     pageData.showCustomPharmacyInput = false;
@@ -1861,12 +1862,12 @@ function resetPageData(pageMode) {
   pageData.showCustomExampleInput =
     pageMode === "load" ? pageData.selectedExampleId === "custom" : false;
   pageData.showCustomPharmacyInput =
-    pageMode === "edit" || pageMode === "release-nominated-pharmacy"
+    pageMode === "edit" || pageMode === "release"
       ? pageData.selectedPharmacy === "custom"
       : false;
   pageData.releaseResponse = null;
   pageData.selectedPharmacy =
-    pageMode === "edit" || pageMode === "release-nominated-pharmacy"
+    pageMode === "edit" || pageMode === "release"
       ? pageData.selectedPharmacy ?? "VNFKT"
       : null;
   if (pageData.mode == "sign") {
