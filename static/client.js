@@ -1837,7 +1837,9 @@ function createCancellation(bundle) {
 }
 
 function onLoad() {
-  bind();
+  if (pageData.mode === "release" && pageData.prescriptionId) {
+    pageData.selectedReleaseId = "custom"
+  }
   if (
     pageData.mode === "send" &&
     !pageData.sendResponse &&
@@ -1856,10 +1858,7 @@ function onLoad() {
     );
     pageData.signRequestSummary = getSummary(response);
   }
-  if (pageData.mode === "release" && pageData.prescriptionId) {
-    pageData.selectedReleaseId = "custom"
-    resetPageData("release")
-  }
+  bind();
   document.querySelector("#main-content").style.display = "";
 }
 
