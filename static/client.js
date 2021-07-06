@@ -1856,6 +1856,9 @@ function onLoad() {
     );
     pageData.signRequestSummary = getSummary(response);
   }
+  if (pageData.mode === "release" && pageData.prescriptionId) {
+    pageData.selectedReleaseId = "custom"
+  }
   document.querySelector("#main-content").style.display = "";
 }
 
