@@ -65,7 +65,9 @@
                 <h1 class="nhsuk-fieldset__heading">Select Auth method...</h1>
               </div>
               <div rv-show="mode | isHome">
-                <h1 class="nhsuk-fieldset__heading">I would like to...</h1>
+                <span rv-hide="environment | isProd">
+                  <h1 class="nhsuk-fieldset__heading">I would like to...</h1>
+              </span>
               </div>
               <div rv-show="mode | isLoad">
                 <h1 class="nhsuk-fieldset__heading">Load prescription</h1>
