@@ -1886,7 +1886,7 @@ function createDispenseRequest(bundle) {
   const clonedHeaderEntry = JSON.parse(
     JSON.stringify(bundle.entry.filter(e => e.resource.resourceType === "MessageHeader")[0])
   );
-  clonedHeaderEntry.response = {
+  clonedHeaderEntry.resource.response = {
     "identifier": "999f9999-9999-9999-9ff9-f9fff9999999",
     "code": "ok"
   }
