@@ -33,6 +33,10 @@ const pageData = {
     //new Prescription("10", "Homecare - Repeat Prescribing (nominated)", HOMECARE_REPEAT_PRESCRIBING_NOMINATED),
     new Prescription("custom", "Custom", null),
   ],
+  releases: [
+    new Release("all", "All nominated"),
+    new Release("custom", "Custom"),
+  ],
   pharmacies: [
     new Pharmacy("VNFKT", "FIVE STAR HOMECARE LEEDS LTD"),
     new Pharmacy("YGM1E", "MBBM HEALTHCARE TECHNOLOGIES LTD"),
@@ -41,6 +45,8 @@ const pageData = {
   actions: [
     new PrescriptionAction("", ""),
     new PrescriptionAction("cancel", "Cancel"),
+    new PrescriptionAction("release", "Release"),
+    new PrescriptionAction("dispense", "Dispense"),
   ],
   reasons: [
     new CancellationReason("0001", "Prescribing Error"),
@@ -91,6 +97,10 @@ const pageData = {
   selectedExampleId: "1",
   selectedCancellationReasonId: "0001",
   selectedCancellerId: "same-as-original-author",
+  selectedReleaseId: "all",
+  prescriptionId: new URLSearchParams(window.location.search).get(
+    "prescription_id"
+  ),
   payloads: [],
 };
 
@@ -112,6 +122,16 @@ function Pharmacy(id, name) {
   this.select = function () {
     pageData.selectedPharmacy = id;
     pageData.showCustomPharmacyInput = id === "custom";
+    resetPageData(pageData.mode);
+  };
+}
+
+function Release(id, description) {
+  this.id = id;
+  this.description = description;
+  this.select = function () {
+    pageData.selectedReleaseId = id;
+    pageData.showCustomPrescriptionIdInput = id === "custom";
     resetPageData(pageData.mode);
   };
 }
@@ -243,7 +263,10 @@ rivets.formatters.dosageInstruction = function (dosageInstructions) {
 };
 
 rivets.formatters.dispenserNotes = function (notes) {
-  return notes?.filter(note => note.text).map(note => note.text).join(". ");
+  return notes
+    ?.filter((note) => note.text)
+    .map((note) => note.text)
+    .join(". ");
 };
 
 rivets.formatters.fullName = function (name) {
@@ -297,11 +320,14 @@ rivets.formatters.isSend = function (mode) {
 rivets.formatters.isCancel = function (mode) {
   return mode === "cancel";
 };
-rivets.formatters.isReleaseNominatedPharmacy = function (mode) {
-  return mode === "release-nominated-pharmacy";
+rivets.formatters.isRelease = function (mode) {
+  return mode === "release";
+};
+rivets.formatters.isDispense = function (mode) {
+  return mode === "dispense";
 };
 rivets.formatters.showPharmacyList = function (mode) {
-  return mode === "edit" || mode === "release-nominated-pharmacy";
+  return mode === "edit" || mode === "release";
 };
 
 rivets.formatters.joinWithSpaces = function (strings) {
@@ -512,14 +538,19 @@ function sendCancelRequest() {
   }
 }
 
-function sendDispenseNominatedPharmacyReleaseRequest() {
+function sendReleaseRequest() {
   try {
+    const prescriptionId =
+      pageData.selectedReleaseId === "custom"
+        ? document.getElementById("prescription-id-input").value
+        : undefined;
     const request = {
+      prescriptionId,
       odsCode: getOdsCode(),
     };
     const response = makeRequest(
       "POST",
-      "/dispense/release-nominated-pharmacy",
+      "/dispense/release",
       JSON.stringify(request)
     );
     pageData.showCustomPharmacyInput = false;
@@ -534,6 +565,66 @@ function sendDispenseNominatedPharmacyReleaseRequest() {
         })
       : null;
     pageData.releaseResponse.success = response.success;
+    document.getElementById(
+      "release-request-download-fhir"
+    ).href = `data:application/json,${encodeURI(
+      JSON.stringify(response.request, null, 2)
+        .replace(/\\/g, "")
+        .replace(/"/, "")
+        .replace(/.$/, "")
+    )}`;
+    document.getElementById(
+      "release-request-download-xml"
+    ).href = `data:application/xml,${encodeURIComponent(response.request_xml)}`; // component includes '#' which is present in xml
+    document.getElementById(
+      "release-response-download"
+    ).href = `data:application/json,${encodeURI(
+      JSON.stringify(response.response, null, 2)
+        .replace(/\\/g, "")
+        .replace(/"/, "")
+        .replace(/.$/, "")
+    )}`;
+  } catch (e) {
+    console.log(e);
+    addError("Communication error");
+  }
+}
+
+function sendDispenseRequest() {
+  try {
+    const prescriptionId = Cookies.get("Current-Prescription-Id");
+    const bundle = makeRequest(
+      "GET",
+      `/prescribe/edit?prescription_id=${prescriptionId}`
+    );
+    const dispenseRequest = createDispenseRequest(bundle);
+    const response = makeRequest(
+      "POST",
+      "/dispense/dispense",
+      JSON.stringify(dispenseRequest)
+    );
+    pageData.dispenseResponse = {};
+    pageData.dispenseResponse.body = response.body;
+    pageData.dispenseResponse.success = response.success;
+    document.getElementById(
+      "dispense-request-download-fhir"
+    ).href = `data:application/json,${encodeURI(
+      JSON.stringify(response.request, null, 2)
+        .replace(/\\/g, "")
+        .replace(/"/, "")
+        .replace(/.$/, "")
+    )}`;
+    document.getElementById(
+      "dispense-request-download-xml"
+    ).href = `data:application/xml,${encodeURIComponent(response.request_xml)}`; // component includes '#' which is present in xml
+    document.getElementById(
+      "dispense-response-download"
+    ).href = `data:application/json,${encodeURI(
+      JSON.stringify(response.response, null, 2)
+        .replace(/\\/g, "")
+        .replace(/"/, "")
+        .replace(/.$/, "")
+    )}`;
   } catch (e) {
     console.log(e);
     addError("Communication error");
@@ -766,13 +857,16 @@ function getSummary(payload) {
   const parentOrganization = organizations[0];
   const medicationRequests = getResourcesOfType(payload, "MedicationRequest");
 
-  const communicationRequests = getResourcesOfType(payload, "CommunicationRequest");
+  const communicationRequests = getResourcesOfType(
+    payload,
+    "CommunicationRequest"
+  );
   const patientInstructions = communicationRequests
-  .flatMap(communicationRequest => communicationRequest.payload)
-  .filter(Boolean)
-  .filter(payload => payload.contentString)
-  .map(payload => payload.contentString)
-  .join("\n")
+    .flatMap((communicationRequest) => communicationRequest.payload)
+    .filter(Boolean)
+    .filter((payload) => payload.contentString)
+    .map((payload) => payload.contentString)
+    .join("\n");
 
   const startDate =
     medicationRequests[0].dispenseRequest.validityPeriod?.start ??
@@ -1659,7 +1753,23 @@ function doPrescriptionAction(select) {
   const prescriptionId = Cookies.get("Current-Prescription-Id");
   switch (value) {
     case "cancel":
-      window.location.href = `/prescribe/cancel?prescription_id=${prescriptionId}`;
+      window.open(
+        `/prescribe/cancel?prescription_id=${prescriptionId}`,
+        "_blank"
+      );
+      break;
+    case "release":
+      window.open(
+        `/dispense/release?prescription_id=${prescriptionId}`,
+        "_blank"
+      );
+      break;
+    case "dispense":
+      window.open(
+        `/dispense/dispense?prescription_id=${prescriptionId}`,
+        "_blank"
+      );
+      break;
     default:
       return;
   }
@@ -1677,7 +1787,7 @@ function createCancellation(bundle) {
   messageHeader.eventCoding.code = "prescription-order-update";
   messageHeader.eventCoding.display = "Prescription Order Update";
 
-  // cheat and remove focus references as references not in bundle causes validation errors
+  // remove focus references as references not in bundle causes validation errors
   // but no references always passes
   messageHeader.focus = [];
   // ****************************************
@@ -1794,8 +1904,189 @@ function createCancellation(bundle) {
   return bundle;
 }
 
+function createDispenseRequest(bundle) {
+  // Fixes duplicate hl7v3 identifier error
+  // this is not an obvious error for a supplier to resolve as
+  // there is no mention of the fhir field it relates to
+  // can we improve our returned error message here??
+  bundle.identifier.value = uuidv4();
+  // ****************************************
+
+  const messageHeader = getResourcesOfType(bundle, "MessageHeader")[0];
+  messageHeader.eventCoding.code = "dispense-notification";
+  messageHeader.eventCoding.display = "Dispense Notification";
+
+  // remove focus references as references not in bundle causes validation errors
+  // but no references always passes
+  messageHeader.focus = [];
+  // ****************************************
+
+  const clonedHeaderEntry = JSON.parse(
+    JSON.stringify(
+      bundle.entry.filter((e) => e.resource.resourceType === "MessageHeader")[0]
+    )
+  );
+  clonedHeaderEntry.resource.response = {
+    identifier: "999f9999-9999-9999-9ff9-f9fff9999999",
+    code: "ok",
+  };
+
+  var medicationToDispenseSnomed = document.querySelectorAll(
+    'input[name="dispense-medications"]:checked'
+  )[0].value;
+  const medicationRequestEntries = bundle.entry.filter(
+    (entry) => entry.resource.resourceType === "MedicationRequest"
+  );
+
+  const medicationRequestEntryToDispense = medicationRequestEntries.filter(
+    (e) =>
+      e.resource.medicationCodeableConcept.coding.some(
+        (c) => c.code === medicationToDispenseSnomed
+      )
+  )[0];
+
+  const clonedMedicationRequestEntry = JSON.parse(
+    JSON.stringify(medicationRequestEntryToDispense)
+  );
+  const clonedMedicationRequest = clonedMedicationRequestEntry.resource;
+
+  const medicationDispenseEntry = {};
+  medicationDispenseEntry.fullUrl = clonedMedicationRequestEntry.fullUrl;
+  medicationDispenseEntry.resource = {};
+  const medicationDispense = medicationDispenseEntry.resource;
+  medicationDispense.resourceType = "MedicationDispense";
+  (medicationDispense.identifier = [
+    {
+      system: "https://fhir.nhs.uk/Id/prescription-dispense-item-number",
+      value: clonedMedicationRequestEntry.fullUrl.replace("urn:uuid:", ""),
+    },
+  ]),
+    (medicationDispense.extension = [
+      {
+        url:
+          "https://fhir.nhs.uk/StructureDefinition/Extension-EPS-TaskBusinessStatus",
+        valueCoding: {
+          system: "https://fhir.nhs.uk/CodeSystem/EPS-task-business-status",
+          code: "0003",
+          display: "With Dispenser - Active",
+        },
+      },
+    ]);
+  medicationDispense.status = "completed";
+  medicationDispense.medicationCodeableConcept =
+    clonedMedicationRequest.medicationCodeableConcept;
+  const patientEntry = bundle.entry.filter(
+    (e) => e.resource.resourceType === "Patient"
+  )[0];
+  medicationDispense.subject = {
+    type: "Patient",
+    identifier: {
+      system: "https://fhir.nhs.uk/Id/nhs-number",
+      value: getNhsNumber(patientEntry),
+    },
+  };
+  medicationDispense.authorizingPrescription = [
+    {
+      extension: [
+        {
+          url:
+            "https://fhir.nhs.uk/StructureDefinition/Extension-DM-GroupIdentifier",
+          extension: [
+            {
+              url: "shortForm",
+              valueIdentifier: {
+                system: "https://fhir.nhs.uk/Id/prescription-order-number",
+                value: clonedMedicationRequest.groupIdentifier.value,
+              },
+            },
+            {
+              url: "UUID",
+              valueIdentifier: {
+                system: "https://fhir.nhs.uk/Id/prescription",
+                value: getLongFormIdExtension(
+                  clonedMedicationRequest.groupIdentifier.extension
+                ).valueIdentifier.value,
+              },
+            },
+          ],
+        },
+      ],
+      identifier: {
+        system: "https://fhir.nhs.uk/Id/prescription-order-item-number",
+        value: clonedMedicationRequestEntry.fullUrl.replace("urn:uuid:", ""),
+      },
+    },
+  ];
+  medicationDispense.performer = [
+    {
+      actor: {
+        type: "Practitioner",
+        identifier: {
+          system: "https://fhir.hl7.org.uk/Id/gphc-number",
+          value: "7654321",
+        },
+        display: "Mr Peter Potion",
+      },
+    },
+    {
+      actor: {
+        type: "Organization",
+        identifier: {
+          system: "https://fhir.nhs.uk/Id/ods-organization-code",
+          value: "VNFKT",
+        },
+        display: "FIVE STAR HOMECARE LEEDS LTD",
+      },
+    },
+  ];
+  medicationDispense.type = {
+    coding: [
+      {
+        system: "https://fhir.nhs.uk/CodeSystem/medicationdispense-type",
+        code: "0003",
+        display: "Item dispensed - partial",
+      },
+    ],
+  };
+  medicationDispense.whenPrepared = "2021-07-07T15:43:00+00:00";
+  medicationDispense.dosageInstruction = [
+    {
+      text: "4 times a day for 7 days",
+    },
+  ];
+  medicationDispense.quantity = clonedMedicationRequest.dispenseRequest?.quantity ?? undefined
+
+  bundle.entry = bundle.entry
+    .filter((entry) => entry.resource.resourceType !== "MessageHeader")
+    .filter((entry) => entry.resource.resourceType !== "MedicationRequest")
+    .filter((entry) => entry.resource.resourceType !== "Practitioner")
+    .filter((entry) => entry.resource.resourceType !== "PractitionerRole")
+    .filter((entry) => entry.resource.resourceType !== "CommunicationRequest")
+    .filter((entry) => entry.resource.resourceType !== "Location")
+    .filter((entry) => entry.resource.resourceType !== "Organization")
+    .filter((entry) => entry.resource.resourceType !== "HealthcareService")
+    .filter((entry) => entry.resource.resourceType !== "List");
+
+  bundle.entry.unshift(clonedHeaderEntry);
+  bundle.entry.push(medicationDispenseEntry);
+
+  return bundle;
+}
+
 function onLoad() {
-  bind();
+  if (pageData.mode === "release" && pageData.prescriptionId) {
+    pageData.selectedReleaseId = "custom";
+    resetPageData("release");
+  }
+  if (pageData.mode === "dispense") {
+    const prescriptionId = Cookies.get("Current-Prescription-Id");
+    const response = makeRequest(
+      "GET",
+      `/prescribe/edit?prescription_id=${prescriptionId}`
+    );
+    pageData.signRequestSummary = getSummary(response);
+    resetPageData("dispense");
+  }
   if (
     pageData.mode === "send" &&
     !pageData.sendResponse &&
@@ -1813,7 +2104,9 @@ function onLoad() {
       `/prescribe/edit?prescription_id=${prescriptionId}`
     );
     pageData.signRequestSummary = getSummary(response);
+    resetPageData("cancel");
   }
+  bind();
   document.querySelector("#main-content").style.display = "";
 }
 
@@ -1827,12 +2120,15 @@ function resetPageData(pageMode) {
   pageData.showCustomExampleInput =
     pageMode === "load" ? pageData.selectedExampleId === "custom" : false;
   pageData.showCustomPharmacyInput =
-    pageMode === "edit" || pageMode === "release-nominated-pharmacy"
+    pageMode === "edit" || pageMode === "release"
       ? pageData.selectedPharmacy === "custom"
       : false;
+  pageData.showCustomPrescriptionIdInput =
+    pageMode === "release" ? pageData.selectedReleaseId === "custom" : false;
   pageData.releaseResponse = null;
+  pageData.dispenseResponse = null;
   pageData.selectedPharmacy =
-    pageMode === "edit" || pageMode === "release-nominated-pharmacy"
+    pageMode === "edit" || pageMode === "release"
       ? pageData.selectedPharmacy ?? "VNFKT"
       : null;
   if (pageData.mode == "sign") {

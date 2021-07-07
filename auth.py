@@ -16,7 +16,7 @@ LOAD_URL = "/prescribe/load"
 EDIT_URL = "/prescribe/edit"
 SIGN_URL = "/prescribe/sign"
 SEND_URL = "/prescribe/send"
-DISPENSE_RELEASE_NOMINATED_PHARMACY_URL = "/dispense/release-nominated-pharmacy"
+RELEASE_URL = "/dispense/release"
 REDIRECT_URL_FOR_STATE = {"login": "/login", "home": "/"}
 
 

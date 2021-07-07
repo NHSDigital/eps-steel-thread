@@ -12,7 +12,9 @@ The site is hosted in heroku and has a development and production version
 | Production       | epsat            | https://nhsd-epsat.herokuapp.com     |
 
 
-Smartcard auth is enabled by default, once logged in via smartcard you are able to change authentication to simulated.
+Smartcard auth is enabled by default so when navigating to homepage and selecting login you will be redirected to authenticate with a smartcard.
+
+If you don't have a smartcard you can navigate to `/login` to select simulated auth instead
 
 ## Backend
 
@@ -20,7 +22,7 @@ The assurance tool is configured against the EPS environments above so any creat
 
 ## Features
 
-* Parse a FHIR prepare nominated-pharmacy prescription-order into a readable format
+* Parse a FHIR prepare nominated-pharmacy prescription-order into a readable format - (allows anonymous users)
 * Amend a prescription to be nominated to another pharmacy
 * Sign a prescription
 * Send a prescription
