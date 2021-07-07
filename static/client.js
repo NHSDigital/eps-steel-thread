@@ -44,9 +44,7 @@ const pageData = {
   ],
   actions: [
     new PrescriptionAction("", ""),
-    new PrescriptionAction("cancel", "Cancel"),
-    new PrescriptionAction("release", "Release"),
-    new PrescriptionAction("dispense", "Dispense"),
+    new PrescriptionAction("cancel", "Cancel")
   ],
   reasons: [
     new CancellationReason("0001", "Prescribing Error"),
@@ -103,6 +101,11 @@ const pageData = {
   ),
   payloads: [],
 };
+
+if (pageData.environment !== "prod") {
+  pageData.actions.push(new PrescriptionAction("release", "Release"))
+  pageData.actions.push(new PrescriptionAction("dispense", "Dispense"))
+}
 
 function Prescription(id, description, message) {
   this.id = id;
@@ -338,6 +341,16 @@ rivets.formatters.appendPageMode = function (string) {
   return string + pageData.mode;
 };
 
+rivets.formatters.displayEnvironment = function (environment) {
+  if (environment === "prod") {
+    return "Production"
+  } else if (environment === "int") {
+    return "Integration"
+  } else {
+    return environment
+  }
+};
+
 function concatenateIfPresent(fields) {
   return fields.filter(Boolean).reduce(function (currentValues, valuesToAdd) {
     return currentValues.concat(valuesToAdd);
@@ -427,6 +440,7 @@ function sendEditRequest() {
     bundles.forEach((bundle) => {
       updateBundleIds(bundle);
       updateNominatedPharmacy(bundle, getOdsCode());
+      sanitiseProdTestData(bundle);
     });
     const response = makeRequest(
       "POST",
@@ -439,6 +453,71 @@ function sendEditRequest() {
     console.log(e);
     addError("Communication error");
   }
+}
+
+const TEST_PATIENT = {
+  "resourceType": "Patient",
+  "identifier":  [
+    {
+      "extension":  [
+        {
+          "url": "https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-NHSNumberVerificationStatus",
+          "valueCodeableConcept": {
+            "coding":  [
+              {
+                "system": "https://fhir.hl7.org.uk/CodeSystem/UKCore-NHSNumberVerificationStatus",
+                "code": "01",
+                "display": "Number present and verified"
+              }
+            ]
+          }
+        }
+      ],
+      "system": "https://fhir.nhs.uk/Id/nhs-number",
+      "value": "9990548609"
+    }
+  ],
+  "name":  [
+    {
+      "use": "official",
+      "family": "XXTESTPATIENT-TGNP",
+      "given":  [
+        "DONOTUSE"
+      ],
+    }
+  ],
+  "gender": "male",
+  "birthDate": "1932-01-06",
+  "address":  [
+    {
+      "use": "home",
+      "postalCode": "LS1 6AE"
+    }
+  ],
+  "generalPractitioner":  [
+    {
+      "identifier": {
+        "system": "https://fhir.nhs.uk/Id/ods-organization-code",
+        "value": "Y90001"
+      }
+    }
+  ]
+}
+
+function sanitiseProdTestData(bundle) {
+  if (pageData.environment !== "prod") {
+    return
+  }
+
+  const patientBundleEntry = bundle.entry.find(entry => entry.resource.resourceType === "Patient")
+  patientBundleEntry.resource = TEST_PATIENT
+
+  const medicationRequestBundleEntry = bundle.entry.filter(entry => entry.resource.resourceType === "MedicationRequest")
+  medicationRequestBundleEntry.forEach((entry) => {
+    const medicationRequest = entry.resource
+    medicationRequest.note = [{text: "TEST PRESCRIPTION - DO NOT DISPENSE"}]
+    medicationRequest.dosageInstruction[0].patientInstruction = "TEST PRESCRIPTION - DO NOT DISPENSE"
+  })
 }
 
 function sendSignRequest(skipSignaturePage) {
