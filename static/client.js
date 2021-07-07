@@ -1995,7 +1995,7 @@ function createDispenseRequest(bundle) {
           system: "https://fhir.nhs.uk/Id/ods-organization-code",
           value: "VNFKT",
         },
-        display: "The Simple Pharmacy",
+        display: "FIVE STAR HOMECARE LEEDS LTD",
       },
     },
   ];
@@ -2017,7 +2017,7 @@ function createDispenseRequest(bundle) {
     .filter((entry) => entry.resource.resourceType !== "Location")
     .filter((entry) => entry.resource.resourceType !== "Organization")
     .filter((entry) => entry.resource.resourceType !== "HealthcareService");
-  bundle.entry.push(clonedHeaderEntry);
+  bundle.entry.unshift(clonedHeaderEntry);
   bundle.entry.push(medicationDispenseEntry);
 
   return bundle;
