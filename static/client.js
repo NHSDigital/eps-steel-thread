@@ -1920,7 +1920,7 @@ function createDispenseRequest(bundle) {
   (medicationDispense.identifier = [
     {
       system: "https://fhir.nhs.uk/Id/prescription-dispense-item-number",
-      value: uuidv4(),
+      value: clonedMedicationRequestEntry.fullUrl.replace("urn:uuid:", ""),
     },
   ]),
     (medicationDispense.extension = [
