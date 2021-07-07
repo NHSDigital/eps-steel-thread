@@ -367,7 +367,14 @@ def post_release():
         get_access_token(),
         release_request_body,
     )
-    return {"body": json.dumps(response.json()), "success": response.status_code == 200}
+    release_request_xml = make_eps_api_convert_message_request(get_access_token(), release_request_body)
+    return {
+        "body": json.dumps(response.json()),
+        "success": response.status_code == 200,
+        "request_xml": release_request_xml.text,
+        "request": json.dumps(release_request_body),
+        "response": json.dumps(response.json()),
+    }
 
 
 @app.route(DISPENSE_URL, methods=["GET"])
@@ -382,13 +389,18 @@ def post_dispense():
     if (config.ENVIRONMENT == "prod"):
         return app.make_response("Bad Request", 400)
     dispense_request = flask.request.json
-    print("Sending dispense request...")
-    print(json.dumps(dispense_request))
     response = make_eps_api_process_message_request(
         get_access_token(),
         dispense_request
     )
-    return {"body": json.dumps(response.json()), "success": response.status_code == 200}
+    dispense_request_xml = make_eps_api_convert_message_request(get_access_token(), dispense_request)
+    return {
+        "body": json.dumps(response.json()),
+        "success": response.status_code == 200,
+        "request_xml": dispense_request_xml.text,
+        "request": json.dumps(dispense_request),
+        "response": json.dumps(response.json()),
+    }
 
 
 @app.route("/logout", methods=["GET"])

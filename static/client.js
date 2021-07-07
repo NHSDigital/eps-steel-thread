@@ -565,6 +565,25 @@ function sendReleaseRequest() {
         })
       : null;
     pageData.releaseResponse.success = response.success;
+    document.getElementById(
+      "release-request-download-fhir"
+    ).href = `data:application/json,${encodeURI(
+      JSON.stringify(response.request, null, 2)
+        .replace(/\\/g, "")
+        .replace(/"/, "")
+        .replace(/.$/, "")
+    )}`;
+    document.getElementById(
+      "release-request-download-xml"
+    ).href = `data:application/xml,${encodeURIComponent(response.request_xml)}`; // component includes '#' which is present in xml
+    document.getElementById(
+      "release-response-download"
+    ).href = `data:application/json,${encodeURI(
+      JSON.stringify(response.response, null, 2)
+        .replace(/\\/g, "")
+        .replace(/"/, "")
+        .replace(/.$/, "")
+    )}`;
   } catch (e) {
     console.log(e);
     addError("Communication error");
@@ -587,6 +606,25 @@ function sendDispenseRequest() {
     pageData.dispenseResponse = {};
     pageData.dispenseResponse.body = response.body;
     pageData.dispenseResponse.success = response.success;
+    document.getElementById(
+      "dispense-request-download-fhir"
+    ).href = `data:application/json,${encodeURI(
+      JSON.stringify(response.request, null, 2)
+        .replace(/\\/g, "")
+        .replace(/"/, "")
+        .replace(/.$/, "")
+    )}`;
+    document.getElementById(
+      "dispense-request-download-xml"
+    ).href = `data:application/xml,${encodeURIComponent(response.request_xml)}`; // component includes '#' which is present in xml
+    document.getElementById(
+      "dispense-response-download"
+    ).href = `data:application/json,${encodeURI(
+      JSON.stringify(response.response, null, 2)
+        .replace(/\\/g, "")
+        .replace(/"/, "")
+        .replace(/.$/, "")
+    )}`;
   } catch (e) {
     console.log(e);
     addError("Communication error");
