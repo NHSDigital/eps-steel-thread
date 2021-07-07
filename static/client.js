@@ -573,8 +573,7 @@ function sendReleaseRequest() {
 
 function sendDispenseRequest() {
   try {
-    const prescriptionId = document.getElementById("prescription-id-input")
-      .value;
+    const prescriptionId = Cookies.get("Current-Prescription-Id");
     const bundle = makeRequest(
       "GET",
       `/prescribe/edit?prescription_id=${prescriptionId}`
@@ -2002,6 +2001,12 @@ function onLoad() {
     resetPageData("release");
   }
   if (pageData.mode === "dispense") {
+    const prescriptionId = Cookies.get("Current-Prescription-Id");
+    const response = makeRequest(
+      "GET",
+      `/prescribe/edit?prescription_id=${prescriptionId}`
+    );
+    pageData.signRequestSummary = getSummary(response);
     resetPageData("dispense");
   }
   if (
@@ -2041,9 +2046,7 @@ function resetPageData(pageMode) {
       ? pageData.selectedPharmacy === "custom"
       : false;
   pageData.showCustomPrescriptionIdInput =
-    pageMode === "release"
-      ? pageData.selectedReleaseId === "custom"
-      : false;
+    pageMode === "release" ? pageData.selectedReleaseId === "custom" : false;
   pageData.releaseResponse = null;
   pageData.dispenseResponse = null;
   pageData.selectedPharmacy =

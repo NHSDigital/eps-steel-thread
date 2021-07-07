@@ -464,6 +464,25 @@
           </div>
         </div>
       </div>
+      <div class="nhsuk-grid-row" rv-show="mode | isDispense">
+        <div class="nhsuk-grid-column-full" rv-hide="dispenseResponse">
+          <div class="nhsuk-form-group">
+            <fieldset class="nhsuk-fieldset" aria-describedby="canceler-hint">
+              <div>
+                <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m">Choose a medication to dispense</legend>
+              </div>
+              <div class="nhsuk-checkboxes">
+                <div class="nhsuk-checkboxes__item" rv-each-medication="signRequestSummary.medicationRequests">
+                  <input class="nhsuk-radios__input" name="cancel-medications" type="radio" rv-value="medication.medicationCodeableConcept.coding | snomedCode">
+                  <label class="nhsuk-label nhsuk-radios__label" rv-for="medication.medicationCodeableConcept.coding | snomedCode">
+                    {medication.medicationCodeableConcept.coding | snomedCodeDescription}
+                  </label>
+                </div>
+              </div>
+            </fieldset>
+          </div>
+        </div>
+      </div>
       <div class="nhsuk-grid-row" rv-show="cancelResponse">
         <div class="nhsuk-grid-column-full">
           <div class="nhsuk-panel">
