@@ -382,6 +382,8 @@ def post_dispense():
     if (config.ENVIRONMENT == "prod"):
         return app.make_response("Bad Request", 400)
     dispense_request = flask.request.json
+    print("Sending dispense request...")
+    print(json.dumps(dispense_request))
     response = make_eps_api_process_message_request(
         get_access_token(),
         dispense_request
