@@ -2016,7 +2016,7 @@ function createDispenseRequest(bundle) {
       text: "4 times a day for 7 days",
     },
   ];
-  medicationDispense.quantity = clonedMedicationRequest.quantity
+  medicationDispense.quantity = clonedMedicationRequest.dispenseRequest?.quantity ?? undefined
 
   bundle.entry = bundle.entry
     .filter((entry) => entry.resource.resourceType !== "MessageHeader")
