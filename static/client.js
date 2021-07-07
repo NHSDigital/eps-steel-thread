@@ -2005,8 +2005,8 @@ function createDispenseRequest(bundle) {
     coding: [
       {
         system: "https://fhir.nhs.uk/CodeSystem/medicationdispense-type",
-        code: "0001",
-        display: "Item fully dispensed",
+        code: "0003",
+        display: "Item dispensed - partial",
       },
     ],
   };
