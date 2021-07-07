@@ -1924,43 +1924,43 @@ function createDispenseRequest(bundle) {
   const patientEntry = bundle.entry.filter(
     (e) => e.resource.resourceType === "Patient"
   )[0];
-  // medicationDispense.subject = {
-  //   type: "Patient",
-  //   identifier: {
-  //     system: "https://fhir.nhs.uk/Id/nhs-number",
-  //     value: getNhsNumber(patientEntry),
-  //   },
-  // };
-  // medicationDispense.authorizingPrescription = [
-  //   {
-  //     extension: [
-  //       {
-  //         url:
-  //           "https://fhir.nhs.uk/StructureDefinition/Extension-DM-GroupIdentifier",
-  //         extension: [
-  //           {
-  //             url: "shortForm",
-  //             valueIdentifier: {
-  //               system: "https://fhir.nhs.uk/Id/prescription-order-number",
-  //               value: "A0548B-A99968-451485",
-  //             },
-  //           },
-  //           {
-  //             url: "UUID",
-  //             valueIdentifier: {
-  //               system: "https://fhir.nhs.uk/Id/prescription",
-  //               value: "a5b9dc81-ccf4-4dab-b887-3d88e557febb",
-  //             },
-  //           },
-  //         ],
-  //       },
-  //     ],
-  //     identifier: {
-  //       system: "https://fhir.nhs.uk/Id/prescription-order-item-number",
-  //       value: "a54219b8-f741-4c47-b662-e4f8dfa49ab7",
-  //     },
-  //   },
-  // ];
+  medicationDispense.subject = {
+    type: "Patient",
+    identifier: {
+      system: "https://fhir.nhs.uk/Id/nhs-number",
+      value: getNhsNumber(patientEntry),
+    },
+  };
+  medicationDispense.authorizingPrescription = [
+    {
+      extension: [
+        {
+          url:
+            "https://fhir.nhs.uk/StructureDefinition/Extension-DM-GroupIdentifier",
+          extension: [
+            {
+              url: "shortForm",
+              valueIdentifier: {
+                system: "https://fhir.nhs.uk/Id/prescription-order-number",
+                value: clonedMedicationRequest.groupIdentifier.value,
+              },
+            },
+            {
+              url: "UUID",
+              valueIdentifier: {
+                system: "https://fhir.nhs.uk/Id/prescription",
+                value: getLongFormIdExtension(clonedMedicationRequest.groupIdentifier.extension).valueIdentifier.value,
+              },
+            },
+          ],
+        },
+      ],
+      identifier: {
+        system: "https://fhir.nhs.uk/Id/prescription-order-item-number",
+        value: clonedMedicationRequest.id,
+      },
+    },
+  ];
   bundle.entry = bundle.entry.filter(
     (entry) => entry.resource.resourceType !== "MedicationRequest"
   );
