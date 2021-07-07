@@ -1890,94 +1890,38 @@ function createDispenseRequest(bundle) {
     (entry) => entry.resource.resourceType === "MedicationRequest"
   );
 
-  const medicationEntryToDispense = medicationRequestEntries.filter((e) =>
+  const medicationRequestEntryToDispense = medicationRequestEntries.filter((e) =>
     e.resource.medicationCodeableConcept.coding.some(
       (c) => c.code === medicationToDispenseSnomed
     )
   )[0];
 
-  const medicationDispenseEntry = JSON.parse(
-    JSON.stringify(medicationEntryToDispense)
+  const clonedMedicationRequestEntry = JSON.parse(
+    JSON.stringify(medicationRequestEntryToDispense)
   );
-  const medicationDispense = medicationDispenseEntry.resource;
-  medicationDispense.resourceType = "MedicationDispense"
+  const clonedMedicationRequest = clonedMedicationRequestEntry.resource
+
+  const medicationDispenseEntry = {}
+  medicationDispenseEntry.fullUrl = clonedMedicationRequestEntry.fullUrl
+  medicationDispenseEntry.resource = {}
+  const medicationDispense = medicationDispenseEntry.resource
+  medicationDispense.resourceType = "MedicationDispense";
+  medicationDispense.extension = [
+    {
+      "url": "https://fhir.nhs.uk/StructureDefinition/Extension-EPS-TaskBusinessStatus",
+      "valueCoding": {
+        "system": "https://fhir.nhs.uk/CodeSystem/EPS-task-business-status",
+        "code": "0003",
+        "display": "With Dispenser - Active"
+      }
+    }
+  ]
+  medicationDispense.status = "completed"
+  medicationDispense.medicationCodeableConcept = clonedMedicationRequest.medicationCodeableConcept
   bundle.entry = bundle.entry.filter(
     (entry) => entry.resource.resourceType !== "MedicationRequest"
   );
   bundle.entry.push(medicationDispenseEntry);
-
-  const canceller = pageData.cancellers.filter(
-    (canceller) => canceller.id === pageData.selectedCancellerId
-  )[0];
-
-  if (canceller.id !== "same-as-original-author") {
-    const cancelPractitionerRoleIdentifier = uuidv4();
-    const cancelPractitionerIdentifier = uuidv4();
-
-    medicationRequest.extension.push({
-      url:
-        "https://fhir.nhs.uk/StructureDefinition/Extension-DM-ResponsiblePractitioner",
-      valueReference: {
-        reference: `urn:uuid:${cancelPractitionerRoleIdentifier}`,
-      },
-    });
-
-    const practitionerRoleEntry = bundle.entry.filter(
-      (entry) => entry.resource.resourceType === "PractitionerRole"
-    )[0];
-    const cancelPractitionerRoleEntry = JSON.parse(
-      JSON.stringify(practitionerRoleEntry)
-    );
-
-    cancelPractitionerRoleEntry.fullUrl = `urn:uuid:${cancelPractitionerRoleIdentifier}`;
-    const cancelPractitionerRole = cancelPractitionerRoleEntry.resource;
-    cancelPractitionerRole.practitioner.reference = `urn:uuid:${cancelPractitionerIdentifier}`;
-    cancelPractitionerRole.identifier = [
-      {
-        system: "https://fhir.nhs.uk/Id/sds-role-profile-id",
-        value: canceller.sdsRoleProfileId,
-      },
-    ];
-    cancelPractitionerRole.code.forEach((code) =>
-      code.coding
-        .filter(
-          (coding) =>
-            coding.system ===
-            "https://fhir.hl7.org.uk/CodeSystem/UKCore-SDSJobRoleName"
-        )
-        .forEach((coding) => {
-          (coding.code = canceller.id), (coding.display = canceller.display);
-        })
-    );
-    bundle.entry.push(cancelPractitionerRoleEntry);
-
-    const practitionerEntry = bundle.entry.filter(
-      (entry) => entry.resource.resourceType === "Practitioner"
-    )[0];
-    const cancelPractitionerEntry = JSON.parse(
-      JSON.stringify(practitionerEntry)
-    );
-    cancelPractitionerEntry.fullUrl = `urn:uuid:${cancelPractitionerIdentifier}`;
-    const cancelPractitioner = cancelPractitionerEntry.resource;
-    cancelPractitioner.identifier = [
-      {
-        system: "https://fhir.nhs.uk/Id/sds-user-id",
-        value: canceller.sdsUserId,
-      },
-      {
-        system: canceller.professionalCodeSystem,
-        value: canceller.professionalCodeValue,
-      },
-    ];
-    cancelPractitioner.name = [
-      {
-        family: canceller.lastName,
-        given: [canceller.firstName],
-        prefix: [canceller.title],
-      },
-    ];
-    bundle.entry.push(cancelPractitionerEntry);
-  }
 
   return bundle;
 }
