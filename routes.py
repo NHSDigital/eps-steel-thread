@@ -178,7 +178,7 @@ def download():
         zFile,
         mimetype='application/zip',
         as_attachment=True,
-        attachment_filename='send_requests.zip')
+        attachment_filename='messages.zip')
 
 
 def update_pagination(response, short_prescription_ids, current_short_prescription_id):
