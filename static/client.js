@@ -1921,11 +1921,14 @@ function createDispenseRequest(bundle) {
   medicationDispense.status = "completed";
   medicationDispense.medicationCodeableConcept =
     clonedMedicationRequest.medicationCodeableConcept;
+  const patientEntry = bundle.entry.filter(
+    (e) => e.resource.resourceType === "Patient"
+  )[0];
   medicationDispense.subject = {
     type: "Patient",
     identifier: {
       system: "https://fhir.nhs.uk/Id/nhs-number",
-      value: getNhsNumber(getResourcesOfType(bundle, "Patient")[0]),
+      value: getNhsNumber(patientEntry),
     },
   };
   (medicationDispense.authorizingPrescription = [
