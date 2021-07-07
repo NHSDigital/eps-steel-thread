@@ -1749,7 +1749,7 @@ function createCancellation(bundle) {
   messageHeader.eventCoding.code = "prescription-order-update";
   messageHeader.eventCoding.display = "Prescription Order Update";
 
-  // cheat and remove focus references as references not in bundle causes validation errors
+  // remove focus references as references not in bundle causes validation errors
   // but no references always passes
   messageHeader.focus = [];
   // ****************************************
@@ -1878,7 +1878,7 @@ function createDispenseRequest(bundle) {
   messageHeader.eventCoding.code = "dispense-notification";
   messageHeader.eventCoding.display = "Dispense Notification";
 
-  // cheat and remove focus references as references not in bundle causes validation errors
+  // remove focus references as references not in bundle causes validation errors
   // but no references always passes
   messageHeader.focus = [];
   // ****************************************
@@ -1890,37 +1890,55 @@ function createDispenseRequest(bundle) {
     (entry) => entry.resource.resourceType === "MedicationRequest"
   );
 
-  const medicationRequestEntryToDispense = medicationRequestEntries.filter((e) =>
-    e.resource.medicationCodeableConcept.coding.some(
-      (c) => c.code === medicationToDispenseSnomed
-    )
+  const medicationRequestEntryToDispense = medicationRequestEntries.filter(
+    (e) =>
+      e.resource.medicationCodeableConcept.coding.some(
+        (c) => c.code === medicationToDispenseSnomed
+      )
   )[0];
 
   const clonedMedicationRequestEntry = JSON.parse(
     JSON.stringify(medicationRequestEntryToDispense)
   );
-  const clonedMedicationRequest = clonedMedicationRequestEntry.resource
+  const clonedMedicationRequest = clonedMedicationRequestEntry.resource;
 
-  const medicationDispenseEntry = {}
-  medicationDispenseEntry.fullUrl = clonedMedicationRequestEntry.fullUrl
-  medicationDispenseEntry.resource = {}
-  const medicationDispense = medicationDispenseEntry.resource
+  const medicationDispenseEntry = {};
+  medicationDispenseEntry.fullUrl = clonedMedicationRequestEntry.fullUrl;
+  medicationDispenseEntry.resource = {};
+  const medicationDispense = medicationDispenseEntry.resource;
   medicationDispense.resourceType = "MedicationDispense";
   medicationDispense.extension = [
     {
-      "url": "https://fhir.nhs.uk/StructureDefinition/Extension-EPS-TaskBusinessStatus",
-      "valueCoding": {
-        "system": "https://fhir.nhs.uk/CodeSystem/EPS-task-business-status",
-        "code": "0003",
-        "display": "With Dispenser - Active"
-      }
-    }
-  ]
-  medicationDispense.status = "completed"
-  medicationDispense.medicationCodeableConcept = clonedMedicationRequest.medicationCodeableConcept
-  bundle.entry = bundle.entry.filter(
-    (entry) => entry.resource.resourceType !== "MedicationRequest"
-  );
+      url:
+        "https://fhir.nhs.uk/StructureDefinition/Extension-EPS-TaskBusinessStatus",
+      valueCoding: {
+        system: "https://fhir.nhs.uk/CodeSystem/EPS-task-business-status",
+        code: "0003",
+        display: "With Dispenser - Active",
+      },
+    },
+  ];
+  medicationDispense.status = "completed";
+  medicationDispense.medicationCodeableConcept =
+    clonedMedicationRequest.medicationCodeableConcept;
+  medicationDispense.subject = {
+    type: "Patient",
+    identifier: {
+      system: "https://fhir.nhs.uk/Id/nhs-number",
+      value: getNhsNumber(getResourcesOfType(bundle, "Patient")[0]),
+    },
+  };
+  (medicationDispense.authorizingPrescription = [
+    {
+      identifier: {
+        system: "https://fhir.nhs.uk/Id/prescription-order-item-number",
+        value: "a54219b8-f741-4c47-b662-e4f8dfa49ab7",
+      },
+    },
+  ]),
+    (bundle.entry = bundle.entry.filter(
+      (entry) => entry.resource.resourceType !== "MedicationRequest"
+    ));
   bundle.entry.push(medicationDispenseEntry);
 
   return bundle;
