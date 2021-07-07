@@ -1949,7 +1949,9 @@ function createDispenseRequest(bundle) {
               url: "UUID",
               valueIdentifier: {
                 system: "https://fhir.nhs.uk/Id/prescription",
-                value: getLongFormIdExtension(clonedMedicationRequest.groupIdentifier.extension).valueIdentifier.value,
+                value: getLongFormIdExtension(
+                  clonedMedicationRequest.groupIdentifier.extension
+                ).valueIdentifier.value,
               },
             },
           ],
@@ -1961,9 +1963,14 @@ function createDispenseRequest(bundle) {
       },
     },
   ];
-  bundle.entry = bundle.entry.filter(
-    (entry) => entry.resource.resourceType !== "MedicationRequest"
-  );
+  bundle.entry = bundle.entry
+    .filter((entry) => entry.resource.resourceType !== "MedicationRequest")
+    .filter((entry) => entry.resource.resourceType !== "Practitioner")
+    .filter((entry) => entry.resource.resourceType !== "PractitionerRole")
+    .filter((entry) => entry.resource.resourceType !== "CommunicationRequest")
+    .filter((entry) => entry.resource.resourceType !== "Location")
+    .filter((entry) => entry.resource.resourceType !== "Organization")
+    .filter((entry) => entry.resource.resourceType !== "HealthcareService");
   bundle.entry.push(medicationDispenseEntry);
 
   return bundle;
