@@ -169,7 +169,9 @@ def download():
         short_prescription_ids = get_prescription_ids_from_cookie()
         for index, short_prescription_id in enumerate(short_prescription_ids):
             bundle = load_prepare_request(short_prescription_id)
+            xml = make_eps_api_convert_message_request(get_access_token(), bundle).text
             zip_file.writestr(f"send_request_{index+1}.json", json.dumps(bundle, indent=2))
+            zip_file.writestr(f"send_request_{index+1}.xml", xml)
     zFile.seek(0)
 
     return flask.send_file(
