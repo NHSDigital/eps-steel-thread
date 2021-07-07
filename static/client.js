@@ -2016,18 +2016,7 @@ function createDispenseRequest(bundle) {
       text: "4 times a day for 7 days",
     },
   ];
-  medicationDispense.quantity = {
-    value: 28,
-    unit: "capsule",
-    system: "http://snomed.info/sct",
-    code: "3316911000001105",
-  };
-  medicationDispense.daysSupply = {
-    value: 7,
-    unit: "Day",
-    system: "http://unitsofmeasure.org",
-    code: "d",
-  };
+  medicationDispense.quantity = clonedMedicationRequest.quantity
 
   bundle.entry = bundle.entry
     .filter((entry) => entry.resource.resourceType !== "MessageHeader")
