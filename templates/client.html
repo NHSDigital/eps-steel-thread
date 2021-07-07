@@ -106,6 +106,7 @@
                 </path>
               </svg>
               <span class="nhsuk-action-link__text" rv-hide="environment | isProd">Change auth</span>
+              <span class="nhsuk-action-link__text" rv-show="environment | isProd">Login</span>
             </a>
           </div>
         </div>
@@ -657,7 +658,7 @@
             <a href="/dispense/release" class="nhsuk-button" rv-hide="environment | isProd">Dispense</a>
           </div>
           <div rv-hide="loggedIn" class="nhsuk-grid-column-full">
-            <a href="/prescribe/load" class="nhsuk-button">View Prescription(s)</a>
+            <a href="/prescribe/load" class="nhsuk-button" rv-hide="environment | isProd">View Prescription(s)</a>
           </div>
         </div>
       </div>
