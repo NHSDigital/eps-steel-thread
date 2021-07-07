@@ -1907,6 +1907,12 @@ function createDispenseRequest(bundle) {
   medicationDispenseEntry.resource = {};
   const medicationDispense = medicationDispenseEntry.resource;
   medicationDispense.resourceType = "MedicationDispense";
+  medicationDispense.identifier = [
+    {
+      "system": "https://fhir.nhs.uk/Id/prescription-dispense-item-number",
+      "value": uuidv4()
+    }
+  ],
   medicationDispense.extension = [
     {
       url:
