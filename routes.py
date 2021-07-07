@@ -161,6 +161,7 @@ def get_load():
     return render_client("load")
 
 
+@exclude_from_auth()
 @app.route('/download', methods=['GET'])
 def download():
     zFile = io.BytesIO()
