@@ -1884,12 +1884,14 @@ function createDispenseRequest(bundle) {
   // ****************************************
 
   const clonedHeaderEntry = JSON.parse(
-    JSON.stringify(bundle.entry.filter(e => e.resource.resourceType === "MessageHeader")[0])
+    JSON.stringify(
+      bundle.entry.filter((e) => e.resource.resourceType === "MessageHeader")[0]
+    )
   );
   clonedHeaderEntry.resource.response = {
-    "identifier": "999f9999-9999-9999-9ff9-f9fff9999999",
-    "code": "ok"
-  }
+    identifier: "999f9999-9999-9999-9ff9-f9fff9999999",
+    code: "ok",
+  };
 
   var medicationToDispenseSnomed = document.querySelectorAll(
     'input[name="dispense-medications"]:checked'
@@ -2008,6 +2010,8 @@ function createDispenseRequest(bundle) {
       },
     ],
   };
+  medicationDispense.whenPrepared = "2021-07-07T15:43:00+00:00"
+
   bundle.entry = bundle.entry
     .filter((entry) => entry.resource.resourceType !== "MessageHeader")
     .filter((entry) => entry.resource.resourceType !== "MedicationRequest")
@@ -2017,6 +2021,7 @@ function createDispenseRequest(bundle) {
     .filter((entry) => entry.resource.resourceType !== "Location")
     .filter((entry) => entry.resource.resourceType !== "Organization")
     .filter((entry) => entry.resource.resourceType !== "HealthcareService");
+
   bundle.entry.unshift(clonedHeaderEntry);
   bundle.entry.push(medicationDispenseEntry);
 
