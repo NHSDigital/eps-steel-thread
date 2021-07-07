@@ -2026,7 +2026,8 @@ function createDispenseRequest(bundle) {
     .filter((entry) => entry.resource.resourceType !== "CommunicationRequest")
     .filter((entry) => entry.resource.resourceType !== "Location")
     .filter((entry) => entry.resource.resourceType !== "Organization")
-    .filter((entry) => entry.resource.resourceType !== "HealthcareService");
+    .filter((entry) => entry.resource.resourceType !== "HealthcareService")
+    .filter((entry) => entry.resource.resourceType !== "List");
 
   bundle.entry.unshift(clonedHeaderEntry);
   bundle.entry.push(medicationDispenseEntry);
