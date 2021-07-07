@@ -33,7 +33,10 @@ const pageData = {
     //new Prescription("10", "Homecare - Repeat Prescribing (nominated)", HOMECARE_REPEAT_PRESCRIBING_NOMINATED),
     new Prescription("custom", "Custom", null),
   ],
-  releases: [new Release("all", "All nominated"), new Release("custom", "Custom")],
+  releases: [
+    new Release("all", "All nominated"),
+    new Release("custom", "Custom"),
+  ],
   pharmacies: [
     new Pharmacy("VNFKT", "FIVE STAR HOMECARE LEEDS LTD"),
     new Pharmacy("YGM1E", "MBBM HEALTHCARE TECHNOLOGIES LTD"),
@@ -570,12 +573,13 @@ function sendReleaseRequest() {
 
 function sendDispenseRequest() {
   try {
-    const prescriptionId = Cookies.get("Current-Prescription-Id");
+    const prescriptionId = document.getElementById("prescription-id-input")
+      .value;
     const bundle = makeRequest(
       "GET",
       `/prescribe/edit?prescription_id=${prescriptionId}`
     );
-    const dispenseRequest = createDispenseRequest(bundle)
+    const dispenseRequest = createDispenseRequest(bundle);
     const response = makeRequest(
       "POST",
       "/dispense/dispense",
@@ -2017,6 +2021,7 @@ function onLoad() {
       `/prescribe/edit?prescription_id=${prescriptionId}`
     );
     pageData.signRequestSummary = getSummary(response);
+    resetPageData("cancel");
   }
   bind();
   document.querySelector("#main-content").style.display = "";
@@ -2038,7 +2043,7 @@ function resetPageData(pageMode) {
   pageData.showCustomPrescriptionIdInput =
     pageMode === "release"
       ? pageData.selectedReleaseId === "custom"
-      : pageMode === "dispense";
+      : false;
   pageData.releaseResponse = null;
   pageData.dispenseResponse = null;
   pageData.selectedPharmacy =
