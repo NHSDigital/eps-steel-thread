@@ -1931,7 +1931,7 @@ function createDispenseRequest(bundle) {
       value: getNhsNumber(patientEntry),
     },
   };
-  (medicationDispense.authorizingPrescription = [
+  medicationDispense.authorizingPrescription = [
     {
       extension: [
         {
@@ -1960,16 +1960,14 @@ function createDispenseRequest(bundle) {
         value: "a54219b8-f741-4c47-b662-e4f8dfa49ab7",
       },
     },
-  ]),
-    (bundle.entry = bundle.entry
-      .filter((entry) => entry.resource.resourceType !== "MedicationRequest")
-      .filter((entry) => entry.resource.resourceType !== "Practitioner")
-      .filter((entry) => entry.resource.resourceType !== "PractitionerRole")
-      .filter((entry) => entry.resource.resourceType !== "Organization")
-      .filter((entry) => entry.resource.resourceType !== "Location")
-      .filter(
-        (entry) => entry.resource.resourceType !== "CommunicationRequest"
-      ));
+  ];
+  bundle.entry = bundle.entry
+    .filter((entry) => entry.resource.resourceType !== "MedicationRequest")
+    .filter((entry) => entry.resource.resourceType !== "Practitioner")
+    .filter((entry) => entry.resource.resourceType !== "PractitionerRole")
+    .filter((entry) => entry.resource.resourceType !== "Organization")
+    .filter((entry) => entry.resource.resourceType !== "Location")
+    .filter((entry) => entry.resource.resourceType !== "CommunicationRequest");
   bundle.entry.push(medicationDispenseEntry);
 
   return bundle;
