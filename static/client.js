@@ -1961,13 +1961,14 @@ function createDispenseRequest(bundle) {
       },
     },
   ];
-  bundle.entry = bundle.entry
-    .filter((entry) => entry.resource.resourceType !== "MedicationRequest")
-    .filter((entry) => entry.resource.resourceType !== "Practitioner")
-    .filter((entry) => entry.resource.resourceType !== "PractitionerRole")
-    .filter((entry) => entry.resource.resourceType !== "Organization")
-    .filter((entry) => entry.resource.resourceType !== "Location")
-    .filter((entry) => entry.resource.resourceType !== "CommunicationRequest");
+  bundle.entry = bundle.entry.filter(
+    (entry) => entry.resource.resourceType !== "MedicationRequest"
+  );
+  // .filter((entry) => entry.resource.resourceType !== "Practitioner")
+  // .filter((entry) => entry.resource.resourceType !== "PractitionerRole")
+  // .filter((entry) => entry.resource.resourceType !== "Organization")
+  // .filter((entry) => entry.resource.resourceType !== "Location")
+  // .filter((entry) => entry.resource.resourceType !== "CommunicationRequest");
   bundle.entry.push(medicationDispenseEntry);
 
   return bundle;
