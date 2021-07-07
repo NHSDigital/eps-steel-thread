@@ -1963,11 +1963,6 @@ function createDispenseRequest(bundle) {
   // ];
   bundle.entry = bundle.entry.filter(
     (entry) => entry.resource.resourceType !== "MedicationRequest"
-    && entry.resource.resourceType !== "Practitioner"
-    && entry.resource.resourceType !== "PractitionerRole"
-    && entry.resource.resourceType !== "Organization"
-    && entry.resource.resourceType !== "Location"
-    && entry.resource.resourceType !== "CommunicationRequest"
   );
   bundle.entry.push(medicationDispenseEntry);
 
