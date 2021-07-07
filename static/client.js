@@ -1963,6 +1963,28 @@ function createDispenseRequest(bundle) {
       },
     },
   ];
+  medicationDispense.performer = [
+    {
+      actor: {
+        type: "Practitioner",
+        identifier: {
+          system: "https://fhir.hl7.org.uk/Id/gphc-number",
+          value: "7654321",
+        },
+        display: "Mr Peter Potion",
+      },
+    },
+    {
+      actor: {
+        type: "Organization",
+        identifier: {
+          system: "https://fhir.nhs.uk/Id/ods-organization-code",
+          value: "AB123",
+        },
+        display: "The Simple Pharmacy",
+      },
+    },
+  ];
   bundle.entry = bundle.entry
     .filter((entry) => entry.resource.resourceType !== "MedicationRequest")
     .filter((entry) => entry.resource.resourceType !== "Practitioner")
