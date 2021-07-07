@@ -1875,49 +1875,36 @@ function createDispenseRequest(bundle) {
   // ****************************************
 
   const messageHeader = getResourcesOfType(bundle, "MessageHeader")[0];
-  messageHeader.eventCoding.code = "prescription-order-update";
-  messageHeader.eventCoding.display = "Prescription Order Update";
+  messageHeader.eventCoding.code = "dispense-notification";
+  messageHeader.eventCoding.display = "Dispense Notification";
 
   // cheat and remove focus references as references not in bundle causes validation errors
   // but no references always passes
   messageHeader.focus = [];
   // ****************************************
 
-  var medicationToCancelSnomed = document.querySelectorAll(
-    'input[name="cancel-medications"]:checked'
+  var medicationToDispenseSnomed = document.querySelectorAll(
+    'input[name="dispense-medications"]:checked'
   )[0].value;
   const medicationRequestEntries = bundle.entry.filter(
     (entry) => entry.resource.resourceType === "MedicationRequest"
   );
 
-  const medicationEntryToCancel = medicationRequestEntries.filter((e) =>
+  const medicationEntryToDispense = medicationRequestEntries.filter((e) =>
     e.resource.medicationCodeableConcept.coding.some(
-      (c) => c.code === medicationToCancelSnomed
+      (c) => c.code === medicationToDispenseSnomed
     )
   )[0];
 
-  const clonedMedicationRequestEntry = JSON.parse(
-    JSON.stringify(medicationEntryToCancel)
+  const medicationDispenseEntry = JSON.parse(
+    JSON.stringify(medicationEntryToDispense)
   );
-  const medicationRequest = clonedMedicationRequestEntry.resource;
-  medicationRequest.status = "cancelled";
-  const cancellationReason = pageData.reasons.filter(
-    (r) => r.id === pageData.selectedCancellationReasonId
-  )[0];
-  medicationRequest.statusReason = {
-    coding: [
-      {
-        system:
-          "https://fhir.nhs.uk/CodeSystem/medicationrequest-status-reason",
-        code: cancellationReason.id,
-        display: cancellationReason.display,
-      },
-    ],
-  };
+  const medicationDispense = medicationDispenseEntry.resource;
+  medicationDispense.resourceType = "MedicationDispense"
   bundle.entry = bundle.entry.filter(
     (entry) => entry.resource.resourceType !== "MedicationRequest"
   );
-  bundle.entry.push(clonedMedicationRequestEntry);
+  bundle.entry.push(medicationDispenseEntry);
 
   const canceller = pageData.cancellers.filter(
     (canceller) => canceller.id === pageData.selectedCancellerId
