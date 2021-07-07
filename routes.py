@@ -15,7 +15,7 @@ from urllib.parse import urlencode
 from api import (
     make_eps_api_prepare_request,
     make_eps_api_process_message_request,
-    make_eps_api_release_nominated_pharmacy_request,
+    make_eps_api_release_request,
     make_sign_api_signature_upload_request,
     make_sign_api_signature_download_request,
     make_eps_api_convert_message_request,
@@ -63,7 +63,8 @@ EDIT_URL = "/prescribe/edit"
 SIGN_URL = "/prescribe/sign"
 SEND_URL = "/prescribe/send"
 CANCEL_URL = "/prescribe/cancel"
-DISPENSE_RELEASE_NOMINATED_PHARMACY_URL = "/dispense/release-nominated-pharmacy"
+RELEASE_URL = "/dispense/release"
+DISPENSE_URL = "/dispense/dispense"
 
 
 def exclude_from_auth(*args, **kw):
@@ -149,15 +150,18 @@ def post_login():
 
 @app.route("/", methods=["GET"])
 @app.route("/home", methods=["GET"])
+@exclude_from_auth()
 def get_home():
     return render_client("home")
 
 
 @app.route(LOAD_URL, methods=["GET"])
+@exclude_from_auth()
 def get_load():
     return render_client("load")
 
 
+@exclude_from_auth()
 @app.route('/download', methods=['GET'])
 def download():
     zFile = io.BytesIO()
@@ -191,6 +195,7 @@ def update_pagination(response, short_prescription_ids, current_short_prescripti
 
 
 @app.route(EDIT_URL, methods=["GET"])
+@exclude_from_auth()
 def get_edit():
     current_short_prescription_id = flask.request.args.get("prescription_id")
     bundle = load_prepare_request(current_short_prescription_id)
@@ -201,6 +206,7 @@ def get_edit():
 
 
 @app.route(EDIT_URL, methods=["POST"])
+@exclude_from_auth()
 def post_edit():
     request_bundles = flask.request.json
     short_prescription_ids = []
@@ -308,22 +314,46 @@ def post_cancel():
     return response
 
 
-@app.route(DISPENSE_RELEASE_NOMINATED_PHARMACY_URL, methods=["GET"])
-def get_nominated_pharmacy():
+@app.route(RELEASE_URL, methods=["GET"])
+def get_release():
     if (config.ENVIRONMENT == "prod"):
         return app.make_response("Bad Request", 400)
-    return render_client("release-nominated-pharmacy")
+    return render_client("release")
 
 
-@app.route(DISPENSE_RELEASE_NOMINATED_PHARMACY_URL, methods=["POST"])
-def post_nominated_pharmacy():
+@app.route(RELEASE_URL, methods=["POST"])
+def post_release():
     if (config.ENVIRONMENT == "prod"):
         return app.make_response("Bad Request", 400)
-    nominated_pharmacy_release = flask.request.json
-    ods_code = nominated_pharmacy_release["odsCode"]
-    response = make_eps_api_release_nominated_pharmacy_request(
-        get_access_token(),
-        {
+    release = flask.request.json
+    short_prescription_id = release.get("prescriptionId")
+    ods_code = release["odsCode"]
+    if short_prescription_id:
+        release_request_body = {
+            "resourceType": "Parameters",
+            "id": str(uuid.uuid4()),
+            "parameter": [
+            {
+                "name": "owner",
+                "valueIdentifier": {
+                    "system": "https://fhir.nhs.uk/Id/ods-organization-code",
+                    "value": ods_code
+                }
+            },
+            {
+                "name": "group-identifier",
+                "valueIdentifier": {
+                    "system": "https://fhir.nhs.uk/Id/prescription-order-number",
+                    "value": short_prescription_id
+                }
+            },
+            {
+                "name": "status",
+                "valueCode": "accepted"
+            }]
+        }
+    else:
+        release_request_body = {
             "resourceType": "Parameters",
             "id": str(uuid.uuid4()),
             "parameter": [
@@ -333,9 +363,45 @@ def post_nominated_pharmacy():
                 },
                 {"name": "status", "valueCode": "accepted"},
             ],
-        },
+        }
+    response = make_eps_api_release_request(
+        get_access_token(),
+        release_request_body,
     )
-    return {"body": json.dumps(response.json()), "success": response.status_code == 200}
+    release_request_xml = make_eps_api_convert_message_request(get_access_token(), release_request_body)
+    return {
+        "body": json.dumps(response.json()),
+        "success": response.status_code == 200,
+        "request_xml": release_request_xml.text,
+        "request": json.dumps(release_request_body),
+        "response": json.dumps(response.json()),
+    }
+
+
+@app.route(DISPENSE_URL, methods=["GET"])
+def get_dispense():
+    if (config.ENVIRONMENT == "prod"):
+        return app.make_response("Bad Request", 400)
+    return render_client("dispense")
+
+
+@app.route(DISPENSE_URL, methods=["POST"])
+def post_dispense():
+    if (config.ENVIRONMENT == "prod"):
+        return app.make_response("Bad Request", 400)
+    dispense_request = flask.request.json
+    response = make_eps_api_process_message_request(
+        get_access_token(),
+        dispense_request
+    )
+    dispense_request_xml = make_eps_api_convert_message_request(get_access_token(), dispense_request)
+    return {
+        "body": json.dumps(response.json()),
+        "success": response.status_code == 200,
+        "request_xml": dispense_request_xml.text,
+        "request": json.dumps(dispense_request),
+        "response": json.dumps(response.json()),
+    }
 
 
 @app.route("/logout", methods=["GET"])

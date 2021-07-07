@@ -33,6 +33,10 @@ const pageData = {
     //new Prescription("10", "Homecare - Repeat Prescribing (nominated)", HOMECARE_REPEAT_PRESCRIBING_NOMINATED),
     new Prescription("custom", "Custom", null),
   ],
+  releases: [
+    new Release("all", "All nominated"),
+    new Release("custom", "Custom"),
+  ],
   pharmacies: [
     new Pharmacy("VNFKT", "FIVE STAR HOMECARE LEEDS LTD"),
     new Pharmacy("YGM1E", "MBBM HEALTHCARE TECHNOLOGIES LTD"),
@@ -41,6 +45,8 @@ const pageData = {
   actions: [
     new PrescriptionAction("", ""),
     new PrescriptionAction("cancel", "Cancel"),
+    new PrescriptionAction("release", "Release"),
+    new PrescriptionAction("dispense", "Dispense"),
   ],
   reasons: [
     new CancellationReason("0001", "Prescribing Error"),
@@ -91,6 +97,10 @@ const pageData = {
   selectedExampleId: "1",
   selectedCancellationReasonId: "0001",
   selectedCancellerId: "same-as-original-author",
+  selectedReleaseId: "all",
+  prescriptionId: new URLSearchParams(window.location.search).get(
+    "prescription_id"
+  ),
   payloads: [],
 };
 
@@ -112,6 +122,16 @@ function Pharmacy(id, name) {
   this.select = function () {
     pageData.selectedPharmacy = id;
     pageData.showCustomPharmacyInput = id === "custom";
+    resetPageData(pageData.mode);
+  };
+}
+
+function Release(id, description) {
+  this.id = id;
+  this.description = description;
+  this.select = function () {
+    pageData.selectedReleaseId = id;
+    pageData.showCustomPrescriptionIdInput = id === "custom";
     resetPageData(pageData.mode);
   };
 }
@@ -163,25 +183,29 @@ function Canceller(
 // handle cases when no data is present without using "?." operator for IE compatibility
 // handle filter with function as IE will not accept "=>" operator
 rivets.formatters.snomedCode = {
-    read: function(codings) {
-      return codings.length
+  read: function (codings) {
+    return codings.length
       ? codings.filter(function (coding) {
           return coding.system === "http://snomed.info/sct";
         })[0].code
       : "";
-    },
-    publish: function(value, binding) {return binding}
+  },
+  publish: function (value, binding) {
+    return binding;
+  },
 };
 
 rivets.formatters.snomedCodeDescription = {
-  read: function(codings) {
+  read: function (codings) {
     return codings.length
-    ? codings.filter(function (coding) {
-        return coding.system === "http://snomed.info/sct";
-      })[0].display
-    : "";
+      ? codings.filter(function (coding) {
+          return coding.system === "http://snomed.info/sct";
+        })[0].display
+      : "";
   },
-  publish: function(value, binding) {return binding}
+  publish: function (value, binding) {
+    return binding;
+  },
 };
 
 rivets.formatters.prescriptionEndorsements = function (extensions) {
@@ -232,6 +256,17 @@ rivets.formatters.titleCase = function (string) {
   return string
     ? string.substring(0, 1).toUpperCase() + string.substring(1)
     : "";
+};
+
+rivets.formatters.dosageInstruction = function (dosageInstructions) {
+  return dosageInstructions ? dosageInstructions[0].text : "";
+};
+
+rivets.formatters.dispenserNotes = function (notes) {
+  return notes
+    ?.filter((note) => note.text)
+    .map((note) => note.text)
+    .join(". ");
 };
 
 rivets.formatters.fullName = function (name) {
@@ -285,11 +320,14 @@ rivets.formatters.isSend = function (mode) {
 rivets.formatters.isCancel = function (mode) {
   return mode === "cancel";
 };
-rivets.formatters.isReleaseNominatedPharmacy = function (mode) {
-  return mode === "release-nominated-pharmacy";
+rivets.formatters.isRelease = function (mode) {
+  return mode === "release";
+};
+rivets.formatters.isDispense = function (mode) {
+  return mode === "dispense";
 };
 rivets.formatters.showPharmacyList = function (mode) {
-  return mode === "edit" || mode === "release-nominated-pharmacy";
+  return mode === "edit" || mode === "release";
 };
 
 rivets.formatters.joinWithSpaces = function (strings) {
@@ -341,7 +379,7 @@ function sendLoadRequest() {
   const payloads = filePayloads
     .concat(textPayloads)
     .filter(Boolean)
-    .map((payload) => JSON.parse(payload))
+    .map((payload) => JSON.parse(payload));
   if (isCustom && !payloads.length) {
     addError("Unable to parse custom prescription(s)");
   } else {
@@ -397,7 +435,7 @@ function sendEditRequest() {
   try {
     const bundles = getPayloads();
     bundles.forEach((bundle) => {
-      updateBundleIds(bundle)
+      updateBundleIds(bundle);
       updateNominatedPharmacy(bundle, getOdsCode());
       sanitiseProdTestData(bundle);
     });
@@ -576,14 +614,19 @@ function sendCancelRequest() {
   }
 }
 
-function sendDispenseNominatedPharmacyReleaseRequest() {
+function sendReleaseRequest() {
   try {
+    const prescriptionId =
+      pageData.selectedReleaseId === "custom"
+        ? document.getElementById("prescription-id-input").value
+        : undefined;
     const request = {
+      prescriptionId,
       odsCode: getOdsCode(),
     };
     const response = makeRequest(
       "POST",
-      "/dispense/release-nominated-pharmacy",
+      "/dispense/release",
       JSON.stringify(request)
     );
     pageData.showCustomPharmacyInput = false;
@@ -598,6 +641,66 @@ function sendDispenseNominatedPharmacyReleaseRequest() {
         })
       : null;
     pageData.releaseResponse.success = response.success;
+    document.getElementById(
+      "release-request-download-fhir"
+    ).href = `data:application/json,${encodeURI(
+      JSON.stringify(response.request, null, 2)
+        .replace(/\\/g, "")
+        .replace(/"/, "")
+        .replace(/.$/, "")
+    )}`;
+    document.getElementById(
+      "release-request-download-xml"
+    ).href = `data:application/xml,${encodeURIComponent(response.request_xml)}`; // component includes '#' which is present in xml
+    document.getElementById(
+      "release-response-download"
+    ).href = `data:application/json,${encodeURI(
+      JSON.stringify(response.response, null, 2)
+        .replace(/\\/g, "")
+        .replace(/"/, "")
+        .replace(/.$/, "")
+    )}`;
+  } catch (e) {
+    console.log(e);
+    addError("Communication error");
+  }
+}
+
+function sendDispenseRequest() {
+  try {
+    const prescriptionId = Cookies.get("Current-Prescription-Id");
+    const bundle = makeRequest(
+      "GET",
+      `/prescribe/edit?prescription_id=${prescriptionId}`
+    );
+    const dispenseRequest = createDispenseRequest(bundle);
+    const response = makeRequest(
+      "POST",
+      "/dispense/dispense",
+      JSON.stringify(dispenseRequest)
+    );
+    pageData.dispenseResponse = {};
+    pageData.dispenseResponse.body = response.body;
+    pageData.dispenseResponse.success = response.success;
+    document.getElementById(
+      "dispense-request-download-fhir"
+    ).href = `data:application/json,${encodeURI(
+      JSON.stringify(response.request, null, 2)
+        .replace(/\\/g, "")
+        .replace(/"/, "")
+        .replace(/.$/, "")
+    )}`;
+    document.getElementById(
+      "dispense-request-download-xml"
+    ).href = `data:application/xml,${encodeURIComponent(response.request_xml)}`; // component includes '#' which is present in xml
+    document.getElementById(
+      "dispense-response-download"
+    ).href = `data:application/json,${encodeURI(
+      JSON.stringify(response.response, null, 2)
+        .replace(/\\/g, "")
+        .replace(/"/, "")
+        .replace(/.$/, "")
+    )}`;
   } catch (e) {
     console.log(e);
     addError("Communication error");
@@ -800,7 +903,10 @@ function getLongFormIdExtension(extensions) {
 
 window.onerror = function (msg, url, line, col, error) {
   // todo: fix cancellation page checkbox, prevent rivets from publishing checkbox values
-  if (pageData.mode === "cancel" && msg === "Uncaught TypeError: Cannot read property 'length' of undefined") {
+  if (
+    pageData.mode === "cancel" &&
+    msg === "Uncaught TypeError: Cannot read property 'length' of undefined"
+  ) {
     return true;
   }
   addError(
@@ -826,6 +932,18 @@ function getSummary(payload) {
   const prescribingOrganization = organizations[0]; // todo: add logic to handle primary/secondary-care
   const parentOrganization = organizations[0];
   const medicationRequests = getResourcesOfType(payload, "MedicationRequest");
+
+  const communicationRequests = getResourcesOfType(
+    payload,
+    "CommunicationRequest"
+  );
+  const patientInstructions = communicationRequests
+    .flatMap((communicationRequest) => communicationRequest.payload)
+    .filter(Boolean)
+    .filter((payload) => payload.contentString)
+    .map((payload) => payload.contentString)
+    .join("\n");
+
   const startDate =
     medicationRequests[0].dispenseRequest.validityPeriod?.start ??
     new Date().toISOString().slice(0, 10);
@@ -851,6 +969,7 @@ function getSummary(payload) {
     author: {
       startDate: startDate,
     },
+    patientInstructions: patientInstructions,
     repeatNumber: Number.isInteger(numberOfRepeatPrescriptionsIssued)
       ? numberOfRepeatPrescriptionsIssued + 1
       : null,
@@ -938,7 +1057,7 @@ var ExcelToJSON = function () {
 };
 
 function handleFileSelect(evt) {
-  var files = evt.target.files; // FileList object
+  var files = evt.target.files;
   var xl2json = new ExcelToJSON();
   xl2json.parseExcel(files[0]);
 }
@@ -1089,8 +1208,39 @@ function getMedicationQuantity(row) {
     value: row["Qty"],
     unit: row["UoM"],
     system: "http://snomed.info/sct",
-    code: "385024007",
+    code: getMedicationQuantityCode(row["UoM"]),
   };
+}
+
+// todo: move this code to new column in test-pack or can we do snomed lookups?
+function getMedicationQuantityCode(unitsOfMeasure) {
+  switch (unitsOfMeasure) {
+    case "ampoule":
+      return "413516001";
+    case "capsule":
+      return "428641000";
+    case "cartridge":
+      return "732988008";
+    case "dose":
+      return "3317411000001100";
+    case "enema":
+      return "700476008";
+    case "patch":
+      return "419702001";
+    case "plaster":
+      return "733010002";
+    case "pre-filled disposable injection":
+      return "3318611000001103";
+    case "sachet":
+      return "733013000";
+    case "tablet":
+      return "428673006";
+    case "vial":
+      return "415818006";
+    case "device":
+    default:
+      return "999999999";
+  }
 }
 
 function getPatient(patients, prescriptionRows) {
@@ -1101,10 +1251,61 @@ function getPatient(patients, prescriptionRows) {
 
 function createPrescription(
   patients,
-  prescription,
+  prescriptionRows,
   repeatsIssued = 0,
   maxRepeatsAllowed = 0
 ) {
+  const careSetting = getCareSetting(prescriptionRows);
+
+  const fhirPatient = getPatient(patients, prescriptionRows);
+
+  const fhirPractitionerRole = {
+    fullUrl: "urn:uuid:56166769-c1c4-4d07-afa8-132b5dfca666",
+    resource: {
+      resourceType: "PractitionerRole",
+      id: "56166769-c1c4-4d07-afa8-132b5dfca666",
+      identifier: [
+        {
+          system: "https://fhir.nhs.uk/Id/sds-role-profile-id",
+          value: "100102238986",
+        },
+      ],
+      practitioner: {
+        reference: "urn:uuid:a8c85454-f8cb-498d-9629-78e2cb5fa47a",
+      },
+      organization: {
+        reference: "urn:uuid:3b4b03a5-52ba-4ba6-9b82-70350aa109d8",
+      },
+      code: [
+        {
+          coding: [
+            {
+              system:
+                "https://fhir.hl7.org.uk/CodeSystem/UKCore-SDSJobRoleName",
+              code: "R8000", // todo: remove hardcoding?
+              display: "Clinical Practitioner Access Role",
+            },
+          ],
+        },
+      ],
+      telecom: [
+        {
+          system: "phone",
+          value: "01234567890",
+          use: "work",
+        },
+      ],
+    },
+  };
+
+  if (careSetting === "Secondary-Care") {
+    fhirPractitionerRole.resource.healthcareService = [
+      {
+        reference: "urn:uuid:54b0506d-49af-4245-9d40-d7d64902055e",
+      },
+    ];
+  }
+
   const fhirPrescription = {
     resourceType: "Bundle",
     id: "aef77afb-7e3c-427a-8657-2c427f71a272",
@@ -1137,8 +1338,9 @@ function createPrescription(
           },
           destination: [
             {
-              endpoint:
-                "https://sandbox.api.service.nhs.uk/electronic-prescriptions/$post-message",
+              endpoint: `https://${
+                pageData.environment === "int" ? "int." : ""
+              }api.service.nhs.uk/electronic-prescriptions/$post-message`,
               receiver: {
                 identifier: {
                   system: "https://fhir.nhs.uk/Id/ods-organization-code",
@@ -1150,51 +1352,8 @@ function createPrescription(
           focus: [],
         },
       },
-      getPatient(patients, prescription),
-      {
-        fullUrl: "urn:uuid:56166769-c1c4-4d07-afa8-132b5dfca666",
-        resource: {
-          resourceType: "PractitionerRole",
-          id: "56166769-c1c4-4d07-afa8-132b5dfca666",
-          identifier: [
-            {
-              system: "https://fhir.nhs.uk/Id/sds-role-profile-id",
-              value: "100102238986",
-            },
-          ],
-          practitioner: {
-            reference: "urn:uuid:a8c85454-f8cb-498d-9629-78e2cb5fa47a",
-          },
-          organization: {
-            reference: "urn:uuid:3b4b03a5-52ba-4ba6-9b82-70350aa109d8",
-          },
-          code: [
-            {
-              coding: [
-                {
-                  system:
-                    "https://fhir.hl7.org.uk/CodeSystem/UKCore-SDSJobRoleName",
-                  code: "R8000",
-                  display: "Clinical Practitioner Access Role",
-                },
-              ],
-            },
-          ],
-          healthcareService: [
-            {
-              reference: "urn:uuid:54b0506d-49af-4245-9d40-d7d64902055e",
-              display: "SOMERSET BOWEL CANCER SCREENING CENTRE",
-            },
-          ],
-          telecom: [
-            {
-              system: "phone",
-              value: "01234567890",
-              use: "work",
-            },
-          ],
-        },
-      },
+      fhirPatient,
+      fhirPractitionerRole,
       {
         fullUrl: "urn:uuid:a8c85454-f8cb-498d-9629-78e2cb5fa47a",
         resource: {
@@ -1224,98 +1383,6 @@ function createPrescription(
         },
       },
       {
-        fullUrl: "urn:uuid:3b4b03a5-52ba-4ba6-9b82-70350aa109d8",
-        resource: {
-          resourceType: "Organization",
-          id: "3b4b03a5-52ba-4ba6-9b82-70350aa109d8",
-          identifier: [
-            {
-              system: "https://fhir.nhs.uk/Id/ods-organization-code",
-              value: "RBA",
-            },
-          ],
-          type: [
-            {
-              coding: [
-                {
-                  system: "https://fhir.nhs.uk/CodeSystem/organisation-role",
-                  code: "197",
-                  display: "NHS TRUST",
-                },
-              ],
-            },
-          ],
-          name: "TAUNTON AND SOMERSET NHS FOUNDATION TRUST",
-          address: [
-            {
-              line: ["MUSGROVE PARK HOSPITAL", "PARKFIELD DRIVE", "TAUNTON"],
-              postalCode: "TA1 5DA",
-            },
-          ],
-          telecom: [
-            {
-              system: "phone",
-              value: "01823333444",
-              use: "work",
-            },
-          ],
-        },
-      },
-      {
-        fullUrl: "urn:uuid:54b0506d-49af-4245-9d40-d7d64902055e",
-        resource: {
-          resourceType: "HealthcareService",
-          id: "54b0506d-49af-4245-9d40-d7d64902055e",
-          identifier: [
-            {
-              use: "usual",
-              system: "https://fhir.nhs.uk/Id/ods-organization-code",
-              value: "A99968",
-            },
-          ],
-          active: true,
-          providedBy: {
-            identifier: {
-              system: "https://fhir.nhs.uk/Id/ods-organization-code",
-              value: "RBA",
-            },
-          },
-          location: [
-            {
-              reference: "urn:uuid:8a5d7d67-64fb-44ec-9802-2dc214bb3dcb",
-            },
-          ],
-          name: "SOMERSET BOWEL CANCER SCREENING CENTRE",
-          telecom: [
-            {
-              system: "phone",
-              value: "01823 333444",
-              use: "work",
-            },
-          ],
-        },
-      },
-      {
-        fullUrl: "urn:uuid:8a5d7d67-64fb-44ec-9802-2dc214bb3dcb",
-        resource: {
-          resourceType: "Location",
-          id: "8a5d7d67-64fb-44ec-9802-2dc214bb3dcb",
-          identifier: [
-            {
-              value: "10008800708",
-            },
-          ],
-          status: "active",
-          mode: "instance",
-          address: {
-            use: "work",
-            line: ["MUSGROVE PARK HOSPITAL"],
-            city: "TAUNTON",
-            postalCode: "TA1 5DA",
-          },
-        },
-      },
-      {
         fullUrl: "urn:uuid:51793ac0-112f-46c7-a891-9af8cefb206e",
         resource: {
           resourceType: "CommunicationRequest",
@@ -1332,16 +1399,15 @@ function createPrescription(
             type: "Organization",
             identifier: {
               system: "https://fhir.nhs.uk/Id/ods-organization-code",
-              value: "RBA",
+              value: "RBA", // todo: remove hardcoded
             },
-            display: "TAUNTON AND SOMERSET NHS FOUNDATION TRUST",
           },
           recipient: [
             {
               type: "Patient",
               identifier: {
                 system: "https://fhir.nhs.uk/Id/nhs-number",
-                value: "9449307571",
+                value: getNhsNumber(fhirPatient),
               },
             },
           ],
@@ -1350,13 +1416,178 @@ function createPrescription(
     ],
   };
   createMedicationRequests(
-    prescription,
+    prescriptionRows,
     repeatsIssued,
     maxRepeatsAllowed
   ).forEach((medicationRequest) =>
     fhirPrescription.entry.push(medicationRequest)
   );
+  createPlaceResources(careSetting, fhirPrescription);
   return JSON.stringify(fhirPrescription);
+}
+
+function getCareSetting(prescriptionRows) {
+  const row = prescriptionRows[0];
+  const prescriberTypeCode = row["Prescriber  Code"];
+  switch (prescriberTypeCode) {
+    // https://simplifier.net/guide/DigitalMedicines/DM-Prescription-Type
+    case "0108":
+    case "0101":
+    case "0113":
+    case "0125":
+    case "0105":
+    case "0113":
+      return "Primary-Care";
+    case "1004":
+    case "1001":
+      return "Secondary-Care";
+  }
+}
+
+function createPlaceResources(careSetting, fhirPrescription) {
+  if (careSetting === "Primary-Care") {
+    fhirPrescription.entry.push({
+      fullUrl: "urn:uuid:3b4b03a5-52ba-4ba6-9b82-70350aa109d8",
+      resource: {
+        resourceType: "Organization",
+        identifier: [
+          {
+            system: "https://fhir.nhs.uk/Id/ods-organization-code",
+            value: "A83008",
+          },
+        ],
+        type: [
+          {
+            coding: [
+              {
+                system: "https://fhir.nhs.uk/CodeSystem/organisation-role",
+                code: "76",
+                display: "GP PRACTICE",
+              },
+            ],
+          },
+        ],
+        name: "HALLGARTH SURGERY",
+        address: [
+          {
+            use: "work",
+            type: "both",
+            line: ["HALLGARTH SURGERY", "CHEAPSIDE"],
+            city: "SHILDON",
+            district: "COUNTY DURHAM",
+            postalCode: "DL4 2HP",
+          },
+        ],
+        telecom: [
+          {
+            system: "phone",
+            value: "0115 9737320",
+            use: "work",
+          },
+        ],
+        partOf: {
+          identifier: {
+            system: "https://fhir.nhs.uk/Id/ods-organization-code",
+            value: "84H",
+          },
+          display: "NHS COUNTY DURHAM CCG",
+        },
+      },
+    });
+  } else if (careSetting === "Secondary-Care") {
+    fhirPrescription.entry.push({
+      fullUrl: "urn:uuid:3b4b03a5-52ba-4ba6-9b82-70350aa109d8",
+      resource: {
+        resourceType: "Organization",
+        id: "3b4b03a5-52ba-4ba6-9b82-70350aa109d8",
+        identifier: [
+          {
+            system: "https://fhir.nhs.uk/Id/ods-organization-code",
+            value: "RBA",
+          },
+        ],
+        type: [
+          {
+            coding: [
+              {
+                system: "https://fhir.nhs.uk/CodeSystem/organisation-role",
+                code: "197",
+                display: "NHS TRUST",
+              },
+            ],
+          },
+        ],
+        name: "TAUNTON AND SOMERSET NHS FOUNDATION TRUST",
+        address: [
+          {
+            line: ["MUSGROVE PARK HOSPITAL", "PARKFIELD DRIVE", "TAUNTON"],
+            postalCode: "TA1 5DA",
+          },
+        ],
+        telecom: [
+          {
+            system: "phone",
+            value: "01823333444",
+            use: "work",
+          },
+        ],
+      },
+    });
+    fhirPrescription.entry.push({
+      fullUrl: "urn:uuid:54b0506d-49af-4245-9d40-d7d64902055e",
+      resource: {
+        resourceType: "HealthcareService",
+        id: "54b0506d-49af-4245-9d40-d7d64902055e",
+        identifier: [
+          {
+            use: "usual",
+            system: "https://fhir.nhs.uk/Id/ods-organization-code",
+            value: "A99968",
+          },
+        ],
+        active: true,
+        providedBy: {
+          identifier: {
+            system: "https://fhir.nhs.uk/Id/ods-organization-code",
+            value: "RBA",
+          },
+        },
+        location: [
+          {
+            reference: "urn:uuid:8a5d7d67-64fb-44ec-9802-2dc214bb3dcb",
+          },
+        ],
+        name: "SOMERSET BOWEL CANCER SCREENING CENTRE",
+        telecom: [
+          {
+            system: "phone",
+            value: "01823 333444",
+            use: "work",
+          },
+        ],
+      },
+    });
+    fhirPrescription.entry.push({
+      fullUrl: "urn:uuid:8a5d7d67-64fb-44ec-9802-2dc214bb3dcb",
+      resource: {
+        resourceType: "Location",
+        id: "8a5d7d67-64fb-44ec-9802-2dc214bb3dcb",
+        identifier: [
+          {
+            value: "10008800708",
+          },
+        ],
+        status: "active",
+        mode: "instance",
+        address: {
+          use: "work",
+          line: ["MUSGROVE PARK HOSPITAL"],
+          city: "TAUNTON",
+          postalCode: "TA1 5DA",
+        },
+      },
+    });
+  }
 }
 
 function createMedicationRequests(
@@ -1509,7 +1740,7 @@ function getDosageInstructionText(row) {
 }
 
 function getMedicationSnomedCode(row) {
-  return row["Snomed"].trim()
+  return row["Snomed"].trim();
 }
 
 function getMedicationDisplay(row) {
@@ -1517,8 +1748,8 @@ function getMedicationDisplay(row) {
 }
 
 function getMedicationRequestExtensions(row, repeatsIssued, maxRepeatsAllowed) {
-  const prescriberTypeCode = row["Prescriber  Code"]
-  const prescriberTypeDisplay = row["Prescriber Description"]
+  const prescriberTypeCode = row["Prescriber  Code"];
+  const prescriberTypeDisplay = row["Prescriber Description"];
   const extension = [
     {
       url:
@@ -1559,6 +1790,12 @@ function getMedicationRequestExtensions(row, repeatsIssued, maxRepeatsAllowed) {
   return extension;
 }
 
+function getNhsNumber(fhirPatient) {
+  return fhirPatient.resource.identifier.filter(
+    (i) => i.system === "https://fhir.nhs.uk/Id/nhs-number"
+  )[0].value;
+}
+
 function getPrescriptionTypeCode(row) {
   const firstPart = row["Prescription Type"].split(" ")[0];
   if (firstPart === "acute") return "acute";
@@ -1592,7 +1829,23 @@ function doPrescriptionAction(select) {
   const prescriptionId = Cookies.get("Current-Prescription-Id");
   switch (value) {
     case "cancel":
-      window.location.href = `/prescribe/cancel?prescription_id=${prescriptionId}`;
+      window.open(
+        `/prescribe/cancel?prescription_id=${prescriptionId}`,
+        "_blank"
+      );
+      break;
+    case "release":
+      window.open(
+        `/dispense/release?prescription_id=${prescriptionId}`,
+        "_blank"
+      );
+      break;
+    case "dispense":
+      window.open(
+        `/dispense/dispense?prescription_id=${prescriptionId}`,
+        "_blank"
+      );
+      break;
     default:
       return;
   }
@@ -1610,17 +1863,23 @@ function createCancellation(bundle) {
   messageHeader.eventCoding.code = "prescription-order-update";
   messageHeader.eventCoding.display = "Prescription Order Update";
 
-  // cheat and remove focus references as references not in bundle causes validation errors
+  // remove focus references as references not in bundle causes validation errors
   // but no references always passes
   messageHeader.focus = [];
   // ****************************************
 
-  var medicationToCancelSnomed = document.querySelectorAll('input[name="cancel-medications"]:checked')[0].value;
+  var medicationToCancelSnomed = document.querySelectorAll(
+    'input[name="cancel-medications"]:checked'
+  )[0].value;
   const medicationRequestEntries = bundle.entry.filter(
     (entry) => entry.resource.resourceType === "MedicationRequest"
   );
 
-  const medicationEntryToCancel = medicationRequestEntries.filter(e => e.resource.medicationCodeableConcept.coding.some(c => c.code === medicationToCancelSnomed))[0]
+  const medicationEntryToCancel = medicationRequestEntries.filter((e) =>
+    e.resource.medicationCodeableConcept.coding.some(
+      (c) => c.code === medicationToCancelSnomed
+    )
+  )[0];
 
   const clonedMedicationRequestEntry = JSON.parse(
     JSON.stringify(medicationEntryToCancel)
@@ -1721,8 +1980,189 @@ function createCancellation(bundle) {
   return bundle;
 }
 
+function createDispenseRequest(bundle) {
+  // Fixes duplicate hl7v3 identifier error
+  // this is not an obvious error for a supplier to resolve as
+  // there is no mention of the fhir field it relates to
+  // can we improve our returned error message here??
+  bundle.identifier.value = uuidv4();
+  // ****************************************
+
+  const messageHeader = getResourcesOfType(bundle, "MessageHeader")[0];
+  messageHeader.eventCoding.code = "dispense-notification";
+  messageHeader.eventCoding.display = "Dispense Notification";
+
+  // remove focus references as references not in bundle causes validation errors
+  // but no references always passes
+  messageHeader.focus = [];
+  // ****************************************
+
+  const clonedHeaderEntry = JSON.parse(
+    JSON.stringify(
+      bundle.entry.filter((e) => e.resource.resourceType === "MessageHeader")[0]
+    )
+  );
+  clonedHeaderEntry.resource.response = {
+    identifier: "999f9999-9999-9999-9ff9-f9fff9999999",
+    code: "ok",
+  };
+
+  var medicationToDispenseSnomed = document.querySelectorAll(
+    'input[name="dispense-medications"]:checked'
+  )[0].value;
+  const medicationRequestEntries = bundle.entry.filter(
+    (entry) => entry.resource.resourceType === "MedicationRequest"
+  );
+
+  const medicationRequestEntryToDispense = medicationRequestEntries.filter(
+    (e) =>
+      e.resource.medicationCodeableConcept.coding.some(
+        (c) => c.code === medicationToDispenseSnomed
+      )
+  )[0];
+
+  const clonedMedicationRequestEntry = JSON.parse(
+    JSON.stringify(medicationRequestEntryToDispense)
+  );
+  const clonedMedicationRequest = clonedMedicationRequestEntry.resource;
+
+  const medicationDispenseEntry = {};
+  medicationDispenseEntry.fullUrl = clonedMedicationRequestEntry.fullUrl;
+  medicationDispenseEntry.resource = {};
+  const medicationDispense = medicationDispenseEntry.resource;
+  medicationDispense.resourceType = "MedicationDispense";
+  (medicationDispense.identifier = [
+    {
+      system: "https://fhir.nhs.uk/Id/prescription-dispense-item-number",
+      value: clonedMedicationRequestEntry.fullUrl.replace("urn:uuid:", ""),
+    },
+  ]),
+    (medicationDispense.extension = [
+      {
+        url:
+          "https://fhir.nhs.uk/StructureDefinition/Extension-EPS-TaskBusinessStatus",
+        valueCoding: {
+          system: "https://fhir.nhs.uk/CodeSystem/EPS-task-business-status",
+          code: "0003",
+          display: "With Dispenser - Active",
+        },
+      },
+    ]);
+  medicationDispense.status = "completed";
+  medicationDispense.medicationCodeableConcept =
+    clonedMedicationRequest.medicationCodeableConcept;
+  const patientEntry = bundle.entry.filter(
+    (e) => e.resource.resourceType === "Patient"
+  )[0];
+  medicationDispense.subject = {
+    type: "Patient",
+    identifier: {
+      system: "https://fhir.nhs.uk/Id/nhs-number",
+      value: getNhsNumber(patientEntry),
+    },
+  };
+  medicationDispense.authorizingPrescription = [
+    {
+      extension: [
+        {
+          url:
+            "https://fhir.nhs.uk/StructureDefinition/Extension-DM-GroupIdentifier",
+          extension: [
+            {
+              url: "shortForm",
+              valueIdentifier: {
+                system: "https://fhir.nhs.uk/Id/prescription-order-number",
+                value: clonedMedicationRequest.groupIdentifier.value,
+              },
+            },
+            {
+              url: "UUID",
+              valueIdentifier: {
+                system: "https://fhir.nhs.uk/Id/prescription",
+                value: getLongFormIdExtension(
+                  clonedMedicationRequest.groupIdentifier.extension
+                ).valueIdentifier.value,
+              },
+            },
+          ],
+        },
+      ],
+      identifier: {
+        system: "https://fhir.nhs.uk/Id/prescription-order-item-number",
+        value: clonedMedicationRequestEntry.fullUrl.replace("urn:uuid:", ""),
+      },
+    },
+  ];
+  medicationDispense.performer = [
+    {
+      actor: {
+        type: "Practitioner",
+        identifier: {
+          system: "https://fhir.hl7.org.uk/Id/gphc-number",
+          value: "7654321",
+        },
+        display: "Mr Peter Potion",
+      },
+    },
+    {
+      actor: {
+        type: "Organization",
+        identifier: {
+          system: "https://fhir.nhs.uk/Id/ods-organization-code",
+          value: "VNFKT",
+        },
+        display: "FIVE STAR HOMECARE LEEDS LTD",
+      },
+    },
+  ];
+  medicationDispense.type = {
+    coding: [
+      {
+        system: "https://fhir.nhs.uk/CodeSystem/medicationdispense-type",
+        code: "0003",
+        display: "Item dispensed - partial",
+      },
+    ],
+  };
+  medicationDispense.whenPrepared = "2021-07-07T15:43:00+00:00";
+  medicationDispense.dosageInstruction = [
+    {
+      text: "4 times a day for 7 days",
+    },
+  ];
+  medicationDispense.quantity = clonedMedicationRequest.dispenseRequest?.quantity ?? undefined
+
+  bundle.entry = bundle.entry
+    .filter((entry) => entry.resource.resourceType !== "MessageHeader")
+    .filter((entry) => entry.resource.resourceType !== "MedicationRequest")
+    .filter((entry) => entry.resource.resourceType !== "Practitioner")
+    .filter((entry) => entry.resource.resourceType !== "PractitionerRole")
+    .filter((entry) => entry.resource.resourceType !== "CommunicationRequest")
+    .filter((entry) => entry.resource.resourceType !== "Location")
+    .filter((entry) => entry.resource.resourceType !== "Organization")
+    .filter((entry) => entry.resource.resourceType !== "HealthcareService")
+    .filter((entry) => entry.resource.resourceType !== "List");
+
+  bundle.entry.unshift(clonedHeaderEntry);
+  bundle.entry.push(medicationDispenseEntry);
+
+  return bundle;
+}
+
 function onLoad() {
-  bind();
+  if (pageData.mode === "release" && pageData.prescriptionId) {
+    pageData.selectedReleaseId = "custom";
+    resetPageData("release");
+  }
+  if (pageData.mode === "dispense") {
+    const prescriptionId = Cookies.get("Current-Prescription-Id");
+    const response = makeRequest(
+      "GET",
+      `/prescribe/edit?prescription_id=${prescriptionId}`
+    );
+    pageData.signRequestSummary = getSummary(response);
+    resetPageData("dispense");
+  }
   if (
     pageData.mode === "send" &&
     !pageData.sendResponse &&
@@ -1740,7 +2180,9 @@ function onLoad() {
       `/prescribe/edit?prescription_id=${prescriptionId}`
     );
     pageData.signRequestSummary = getSummary(response);
+    resetPageData("cancel");
   }
+  bind();
   document.querySelector("#main-content").style.display = "";
 }
 
@@ -1754,12 +2196,15 @@ function resetPageData(pageMode) {
   pageData.showCustomExampleInput =
     pageMode === "load" ? pageData.selectedExampleId === "custom" : false;
   pageData.showCustomPharmacyInput =
-    pageMode === "edit" || pageMode === "release-nominated-pharmacy"
+    pageMode === "edit" || pageMode === "release"
       ? pageData.selectedPharmacy === "custom"
       : false;
+  pageData.showCustomPrescriptionIdInput =
+    pageMode === "release" ? pageData.selectedReleaseId === "custom" : false;
   pageData.releaseResponse = null;
+  pageData.dispenseResponse = null;
   pageData.selectedPharmacy =
-    pageMode === "edit" || pageMode === "release-nominated-pharmacy"
+    pageMode === "edit" || pageMode === "release"
       ? pageData.selectedPharmacy ?? "VNFKT"
       : null;
   if (pageData.mode == "sign") {
