@@ -1975,7 +1975,7 @@ function createDispenseRequest(bundle) {
       ],
       identifier: {
         system: "https://fhir.nhs.uk/Id/prescription-order-item-number",
-        value: clonedMedicationRequest.id,
+        value: clonedMedicationRequestEntry.fullUrl.replace("urn:uuid:", ""),
       },
     },
   ];
