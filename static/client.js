@@ -1907,23 +1907,23 @@ function createDispenseRequest(bundle) {
   medicationDispenseEntry.resource = {};
   const medicationDispense = medicationDispenseEntry.resource;
   medicationDispense.resourceType = "MedicationDispense";
-  medicationDispense.identifier = [
+  (medicationDispense.identifier = [
     {
-      "system": "https://fhir.nhs.uk/Id/prescription-dispense-item-number",
-      "value": uuidv4()
-    }
-  ],
-  medicationDispense.extension = [
-    {
-      url:
-        "https://fhir.nhs.uk/StructureDefinition/Extension-EPS-TaskBusinessStatus",
-      valueCoding: {
-        system: "https://fhir.nhs.uk/CodeSystem/EPS-task-business-status",
-        code: "0003",
-        display: "With Dispenser - Active",
-      },
+      system: "https://fhir.nhs.uk/Id/prescription-dispense-item-number",
+      value: uuidv4(),
     },
-  ];
+  ]),
+    (medicationDispense.extension = [
+      {
+        url:
+          "https://fhir.nhs.uk/StructureDefinition/Extension-EPS-TaskBusinessStatus",
+        valueCoding: {
+          system: "https://fhir.nhs.uk/CodeSystem/EPS-task-business-status",
+          code: "0003",
+          display: "With Dispenser - Active",
+        },
+      },
+    ]);
   medicationDispense.status = "completed";
   medicationDispense.medicationCodeableConcept =
     clonedMedicationRequest.medicationCodeableConcept;
@@ -1991,6 +1991,15 @@ function createDispenseRequest(bundle) {
       },
     },
   ];
+  medicationDispense.type = {
+    coding: [
+      {
+        system: "https://fhir.nhs.uk/CodeSystem/medicationdispense-type",
+        code: "0001",
+        display: "Item fully dispensed",
+      },
+    ],
+  };
   bundle.entry = bundle.entry
     .filter((entry) => entry.resource.resourceType !== "MedicationRequest")
     .filter((entry) => entry.resource.resourceType !== "Practitioner")
