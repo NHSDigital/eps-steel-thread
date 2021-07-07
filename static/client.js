@@ -2010,7 +2010,12 @@ function createDispenseRequest(bundle) {
       },
     ],
   };
-  medicationDispense.whenPrepared = "2021-07-07T15:43:00+00:00"
+  medicationDispense.whenPrepared = "2021-07-07T15:43:00+00:00";
+  medicationDispense.dosageInstruction = [
+    {
+      text: "4 times a day for 7 days",
+    },
+  ];
 
   bundle.entry = bundle.entry
     .filter((entry) => entry.resource.resourceType !== "MessageHeader")
