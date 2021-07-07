@@ -44,9 +44,7 @@ const pageData = {
   ],
   actions: [
     new PrescriptionAction("", ""),
-    new PrescriptionAction("cancel", "Cancel"),
-    new PrescriptionAction("release", "Release"),
-    new PrescriptionAction("dispense", "Dispense"),
+    new PrescriptionAction("cancel", "Cancel")
   ],
   reasons: [
     new CancellationReason("0001", "Prescribing Error"),
@@ -103,6 +101,11 @@ const pageData = {
   ),
   payloads: [],
 };
+
+if (pageData.environment !== "prod") {
+  pageData.actions.push(new PrescriptionAction("release", "Release"))
+  pageData.actions.push(new PrescriptionAction("dispense", "Dispense"))
+}
 
 function Prescription(id, description, message) {
   this.id = id;
