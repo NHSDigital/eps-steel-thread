@@ -1883,6 +1883,14 @@ function createDispenseRequest(bundle) {
   messageHeader.focus = [];
   // ****************************************
 
+  const clonedHeaderEntry = JSON.parse(
+    JSON.stringify(bundle.entry.filter(e => e.resource.resourceType === "MessageHeader")[0])
+  );
+  clonedHeaderEntry.response = {
+    "identifier": "999f9999-9999-9999-9ff9-f9fff9999999",
+    "code": "ok"
+  }
+
   var medicationToDispenseSnomed = document.querySelectorAll(
     'input[name="dispense-medications"]:checked'
   )[0].value;
@@ -1985,7 +1993,7 @@ function createDispenseRequest(bundle) {
         type: "Organization",
         identifier: {
           system: "https://fhir.nhs.uk/Id/ods-organization-code",
-          value: "AB123",
+          value: "VNFKT",
         },
         display: "The Simple Pharmacy",
       },
@@ -2001,6 +2009,7 @@ function createDispenseRequest(bundle) {
     ],
   };
   bundle.entry = bundle.entry
+    .filter((entry) => entry.resource.resourceType !== "MessageHeader")
     .filter((entry) => entry.resource.resourceType !== "MedicationRequest")
     .filter((entry) => entry.resource.resourceType !== "Practitioner")
     .filter((entry) => entry.resource.resourceType !== "PractitionerRole")
@@ -2008,6 +2017,7 @@ function createDispenseRequest(bundle) {
     .filter((entry) => entry.resource.resourceType !== "Location")
     .filter((entry) => entry.resource.resourceType !== "Organization")
     .filter((entry) => entry.resource.resourceType !== "HealthcareService");
+  bundle.entry.push(clonedHeaderEntry);
   bundle.entry.push(medicationDispenseEntry);
 
   return bundle;
