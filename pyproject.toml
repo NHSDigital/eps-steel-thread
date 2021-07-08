@@ -5,7 +5,7 @@ python = "^3.8"
 [tool.poetry]
 name = "epsat"
 version = "0.0.1-alpha"
-description = "EPS Assurance Tool"
+description = "EPS API Tool"
 
 license = "MIT"
 

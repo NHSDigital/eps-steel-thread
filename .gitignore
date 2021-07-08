@@ -3,3 +3,4 @@ get-pip.py
 *.pyc
 .idea/
 node_modules/*
+templates/*
