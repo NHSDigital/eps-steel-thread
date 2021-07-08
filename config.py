@@ -1,4 +1,4 @@
 import os
 
 ENVIRONMENT = os.environ.get("ENVIRONMENT", "prod")
-STATIC_FOLDER='/templates/static'
+STATIC_FOLDER='/templates'
