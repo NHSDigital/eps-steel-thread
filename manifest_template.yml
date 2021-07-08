@@ -12,9 +12,6 @@ APIGEE_ENVIRONMENTS:
 meta:
   api:
     name: eps-api-tool
-    # guid: {{ config.guid }}
-    # spec_guids:
-    #   - {{ config.spec_guid }}
   schema_version: 1.1
 apigee:
   environments:
