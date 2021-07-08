@@ -1,2 +1,2 @@
 lint:
-    echo "Done"
+    echo Done
