@@ -1,7 +1,7 @@
 {
-  "name": "my-webpack-project",
+  "name": "EPSAT",
   "version": "1.0.0",
-  "description": "My webpack project",
+  "description": "EPS Assurance Tool",
   "main": "src/index.js",
   "scripts": {
     "test": "jest",
@@ -16,10 +16,6 @@
   },
   "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/NHSDigital/prescribing-demo/issues"
-  },
-  "homepage": "https://github.com/NHSDigital/prescribing-demo#readme",
   "devDependencies": {
     "@babel/core": "^7.14.6",
     "@babel/preset-env": "^7.14.7",
