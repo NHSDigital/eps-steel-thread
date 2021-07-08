@@ -12,12 +12,15 @@ const stylesHandler = 'style-loader';
 const config = {
     entry: './src/index.js',
     output: {
-        path: path.resolve(__dirname, 'templates')
+        path: path.resolve(__dirname),
+        filename: 'static/main.js'
     },
     plugins: [
         new HtmlWebpackPlugin({
             template: 'src/index.html',
-            filename: "client.html"
+            filename: "templates/client.html",
+            publicPath: "./"
+
         }),
         new CopyPlugin({
             patterns: [
@@ -54,8 +57,6 @@ const config = {
 module.exports = () => {
     if (isProduction) {
         config.mode = 'production';
-        
-        
     } else {
         config.mode = 'development';
     }
