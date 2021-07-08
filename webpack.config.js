@@ -23,7 +23,7 @@ const config = {
         }),
         new CopyPlugin({
             patterns: [
-              { from: "./src/static", to: "/static" },
+              { from: "./src/static", to: path.join(__dirname, "/static") },
             ],
           })
 

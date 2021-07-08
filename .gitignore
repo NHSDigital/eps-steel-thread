@@ -4,3 +4,4 @@ get-pip.py
 .idea/
 node_modules/*
 templates/*
+static/*
