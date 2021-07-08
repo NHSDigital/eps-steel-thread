@@ -1,6 +1,6 @@
-SERVICE_NAME: {{ config['x-meta'].service_name }}
-PRODUCT_DISPLAY_NAME: {{ config['x-meta'].product_display_name }}
-DESCRIPTION: {{ config['x-meta'].product_description }}
+SERVICE_NAME: eps-api-tool
+PRODUCT_DISPLAY_NAME: EPS API Tool
+DESCRIPTION: Assurance tool, prescription tracker, prescription viewer and demo client for the EPS FHIR API
 APIGEE_ENVIRONMENTS:
   - name: internal-dev
     display_name: Internal Development
@@ -11,10 +11,10 @@ APIGEE_ENVIRONMENTS:
 ---
 meta:
   api:
-    name: {{ config['x-meta'].service_name }}
-    guid: {{ config.guid }}
-    spec_guids:
-      - {{ config.spec_guid }}
+    name: eps-api-tool
+    # guid: {{ config.guid }}
+    # spec_guids:
+    #   - {{ config.spec_guid }}
   schema_version: 1.1
 apigee:
   environments:
@@ -42,9 +42,9 @@ apigee:
         quota: '300'
         quotaInterval: '1'
         quotaTimeUnit: minute
-    specs:
-      - name: {{ NAME }}
-        path: {{ SERVICE_NAME }}.json
+    # specs:
+    #   - name: {{ NAME }}
+    #     path: {{ SERVICE_NAME }}.json
     api_catalog:
       - edgeAPIProductName: {{ NAME }}
         anonAllowed: true
