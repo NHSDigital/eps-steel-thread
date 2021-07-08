@@ -12,6 +12,9 @@ APIGEE_ENVIRONMENTS:
 meta:
   api:
     name: eps-api-tool
+    guid: 699ee49f-fad2-4a52-aa20-7f920e3f27ca # todo: replace with real value
+    spec_guids:
+       - a3cf7f48-ff15-4d30-a0b2-a13e9d5193e1 # todo: replace with real value
   schema_version: 1.1
 apigee:
   environments:
