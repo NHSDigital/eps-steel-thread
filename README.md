@@ -1,4 +1,4 @@
-# Electronic Prescription Service Assurance Tool
+# Electronic Prescription Service API Tool
 
 This is a hosted site to assist with testing and tracking implemented features for the *Electronic Prescription Service FHIR® API*.
 
@@ -18,7 +18,7 @@ If you don't have a smartcard you can navigate to `/login` to select simulated a
 
 ## Backend
 
-The assurance tool is configured against the EPS environments above so any created prescriptions will be created and persisted in the matching EPS environment
+The tool is configured against the EPS environments above so any created prescriptions will be created and persisted in the matching EPS environment
 
 ## Features
 
