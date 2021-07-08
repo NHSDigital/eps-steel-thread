@@ -1,2 +1,4 @@
+SHELL=/bin/bash -euo pipefail
+
 lint:
-    echo Done
+    echo lint
