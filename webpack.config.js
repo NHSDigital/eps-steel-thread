@@ -21,14 +21,9 @@ const config = {
         }),
         new CopyPlugin({
             patterns: [
-              { from: "./src/static" },
+            { from: "./src/static", to: path.join(__dirname, "/static") },
             ],
         })
-        //   new CopyPlugin({
-        //       patterns: [
-        //         { from: "./src/static", to: path.join(__dirname, "/static") },
-        //       ],
-        //     })
     ],
     module: {
         rules: [

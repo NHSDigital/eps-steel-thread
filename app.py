@@ -25,9 +25,6 @@ def create_app():
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
     )
     
-    app.static_url_path=app.config.get('STATIC_FOLDER')
-    app.static_folder=app.root_path + app.static_url_path
-
     db.init_app(app)
     migrate.init_app(app, db)
 

@@ -82,7 +82,7 @@ def exclude_from_auth(*args, **kw):
 
 @app.before_request
 def auth_check():
-    if "/static/" in flask.request.path:
+    if "/static/" in flask.request.path or ".js" in flask.request.path:
         return
 
     flask.g.skip_auth = False
