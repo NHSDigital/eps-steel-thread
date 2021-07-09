@@ -1,13 +1,11 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyPlugin = require("copy-webpack-plugin");
+const nodeExternals = require('webpack-node-externals');
 
 const isProduction = process.env.NODE_ENV == 'production';
 
-
 const stylesHandler = 'style-loader';
-
-
 
 const config = {
     entry: './src/index.js',
@@ -55,8 +53,9 @@ const config = {
         ],
     },
     resolve: {
-        extensions: ['.tsx', '.ts', '.js'],
+      extensions: ['.tsx', '.ts', '.js']
     },
+    externals: [nodeExternals()]
 };
 
 module.exports = () => {
