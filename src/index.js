@@ -1,3 +1,4 @@
+import { debug } from 'webpack';
 import examplePrescriptions from './prescriptions'
 
 const pageData = {
