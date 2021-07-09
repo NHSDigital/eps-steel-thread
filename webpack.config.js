@@ -15,6 +15,9 @@ const config = {
         path: path.resolve(__dirname),
         filename: 'static/main.js'
     },
+    optimization: {
+        minimize: false,
+      },
     plugins: [
         new HtmlWebpackPlugin({
             template: 'src/index.html',

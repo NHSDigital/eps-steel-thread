@@ -2154,7 +2154,7 @@ const pageData = {
   
     return bundle;
   }
-  
+
   async function onLoad() {
     if (pageData.mode === "release" && pageData.prescriptionId) {
       pageData.selectedReleaseId = "custom";
