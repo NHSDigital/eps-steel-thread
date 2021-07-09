@@ -20,6 +20,7 @@ const config = {
             template: 'src/index.html',
             filename: "templates/client.html",
             publicPath: "./",
+            inject: "head",
             scriptLoading: "blocking"
 
         }),
