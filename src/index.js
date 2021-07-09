@@ -2142,11 +2142,12 @@ function createDispenseRequest(bundle) {
   medicationDispense.quantity =
     clonedMedicationRequest.dispenseRequest?.quantity ?? undefined;
 
-  window.startApplication = async function(mode, env, signResponse) {
+  window.savePythonVariables = function(mode, env, signResponse) {
     pageData.mode = mode
     pageData.environment = env
     pageData.signResponse = signResponse
-
+  }
+  window.startApplication = async function() {
     if (pageData.mode === "release" && pageData.prescriptionId) {
       pageData.selectedReleaseId = "custom";
       resetPageData("release");
