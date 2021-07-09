@@ -1,13 +1,11 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyPlugin = require("copy-webpack-plugin");
+const ReplaceInFileWebpackPlugin = require('replace-in-file-webpack-plugin');
 
 const isProduction = process.env.NODE_ENV == 'production';
 
-
 const stylesHandler = 'style-loader';
-
-
 
 const config = {
     entry: './src/index.js',
@@ -31,13 +29,21 @@ const config = {
             patterns: [
                 { from: "./src/static", to: path.join(__dirname, "/static") },
             ],
-        })
+        }),
+        new ReplaceInFileWebpackPlugin([{
+          dir: 'static',
+          files: ['main.js'],
+          rules: [{
+              search: '"use strict";',
+              replace: ''
+          }]
+        }])
     ],
     module: {
         rules: [
             {
                 test: /\.(js|jsx)$/i,
-                loader: 'babel-loader',
+                loader: 'babel-loader'
             },
             {
                 test: /\.(ts|tsx)$/i,
@@ -55,8 +61,8 @@ const config = {
         ],
     },
     resolve: {
-        extensions: ['.tsx', '.ts', '.js'],
-    },
+      extensions: ['.tsx', '.ts', '.js']
+    }
 };
 
 module.exports = () => {
