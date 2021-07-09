@@ -743,8 +743,7 @@
       {% if sign_response is not none and page_mode == "send" %}
         signResponse.signature = "{{sign_response.signature}}"
       {% endif %}
-      saveFlaskVariables(mode, env, signResponse)
-      startApplication()
+      startApplication(mode, env, signResponse)
     });
   </script>
 </body>

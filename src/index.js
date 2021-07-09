@@ -2141,51 +2141,23 @@ function createDispenseRequest(bundle) {
   ];
   medicationDispense.quantity =
     clonedMedicationRequest.dispenseRequest?.quantity ?? undefined;
+}
 
-  window.savePythonVariables = function(mode, env, signResponse) {
-    pageData.mode = mode
-    pageData.environment = env
-    pageData.signResponse = signResponse
-  }
-  window.startApplication = async function() {
-    if (pageData.mode === "release" && pageData.prescriptionId) {
-      pageData.selectedReleaseId = "custom";
-      resetPageData("release");
-    }
-    if (pageData.mode === "dispense") {
-      const prescriptionId = Cookies.get("Current-Prescription-Id");
-      const response = await makeRequest(
-        "GET",
-        `/prescribe/edit?prescription_id=${prescriptionId}`
-      );
-      pageData.signRequestSummary = getSummary(response);
-      resetPageData("dispense");
-    }
-    if (
-      pageData.mode === "send" &&
-      !pageData.sendResponse &&
-      Cookies.get("Skip-Signature-Page") === "True"
-    ) {
-      sendPrescriptionRequest();
-    }
-    document
-      .getElementById("prescription-test-pack")
-      .addEventListener("change", handleFileSelect, false);
-    if (pageData.mode === "cancel") {
-      const prescriptionId = Cookies.get("Current-Prescription-Id");
-      const response = await makeRequest(
-        "GET",
-        `/prescribe/edit?prescription_id=${prescriptionId}`
-      );
-      pageData.signRequestSummary = getSummary(response);
-      resetPageData("cancel");
-    }
-    bind();
-    document.querySelector("#main-content").style.display = "";
+function setInitialState (mode, env, signResponse) {
+  pageData.mode = mode
+  pageData.environment = env
+  pageData.signResponse = signResponse
+}
+
+window.startApplication = async function(mode, env, signResponse) {
+  setInitialState(mode, env, signResponse)
+  if (pageData.mode === "release" && pageData.prescriptionId) {
+    pageData.selectedReleaseId = "custom";
+    resetPageData("release");
   }
   if (pageData.mode === "dispense") {
     const prescriptionId = Cookies.get("Current-Prescription-Id");
-    const response = makeRequest(
+    const response = await makeRequest(
       "GET",
       `/prescribe/edit?prescription_id=${prescriptionId}`
     );
@@ -2204,7 +2176,7 @@ function createDispenseRequest(bundle) {
     .addEventListener("change", handleFileSelect, false);
   if (pageData.mode === "cancel") {
     const prescriptionId = Cookies.get("Current-Prescription-Id");
-    const response = makeRequest(
+    const response = await makeRequest(
       "GET",
       `/prescribe/edit?prescription_id=${prescriptionId}`
     );
@@ -2213,35 +2185,64 @@ function createDispenseRequest(bundle) {
   }
   bind();
   document.querySelector("#main-content").style.display = "";
+if (pageData.mode === "dispense") {
+  const prescriptionId = Cookies.get("Current-Prescription-Id");
+  const response = makeRequest(
+    "GET",
+    `/prescribe/edit?prescription_id=${prescriptionId}`
+  );
+  pageData.signRequestSummary = getSummary(response);
+  resetPageData("dispense");
+}
+if (
+  pageData.mode === "send" &&
+  !pageData.sendResponse &&
+  Cookies.get("Skip-Signature-Page") === "True"
+) {
+  sendPrescriptionRequest();
+}
+document
+  .getElementById("prescription-test-pack")
+  .addEventListener("change", handleFileSelect, false);
+if (pageData.mode === "cancel") {
+  const prescriptionId = Cookies.get("Current-Prescription-Id");
+  const response = makeRequest(
+    "GET",
+    `/prescribe/edit?prescription_id=${prescriptionId}`
+  );
+  pageData.signRequestSummary = getSummary(response);
+  resetPageData("cancel");
+}
+bind();
+document.querySelector("#main-content").style.display = "";
 }
 
 // IE compat, no default values for function args
 window.resetPageData = function(pageMode) {
-  pageData.mode = pageMode;
-  pageData.errorList = null;
-  pageData.sendResponse = null;
-  pageData.signResponse = null;
-  pageData.cancelResponse = null;
-  pageData.showCustomExampleInput =
-    pageMode === "load" ? pageData.selectedExampleId === "custom" : false;
-  pageData.showCustomPharmacyInput =
-    pageMode === "edit" || pageMode === "release"
-      ? pageData.selectedPharmacy === "custom"
-      : false;
-  pageData.showCustomPrescriptionIdInput =
-    pageMode === "release" ? pageData.selectedReleaseId === "custom" : false;
-  pageData.releaseResponse = null;
-  pageData.dispenseResponse = null;
-  pageData.selectedPharmacy =
-    pageMode === "edit" || pageMode === "release"
-      ? pageData.selectedPharmacy ?? "VNFKT"
-      : null;
-  if (pageData.mode == "sign") {
-    pageData.previous_prescription_id = Cookies.get("Previous-Prescription-Id");
-    pageData.next_prescription_id = Cookies.get("Next-Prescription-Id");
-  }
+pageData.mode = pageMode;
+pageData.errorList = null;
+pageData.sendResponse = null;
+pageData.signResponse = null;
+pageData.cancelResponse = null;
+pageData.showCustomExampleInput =
+  pageMode === "load" ? pageData.selectedExampleId === "custom" : false;
+pageData.showCustomPharmacyInput =
+  pageMode === "edit" || pageMode === "release"
+    ? pageData.selectedPharmacy === "custom"
+    : false;
+pageData.showCustomPrescriptionIdInput =
+  pageMode === "release" ? pageData.selectedReleaseId === "custom" : false;
+pageData.releaseResponse = null;
+pageData.dispenseResponse = null;
+pageData.selectedPharmacy =
+  pageMode === "edit" || pageMode === "release"
+    ? pageData.selectedPharmacy ?? "VNFKT"
+    : null;
+if (pageData.mode == "sign") {
+  pageData.previous_prescription_id = Cookies.get("Previous-Prescription-Id");
+  pageData.next_prescription_id = Cookies.get("Next-Prescription-Id");
 }
-
+}
 function bind() {
   rivets.bind(document.querySelector("#main-content"), pageData);
   document.getElementById("prescription-files").onchange = function (evt) {
