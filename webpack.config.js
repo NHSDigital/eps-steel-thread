@@ -1,7 +1,7 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyPlugin = require("copy-webpack-plugin");
-const nodeExternals = require('webpack-node-externals');
+const RemoveStrictPlugin = require( 'remove-strict-webpack-plugin' );
 
 const isProduction = process.env.NODE_ENV == 'production';
 
@@ -29,7 +29,8 @@ const config = {
             patterns: [
                 { from: "./src/static", to: path.join(__dirname, "/static") },
             ],
-        })
+        }),
+        new RemoveStrictPlugin()
     ],
     module: {
         rules: [
