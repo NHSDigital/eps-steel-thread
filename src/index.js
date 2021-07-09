@@ -377,7 +377,7 @@ function toUpperCaseIfPresent(field) {
   }
 }
 
-function sendLoadRequest() {
+window.sendLoadRequest = function() {
   const isCustom = pageData.selectedExampleId == "custom";
   const filePayloads = pageData.payloads;
   const textPayloads = [document.getElementById("prescription-textarea").value];
@@ -392,7 +392,7 @@ function sendLoadRequest() {
   }
 }
 
-function updateAuthMethod(authMethod) {
+window.updateAuthMethod = function(authMethod) {
   const response = makeRequest(
     "POST",
     "/login",
@@ -415,7 +415,7 @@ function makeRequest(method, url, body) {
   return JSON.parse(xhr.responseText);
 }
 
-function getEditRequest(previousOrNext) {
+window.getEditRequest = function(previousOrNext) {
   try {
     const prescriptionId =
       previousOrNext === "previous"
@@ -435,7 +435,7 @@ function getEditRequest(previousOrNext) {
   }
 }
 
-function sendEditRequest() {
+window.sendEditRequest = function() {
   try {
     const bundles = getPayloads();
     bundles.forEach((bundle) => {
@@ -526,7 +526,7 @@ function sanitiseProdTestData(bundle) {
   });
 }
 
-function sendSignRequest(skipSignaturePage) {
+window.sendSignRequest = function (skipSignaturePage) {
   try {
     const response = makeRequest(
       "POST",
@@ -540,7 +540,7 @@ function sendSignRequest(skipSignaturePage) {
   }
 }
 
-function sendPrescriptionRequest() {
+window.sendPrescriptionRequest = function() {
   try {
     const response = makeRequest("POST", "/prescribe/send", {});
     pageData.signResponse = null;
@@ -572,7 +572,7 @@ function sendPrescriptionRequest() {
   }
 }
 
-function sendCancelRequest() {
+window.sendCancelRequest = function() {
   try {
     const prescriptionId = Cookies.get("Current-Prescription-Id");
     const prescription = makeRequest(
@@ -623,7 +623,7 @@ function sendCancelRequest() {
   }
 }
 
-function sendReleaseRequest() {
+window.sendReleaseRequest = function() {
   try {
     const prescriptionId =
       pageData.selectedReleaseId === "custom"
@@ -675,7 +675,7 @@ function sendReleaseRequest() {
   }
 }
 
-function sendDispenseRequest() {
+window.sendDispenseRequest = function() {
   try {
     const prescriptionId = Cookies.get("Current-Prescription-Id");
     const bundle = makeRequest(
@@ -2142,8 +2142,11 @@ function createDispenseRequest(bundle) {
   medicationDispense.quantity =
     clonedMedicationRequest.dispenseRequest?.quantity ?? undefined;
 
-  async function onLoad() {
-    console.log("hi")
+  window.startApplication = async function(mode, env, signResponse) {
+    pageData.mode = mode
+    pageData.environment = env
+    pageData.signResponse = signResponse
+
     if (pageData.mode === "release" && pageData.prescriptionId) {
       pageData.selectedReleaseId = "custom";
       resetPageData("release");
@@ -2212,7 +2215,7 @@ function createDispenseRequest(bundle) {
 }
 
 // IE compat, no default values for function args
-function resetPageData(pageMode) {
+window.resetPageData = function(pageMode) {
   pageData.mode = pageMode;
   pageData.errorList = null;
   pageData.sendResponse = null;

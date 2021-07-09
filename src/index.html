@@ -14,16 +14,6 @@
   </style>
 </head>
 <body>
-  <script type="application/javascript">
-    pageData.mode = "{{page_mode}}"
-    pageData.environment = "{{environment}}"
-  </script>
-  {% if sign_response is not none and page_mode == "send" %}
-  <script type="text/javascript">
-    pageData.signResponse = {}
-    pageData.signResponse.signature = "{{sign_response.signature}}"
-  </script>
-  {% endif %}
   <header class="nhsuk-header nhsuk-header--transactional" role="banner">
     <div class="nhsuk-width-container nhsuk-header__container">
       <div class="nhsuk-header__logo nhsuk-header__logo--only">
@@ -747,9 +737,18 @@
   </div>
   <script type="text/javascript">
   document.addEventListener("DOMContentLoaded", (event) => {
-    console.log("html hi")
-    onLoad()
+    const mode = "{{page_mode}}"
+    const env = "{{environment}}"
+    const signResponse = {}
+    {% if sign_response is not none and page_mode == "send" %}
+      signResponse.signature = "{{sign_response.signature}}"
+    {% endif %}
+    startApplication(mode, env, signResponse)
   });
+</script>
+<script type="application/javascript">
+  pageData.mode = "{{page_mode}}"
+  pageData.environment = "{{environment}}"
 </script>
 </body>
 </html>
