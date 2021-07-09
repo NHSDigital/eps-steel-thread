@@ -2142,7 +2142,7 @@ function createDispenseRequest(bundle) {
   medicationDispense.quantity =
     clonedMedicationRequest.dispenseRequest?.quantity ?? undefined;
 
-  function onLoad() {
+  async function onLoad() {
     console.log("hi")
     if (pageData.mode === "release" && pageData.prescriptionId) {
       pageData.selectedReleaseId = "custom";
