@@ -401,7 +401,6 @@ const pageData = {
     window.location.href = response.redirectUri;
   }
   
-  // IE compatibility
   function makeRequest(method, url, body) {
     try {
       const response = fetch(
@@ -411,11 +410,6 @@ const pageData = {
           body: body, 
           headers: {"Content-Type": "application/json;charset=UTF-8"}
         })
-      // var xhr = new XMLHttpRequest();
-      // xhr.withCredentials = true;
-      // xhr.open(method, url, false);
-      // xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-      // xhr.send(body);
       return response.json();
     } catch {
       // if we get an undetecable cors error caused by oauth triggering on a post, then redirect to login

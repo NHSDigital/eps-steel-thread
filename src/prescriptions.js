@@ -5,12 +5,18 @@ const epsModelsUrl =
   "https://raw.githubusercontent.com/NHSDigital/electronic-prescription-service-api/master/examples";
 
 function getPrescription(path) {
-  var xmlHttp = new XMLHttpRequest();
-  // use string concatenation for IE compatibility, interpolation is not supported
-  xmlHttp.open("GET", epsModelsUrl + "/" + path, false);
-  xmlHttp.send(null);
-  const bundle = JSON.parse(xmlHttp.responseText);
-  return bundle;
+  const response = fetch(
+    epsModelsUrl + "/" + path,
+    {
+      method: "GET"
+    })
+  return response.json();
+  // var xmlHttp = new XMLHttpRequest();
+  // // use string concatenation for IE compatibility, interpolation is not supported
+  // xmlHttp.open("GET", epsModelsUrl + "/" + path, false);
+  // xmlHttp.send(null);
+  // const bundle = JSON.parse(xmlHttp.responseText);
+  // return bundle;
 }
 
 /**
