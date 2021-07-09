@@ -20,7 +20,7 @@ const config = {
         new HtmlWebpackPlugin({
             template: 'src/index.html',
             filename: "templates/client.html",
-            publicPath: "",
+            publicPath: "https://nhsd-epsat-int.herokuapp.com/",
             inject: "head",
             scriptLoading: "blocking"
 
