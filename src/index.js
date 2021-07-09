@@ -2160,6 +2160,7 @@ function createDispenseRequest(bundle) {
 }
 
 function onLoad() {
+  debugger;
   if (pageData.mode === "release" && pageData.prescriptionId) {
     pageData.selectedReleaseId = "custom";
     resetPageData("release");
