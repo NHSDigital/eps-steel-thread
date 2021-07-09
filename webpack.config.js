@@ -19,7 +19,8 @@ const config = {
         new HtmlWebpackPlugin({
             template: 'src/index.html',
             filename: "templates/client.html",
-            publicPath: "./"
+            publicPath: "./",
+            scriptLoading: "blocking"
 
         }),
         new CopyPlugin({
