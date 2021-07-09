@@ -13,7 +13,7 @@
     body{background-color: #f6b8b8;}
   </style>
 </head>
-<body onload="onLoad()">
+<body>
   <script type="application/javascript">
     pageData.mode = "{{page_mode}}"
     pageData.environment = "{{environment}}"
@@ -745,5 +745,11 @@
       </div>
     </main>
   </div>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", (event) => {
+      console.log("html hi")
+      onLoad()
+  });
+</script>
 </body>
 </html>
