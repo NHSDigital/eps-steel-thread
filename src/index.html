@@ -9,16 +9,6 @@
   <script type="application/javascript" src="./static/js.cookie-2.2.1.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.0/jszip.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.0/xlsx.js"></script>
-  <script type="application/javascript">
-    pageData.mode = "{{page_mode}}"
-    pageData.environment = "{{environment}}"
-  </script>
-  {% if sign_response is not none and page_mode == "send" %}
-  <script type="text/javascript">
-    pageData.signResponse = {}
-    pageData.signResponse.signature = "{{sign_response.signature}}"
-  </script>
-  {% endif %}
   <style rv-if="environment | isProd">
     body{background-color: #f6b8b8;}
   </style>

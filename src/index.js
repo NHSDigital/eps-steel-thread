@@ -2239,3 +2239,13 @@ const pageData = {
     };
   }
   
+  // <script type="application/javascript">
+  //   pageData.mode = "{{page_mode}}"
+  //   pageData.environment = "{{environment}}"
+  // </script>
+  // {% if sign_response is not none and page_mode == "send" %}
+  // <script type="text/javascript">
+  //   pageData.signResponse = {}
+  //   pageData.signResponse.signature = "{{sign_response.signature}}"
+  // </script>
+  // {% endif %}
