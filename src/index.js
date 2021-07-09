@@ -392,8 +392,8 @@ const pageData = {
     }
   }
   
-  function updateAuthMethod(authMethod) {
-    const response = makeRequest(
+  async function updateAuthMethod(authMethod) {
+    const response = await makeRequest(
       "POST",
       "/login",
       JSON.stringify({ authMethod: authMethod })
@@ -401,9 +401,9 @@ const pageData = {
     window.location.href = response.redirectUri;
   }
   
-  function makeRequest(method, url, body) {
+  async function makeRequest(method, url, body) {
     try {
-      const response = fetch(
+      const response = await fetch(
         url,
         {
           method: method, 
@@ -417,13 +417,13 @@ const pageData = {
     }
   }
   
-  function getEditRequest(previousOrNext) {
+  async function getEditRequest(previousOrNext) {
     try {
       const prescriptionId =
         previousOrNext === "previous"
           ? pageData.previous_prescription_id
           : pageData.next_prescription_id;
-      const response = makeRequest(
+      const response = await makeRequest(
         "GET",
         `/prescribe/edit?prescription_id=${prescriptionId}`
       );
@@ -437,7 +437,7 @@ const pageData = {
     }
   }
   
-  function sendEditRequest() {
+  async function sendEditRequest() {
     try {
       const bundles = getPayloads();
       bundles.forEach((bundle) => {
@@ -445,7 +445,7 @@ const pageData = {
         updateNominatedPharmacy(bundle, getOdsCode());
         sanitiseProdTestData(bundle);
       });
-      const response = makeRequest(
+      const response = await makeRequest(
         "POST",
         "/prescribe/edit",
         JSON.stringify(bundles)
@@ -523,9 +523,9 @@ const pageData = {
     })
   }
   
-  function sendSignRequest(skipSignaturePage) {
+  async function sendSignRequest(skipSignaturePage) {
     try {
-      const response = makeRequest(
+      const response = await makeRequest(
         "POST",
         "/prescribe/sign",
         JSON.stringify({ skipSignaturePage })
@@ -537,9 +537,9 @@ const pageData = {
     }
   }
   
-  function sendPrescriptionRequest() {
+  async function sendPrescriptionRequest() {
     try {
-      const response = makeRequest("POST", "/prescribe/send", {});
+      const response = await makeRequest("POST", "/prescribe/send", {});
       pageData.signResponse = null;
       pageData.sendResponse = {};
       pageData.sendResponse.prescriptionId = response.prescription_id;
@@ -569,16 +569,16 @@ const pageData = {
     }
   }
   
-  function sendCancelRequest() {
+  async function sendCancelRequest() {
     try {
       const prescriptionId = Cookies.get("Current-Prescription-Id");
-      const prescription = makeRequest(
+      const prescription = await makeRequest(
         "GET",
         `/prescribe/edit?prescription_id=${prescriptionId}`
       );
       resetPageData("cancel");
       const cancellation = createCancellation(prescription);
-      const response = makeRequest(
+      const response = await makeRequest(
         "POST",
         "/prescribe/cancel",
         JSON.stringify(cancellation)
@@ -620,7 +620,7 @@ const pageData = {
     }
   }
   
-  function sendReleaseRequest() {
+  async function sendReleaseRequest() {
     try {
       const prescriptionId =
         pageData.selectedReleaseId === "custom"
@@ -630,7 +630,7 @@ const pageData = {
         prescriptionId,
         odsCode: getOdsCode(),
       };
-      const response = makeRequest(
+      const response = await makeRequest(
         "POST",
         "/dispense/release",
         JSON.stringify(request)
@@ -672,15 +672,15 @@ const pageData = {
     }
   }
   
-  function sendDispenseRequest() {
+  async function sendDispenseRequest() {
     try {
       const prescriptionId = Cookies.get("Current-Prescription-Id");
-      const bundle = makeRequest(
+      const bundle = await makeRequest(
         "GET",
         `/prescribe/edit?prescription_id=${prescriptionId}`
       );
       const dispenseRequest = createDispenseRequest(bundle);
-      const response = makeRequest(
+      const response = await makeRequest(
         "POST",
         "/dispense/dispense",
         JSON.stringify(dispenseRequest)
@@ -2155,14 +2155,14 @@ const pageData = {
     return bundle;
   }
   
-  function onLoad() {
+  async function onLoad() {
     if (pageData.mode === "release" && pageData.prescriptionId) {
       pageData.selectedReleaseId = "custom";
       resetPageData("release");
     }
     if (pageData.mode === "dispense") {
       const prescriptionId = Cookies.get("Current-Prescription-Id");
-      const response = makeRequest(
+      const response = await makeRequest(
         "GET",
         `/prescribe/edit?prescription_id=${prescriptionId}`
       );
@@ -2181,7 +2181,7 @@ const pageData = {
       .addEventListener("change", handleFileSelect, false);
     if (pageData.mode === "cancel") {
       const prescriptionId = Cookies.get("Current-Prescription-Id");
-      const response = makeRequest(
+      const response = await makeRequest(
         "GET",
         `/prescribe/edit?prescription_id=${prescriptionId}`
       );

@@ -4,8 +4,8 @@
 const epsModelsUrl =
   "https://raw.githubusercontent.com/NHSDigital/electronic-prescription-service-api/master/examples";
 
-function getPrescription(path) {
-  const response = fetch(
+async function getPrescription(path) {
+  const response = await fetch(
     epsModelsUrl + "/" + path,
     {
       method: "GET"
@@ -23,28 +23,28 @@ function getPrescription(path) {
  * Examples
  */
 export default {
-  PRIMARY_CARE_ACUTE_NOMINATED: getPrescription(
+  PRIMARY_CARE_ACUTE_NOMINATED: await getPrescription(
     "primary-care/acute/nominated-pharmacy/medical-prescriber/1-Prepare-Request-200_OK.json"
   ),
-  PRIMARY_CARE_REPEAT_PRESCRIBING_NOMINATED: getPrescription(
+  PRIMARY_CARE_REPEAT_PRESCRIBING_NOMINATED: await getPrescription(
     "primary-care/repeat-prescribing/1-Prepare-Request-200_OK.json"
   ),
-  SECONDARY_CARE_COMMUNITY_ACUTE_NOMINATED: getPrescription(
+  SECONDARY_CARE_COMMUNITY_ACUTE_NOMINATED: await getPrescription(
     "secondary-care/community/acute/nominated-pharmacy/clinical-practitioner/1-Prepare-Request-200_OK.json"
   ),
-  SECONDARY_CARE_COMMUNITY_ACUTE_NON_NOMINATED: getPrescription(
+  SECONDARY_CARE_COMMUNITY_ACUTE_NON_NOMINATED: await getPrescription(
     "secondary-care/community/acute/no-nominated-pharmacy/clinical-practitioner/1-Prepare-Request-200_OK.json"
   ),
-  SECONDARY_CARE_REPEAT_DISPENSING_NOMINATED: getPrescription(
+  SECONDARY_CARE_REPEAT_DISPENSING_NOMINATED: await getPrescription(
     "secondary-care/community/repeat-dispensing/nominated-pharmacy/clinical-practitioner/multiple-medication-requests/prescriber-endorsed/1-Prepare-Request-200_OK.json"
   ),
-  SECONDARY_CARE_COMMUNITY_ACUTE_NON_NOMINATED: getPrescription(
+  SECONDARY_CARE_COMMUNITY_ACUTE_NON_NOMINATED: await getPrescription(
     "secondary-care/community/acute/no-nominated-pharmacy/clinical-practitioner/1-Prepare-Request-200_OK.json"
   ),
-  SECONDARY_CARE_REPEAT_DISPENSING_NOMINATED: getPrescription(
+  SECONDARY_CARE_REPEAT_DISPENSING_NOMINATED: await getPrescription(
     "secondary-care/community/repeat-dispensing/nominated-pharmacy/clinical-practitioner/multiple-medication-requests/prescriber-endorsed/1-Prepare-Request-200_OK.json"
   ),
-  HOMECARE_ACUTE_NOMINATED: getPrescription(
+  HOMECARE_ACUTE_NOMINATED: await getPrescription(
     "secondary-care/homecare/acute/nominated-pharmacy/clinical-practitioner/1-Prepare-Request-200_OK.json"
   )
 }
