@@ -55,7 +55,8 @@ const config = {
     resolve: {
       extensions: ['.tsx', '.ts', '.js']
     },
-    externals: [nodeExternals()]
+    target: 'node',
+    // externals: [nodeExternals()]
 };
 
 module.exports = () => {
