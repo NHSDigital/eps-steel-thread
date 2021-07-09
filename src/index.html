@@ -736,19 +736,15 @@
     </main>
   </div>
   <script type="text/javascript">
-  document.addEventListener("DOMContentLoaded", (event) => {
-    const mode = "{{page_mode}}"
-    const env = "{{environment}}"
-    const signResponse = {}
-    {% if sign_response is not none and page_mode == "send" %}
-      signResponse.signature = "{{sign_response.signature}}"
-    {% endif %}
-    startApplication(mode, env, signResponse)
-  });
-</script>
-<script type="application/javascript">
-  pageData.mode = "{{page_mode}}"
-  pageData.environment = "{{environment}}"
-</script>
+    document.addEventListener("DOMContentLoaded", (event) => {
+      const mode = "{{page_mode}}"
+      const env = "{{environment}}"
+      const signResponse = {}
+      {% if sign_response is not none and page_mode == "send" %}
+        signResponse.signature = "{{sign_response.signature}}"
+      {% endif %}
+      startApplication(mode, env, signResponse)
+    });
+  </script>
 </body>
 </html>
