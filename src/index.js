@@ -910,19 +910,19 @@ function getLongFormIdExtension(extensions) {
   })[0];
 }
 
-// window.onerror = function (msg, url, line, col, error) {
-//   // todo: fix cancellation page checkbox, prevent rivets from publishing checkbox values
-//   if (
-//     pageData.mode === "cancel" &&
-//     msg === "Uncaught TypeError: Cannot read property 'length' of undefined"
-//   ) {
-//     return true;
-//   }
-//   addError(
-//     "Unhandled error: " + msg + " at " + url + ":" + line + " col " + col
-//   );
-//   return true;
-// };
+window.onerror = function (msg, url, line, col, error) {
+  // todo: fix cancellation page checkbox, prevent rivets from publishing checkbox values
+  if (
+    pageData.mode === "cancel" &&
+    msg === "Uncaught TypeError: Cannot read property 'length' of undefined"
+  ) {
+    return true;
+  }
+  addError(
+    "Unhandled error: " + msg + " at " + url + ":" + line + " col " + col
+  );
+  return true;
+};
 
 function addError(message) {
   if (pageData.errorList === undefined || pageData.errorList === null) {
