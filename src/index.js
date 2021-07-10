@@ -2,7 +2,7 @@ import examplePrescriptions from "./prescriptions";
 
 // hook for rivets callback executing on window unintentionally
 window.call = function(element, event, pageData) {
-  bind()
+  event.preventDefault();
 }
 
 const pageData = {
