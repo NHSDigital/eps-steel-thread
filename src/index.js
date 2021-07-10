@@ -113,9 +113,9 @@ function Prescription(id, description, message) {
   this.id = id;
   this.description = description;
   this.message = message;
-  this.select = function () {
-    pageData.selectedExampleId = id;
-    pageData.showCustomExampleInput = id === "custom";
+  this.select = function (event, rivetsBinding) {
+    pageData.selectedExampleId = rivetsBinding.id;
+    pageData.showCustomExampleInput = rivetsBinding.id === "custom";
     resetPageData(pageData.mode);
   };
 }
