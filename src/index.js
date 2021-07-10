@@ -2,6 +2,10 @@ import examplePrescriptions from "./prescriptions";
 
 // hook for rivets callback executing on window unintentionally
 window.call = function(element, event, pageData) {}
+// prevent rivets from publishing undefined values for input
+rivets.binders.input = {
+  publishes: false
+};
 
 const pageData = {
   examples: [
@@ -119,7 +123,7 @@ function Prescription(id, description, message) {
   this.select = function () {
     pageData.selectedExampleId = id;
     pageData.showCustomExampleInput = id === "custom";
-    //resetPageData(pageData.mode);
+    resetPageData(pageData.mode);
   };
 }
 
