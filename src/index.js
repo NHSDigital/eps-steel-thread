@@ -2217,8 +2217,7 @@ bind();
 document.querySelector("#main-content").style.display = "";
 }
 
-// IE compat, no default values for function args
-window.resetPageData = function(pageMode) {
+function resetPageData(pageMode) {
 pageData.mode = pageMode;
 pageData.errorList = null;
 pageData.sendResponse = null;
@@ -2243,6 +2242,8 @@ if (pageData.mode == "sign") {
   pageData.next_prescription_id = Cookies.get("Next-Prescription-Id");
 }
 }
+window.resetPageData = resetPageData
+
 function bind() {
   rivets.bind(document.querySelector("#main-content"), pageData);
   document.getElementById("prescription-files").onchange = function (evt) {
