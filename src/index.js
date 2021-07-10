@@ -1,11 +1,7 @@
 import examplePrescriptions from "./prescriptions";
 
 // hook for rivets callback executing on window unintentionally
-window.call = function(element, event, pageData) {
-  event.preventDefault();
-  //document.querySelectorAll("input").filter(i => i.type === "radio").forEach(radio => radio.checked = false)
-  //event.target.checked = true;
-}
+window.call = function(element, event, pageData) {}
 
 const pageData = {
   examples: [
@@ -121,9 +117,9 @@ function Prescription(id, description, message) {
   this.description = description;
   this.message = message;
   this.select = function () {
-    this.selectedExampleId = id;
+    pageData.selectedExampleId = id;
     pageData.showCustomExampleInput = id === "custom";
-    resetPageData(pageData.mode);
+    //resetPageData(pageData.mode);
   };
 }
 
