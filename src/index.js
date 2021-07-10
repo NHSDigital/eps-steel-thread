@@ -1,5 +1,8 @@
 import examplePrescriptions from "./prescriptions";
 
+// hook for rivets callback executing on window unintentionally
+window.call = function(element, event, pageData) {}
+
 const pageData = {
   examples: [
     // todo: commented out prescriptions either add missing prescription or fix issues in send
@@ -113,9 +116,9 @@ function Prescription(id, description, message) {
   this.id = id;
   this.description = description;
   this.message = message;
-  this.select = function (event, rivetsBinding) {
-    pageData.selectedExampleId = rivetsBinding["%example%"];
-    pageData.showCustomExampleInput = rivetsBinding["%example%"] === "custom";
+  this.select = function () {
+    pageData.selectedExampleId = id;
+    pageData.showCustomExampleInput = id === "custom";
     resetPageData(pageData.mode);
   };
 }
