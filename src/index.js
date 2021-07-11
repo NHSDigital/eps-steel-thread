@@ -2134,8 +2134,11 @@ function createDispenseRequest(bundle) {
       text: "4 times a day for 7 days",
     },
   ];
-  medicationDispense.quantity =
-    clonedMedicationRequest.dispenseRequest?.quantity ?? undefined;
+  medicationDispense.quantity = clonedMedicationRequest.dispenseRequest?.quantity ?? undefined;
+  bundle.entry = []
+  bundle.entry.push(clonedHeaderEntry);
+  bundle.entry.push(medicationDispenseEntry);
+  return bundle;
 }
 
 function setInitialState (mode, env, signResponse) {
