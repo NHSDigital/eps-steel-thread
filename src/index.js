@@ -2166,8 +2166,8 @@ window.startApplication = async function(mode, env, signResponse) {
   ) {
     sendPrescriptionRequest();
   }
-  else if (pageData.mode === "send") {
-    if (pageData.environment !== "prod") {
+  if (pageData.mode === "send") {
+    if (env !== "prod") {
       pageData.actions.push(new PrescriptionAction("release", "Release"));
       pageData.actions.push(new PrescriptionAction("dispense", "Dispense"));
     }
