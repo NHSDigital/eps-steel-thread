@@ -2,9 +2,9 @@ import examplePrescriptions from "./prescriptions";
 
 // hook for rivets callback executing on window unintentionally
 window.call = function(element, event, pageData) {}
-rivets.binders.input = {
-  publishes: false
-};
+// rivets.binders.input = {
+//   publishes: false
+// };
 // rivets.configure({
 //   handler: function(target, event, binding) {
 //     if (event.target.name !== "example") {
@@ -2198,36 +2198,6 @@ window.startApplication = async function(mode, env, signResponse) {
   }
   bind();
   document.querySelector("#main-content").style.display = "";
-if (pageData.mode === "dispense") {
-  const prescriptionId = Cookies.get("Current-Prescription-Id");
-  const response = makeRequest(
-    "GET",
-    `/prescribe/edit?prescription_id=${prescriptionId}`
-  );
-  pageData.signRequestSummary = getSummary(response);
-  resetPageData("dispense");
-}
-if (
-  pageData.mode === "send" &&
-  !pageData.sendResponse &&
-  Cookies.get("Skip-Signature-Page") === "True"
-) {
-  sendPrescriptionRequest();
-}
-document
-  .getElementById("prescription-test-pack")
-  .addEventListener("change", handleFileSelect, false);
-if (pageData.mode === "cancel") {
-  const prescriptionId = Cookies.get("Current-Prescription-Id");
-  const response = makeRequest(
-    "GET",
-    `/prescribe/edit?prescription_id=${prescriptionId}`
-  );
-  pageData.signRequestSummary = getSummary(response);
-  resetPageData("cancel");
-}
-bind();
-document.querySelector("#main-content").style.display = "";
 }
 
 function resetPageData(pageMode) {
