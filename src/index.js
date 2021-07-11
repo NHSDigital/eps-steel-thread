@@ -1833,7 +1833,7 @@ function createPrescriptionType(system, code) {
   };
 }
 
-function doPrescriptionAction(select) {
+window.doPrescriptionAction = function(select) {
   const value = select.value;
   const prescriptionId = Cookies.get("Current-Prescription-Id");
   switch (value) {
