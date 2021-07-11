@@ -5,13 +5,13 @@ window.call = function(element, event, pageData) {}
 rivets.binders.input = {
   publishes: false
 };
-rivets.configure({
-  handler: function(target, event, binding) {
-    if (event.target.name !== "example") {
-      this.call(target, event, binding.view.models)
-    }
-  }
-});
+// rivets.configure({
+//   handler: function(target, event, binding) {
+//     if (event.target.name !== "example") {
+//       this.call(target, event, binding.view.models)
+//     }
+//   }
+// });
 
 const pageData = {
   examples: [
