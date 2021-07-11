@@ -739,9 +739,10 @@
     document.addEventListener("DOMContentLoaded", (event) => {
       const mode = "{{page_mode}}"
       const env = "{{environment}}"
-      const signResponse = null
       {% if sign_response is not none and page_mode == "send" %}
-        signResponse = {signature: "{{sign_response.signature}}"}
+      const signResponse = {signature: "{{sign_response.signature}}"}
+      {% else %}
+      const signResponse = null
       {% endif %}
       startApplication(mode, env, signResponse)
     });
