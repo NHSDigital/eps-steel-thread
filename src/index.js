@@ -1,18 +1,5 @@
 import examplePrescriptions from "./prescriptions";
 
-// hook for rivets callback executing on window unintentionally
-window.call = function(element, event, pageData) {}
-// rivets.binders.input = {
-//   publishes: false
-// };
-// rivets.configure({
-//   handler: function(target, event, binding) {
-//     if (event.target.name !== "example") {
-//       this.call(target, event, binding.view.models)
-//     }
-//   }
-// });
-
 const pageData = {
   examples: [
     // todo: commented out prescriptions either add missing prescription or fix issues in send
