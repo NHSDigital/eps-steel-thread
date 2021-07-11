@@ -104,11 +104,6 @@ const pageData = {
   payloads: [],
 };
 
-if (pageData.environment !== "prod") {
-  pageData.actions.push(new PrescriptionAction("release", "Release"));
-  pageData.actions.push(new PrescriptionAction("dispense", "Dispense"));
-}
-
 function Prescription(id, description, message) {
   this.id = id;
   this.description = description;
@@ -2170,6 +2165,12 @@ window.startApplication = async function(mode, env, signResponse) {
     Cookies.get("Skip-Signature-Page") === "True"
   ) {
     sendPrescriptionRequest();
+  }
+  else if (pageData.mode === "send") {
+    if (pageData.environment !== "prod") {
+      pageData.actions.push(new PrescriptionAction("release", "Release"));
+      pageData.actions.push(new PrescriptionAction("dispense", "Dispense"));
+    }
   }
   document
     .getElementById("prescription-test-pack")
