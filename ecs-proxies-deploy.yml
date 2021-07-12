@@ -1,0 +1,51 @@
+docker_service_cpu: 512
+docker_service_memory: 512
+docker_service_autoscaling_prod:
+    service_metric: ALBRequestCountPerTarget
+    target_value: 1800
+docker_service_autoscaling: "{{ docker_service_autoscaling_prod if APIGEE_ENVIRONMENT in ('ref', 'prod') else dict() }}"
+docker_service_health_check_grace_period_seconds: 180
+docker_service:
+    - name: eps-api-tool
+      port: 9000
+      expose: true
+      environment:
+          - name: LOG_LEVEL
+            value: "{{ 'debug' if APIGEE_ENVIRONMENT == 'internal-dev' else 'info' }}"
+          - name: COMMIT_ID
+            value: "{{ SOURCE_COMMIT_ID }}"
+          - name: ENVIRONMENT
+            value: "{{ APIGEE_ENVIRONMENT }}"
+          - name: DATABASE_URL
+            value: "PLACEHOLDER"
+          - name: DEMO_APP_CLIENT_ID
+            value: "PLACEHOLDER"
+          - name: DEMO_APP_CLIENT_SECRET
+            value: "PLACEHOLDER"
+          - name: DEMO_APP_KEY_ID
+            value: "PLACEHOLDER"
+          - name: DEMO_APP_PRIVATE_KEY
+            value: "PLACEHOLDER"
+          - name: DEMO_BASE_PATH
+            value: "PLACEHOLDER"
+          - name: EPS_BASE_PATH
+            value: "PLACEHOLDER"
+          - name: OAUTH_BASE_PATH
+            value: "PLACEHOLDER"
+          - name: OAUTH_REDIRECT_URI
+            value: "PLACEHOLDER"
+          - name: RSS_JWT_ISSUER
+            value: "PLACEHOLDER"
+          - name: RSS_JWT_KID
+            value: "PLACEHOLDER"
+          - name: RSS_JWT_PRIVATE_KEY
+            value: "PLACEHOLDER"
+          - name: RSS_JWT_SUBJECT
+            value: "PLACEHOLDER"
+          - name: SESSION_TOKEN_ENCRYPTION_KEY
+            value: "PLACEHOLDER"
+          - name: SIGNING_BASE_PATH
+            value: "PLACEHOLDER"
+          health_check:
+          matcher: "200"
+          path: "/_healthcheck"
