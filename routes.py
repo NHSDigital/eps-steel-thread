@@ -65,6 +65,7 @@ SEND_URL = "/prescribe/send"
 CANCEL_URL = "/prescribe/cancel"
 RELEASE_URL = "/dispense/release"
 DISPENSE_URL = "/dispense/dispense"
+HEALTHCHECK_URL = "/_healthcheck"
 
 
 def exclude_from_auth(*args, **kw):
@@ -128,6 +129,11 @@ def get_authorize_url(state, auth_method):
     }
     return f"{oauth_base_path}/authorize?{urlencode(query_params)}"
 
+
+@app.route("/_healthcheck", methods=["GET"])
+@exclude_from_auth()
+def get_healthcheck():
+    return app.make_response()
 
 @app.route("/login", methods=["GET"])
 @exclude_from_auth()
