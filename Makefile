@@ -7,5 +7,5 @@ publish:
 	echo Publish
 
 release:
-    mkdir -p dist
+	mkdir -p dist
 	cp eps-api-tool.json dist/
