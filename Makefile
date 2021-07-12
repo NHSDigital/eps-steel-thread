@@ -7,4 +7,4 @@ publish:
 	echo Publish
 
 release:
-	echo Release
+	cp eps-api-tool.json dist/
