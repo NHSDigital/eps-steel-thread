@@ -8,5 +8,5 @@ publish:
 
 release:
 	mkdir -p dist/proxies/live
-	cp eps-api-tool.json dist/
+	cp specification/eps-api-tool.json dist/
 	cp -Rv proxies/live/apiproxy dist/proxies/live
