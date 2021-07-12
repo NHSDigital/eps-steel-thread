@@ -46,6 +46,6 @@ docker_service:
             value: "PLACEHOLDER"
           - name: SIGNING_BASE_PATH
             value: "PLACEHOLDER"
-          health_check:
+      health_check:
           matcher: "200"
           path: "/_healthcheck"
