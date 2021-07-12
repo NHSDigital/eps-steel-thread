@@ -14,10 +14,10 @@ meta:
     name: eps-api-tool
     guid: 699ee49f-fad2-4a52-aa20-7f920e3f27ca
     spec_guids: ['a3cf7f48-ff15-4d30-a0b2-a13e9d5193e1']
-  schema_version: 1.1
+  schema_version: 1
 apigee:
   environments:
-{% raw %}{% for ENV in APIGEE_ENVIRONMENTS %}
+{% for ENV in APIGEE_ENVIRONMENTS %}
 {% set TITLE = 'EPS API Tool (' + ENV.display_name + ')' %}
 {% set DESCRIPTION = 'EPS API Tool - ' + ENV.display_name | lower + ' environment' %}
 {% set NAME = 'eps-api-tool-' + ENV.name %}
@@ -53,4 +53,4 @@ apigee:
         title: {{ TITLE }}
         visibility: false
         specId: {{ NAME }}
-{% endfor %}{% endraw %}
+{% endfor %}
