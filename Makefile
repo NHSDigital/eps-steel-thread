@@ -7,5 +7,6 @@ publish:
 	echo Publish
 
 release:
-	mkdir -p dist
+	mkdir -p dist/proxies/live
 	cp eps-api-tool.json dist/
+    cp -Rv proxies/live/apiproxy dist/proxies/live
