@@ -135,6 +135,11 @@ def get_authorize_url(state, auth_method):
 def get_healthcheck():
     return app.make_response()
 
+@app.route("/_status", methods=["GET"])
+@exclude_from_auth()
+def get_status():
+    return app.make_response()
+
 @app.route("/login", methods=["GET"])
 @exclude_from_auth()
 def get_login():
