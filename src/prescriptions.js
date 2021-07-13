@@ -33,10 +33,6 @@ const SECONDARY_CARE_COMMUNITY_ACUTE_NON_NOMINATED = getPrescription(
 const HOMECARE_ACUTE_NOMINATED = getPrescription(
   "secondary-care/homecare/acute/nominated-pharmacy/clinical-practitioner/1-Prepare-Request-200_OK.json"
 )
-//let PRIMARY_CARE_REPEAT_DISPENSING_NOMINATED = getPrescription("primary-care/repeat-dispensing/nominated-pharmacy/medical-prescriber/author/gmc/responsible-party/medication-list/din/1-Prepare-Request-200_OK.json")
-//let SECONDARY_CARE_REPEAT_PRESCRIBING_NOMINATED = getPrescription("todo")
-//let HOMECARE_REPEAT_DISPENSING_NOMINATED = getPrescription("todo")
-//let HOMECARE_REPEAT_PRESCRIBING_NOMINATED = getPrescription("todo")
 /* eslint-enable max-len */
 export default {
   PRIMARY_CARE_ACUTE_NOMINATED,
