@@ -28,5 +28,3 @@ The tool is configured against the EPS environments above so any created prescri
 * Send a prescription
 * Release prescriptions for a pharmacy
 * Dispense a prescription
-
-
