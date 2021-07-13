@@ -506,14 +506,14 @@ function sanitiseProdTestData(bundle) {
   }
 
   const patientBundleEntry = bundle.entry.find(
-    (entry) => entry.resource.resourceType === "Patient"
+    entry => entry.resource.resourceType === "Patient"
   )
   patientBundleEntry.resource = TEST_PATIENT
 
   const medicationRequestBundleEntry = bundle.entry.filter(
-    (entry) => entry.resource.resourceType === "MedicationRequest"
+    entry => entry.resource.resourceType === "MedicationRequest"
   )
-  medicationRequestBundleEntry.forEach((entry) => {
+  medicationRequestBundleEntry.forEach(entry => {
     const medicationRequest = entry.resource
     medicationRequest.note = [{text: "TEST PRESCRIPTION - DO NOT DISPENSE"}]
     medicationRequest.dosageInstruction[0].patientInstruction =
@@ -2021,7 +2021,7 @@ function createDispenseRequest(bundle) {
     'input[name="dispense-medications"]:checked'
   )[0].value
   const medicationRequestEntries = bundle.entry.filter(
-    (entry) => entry.resource.resourceType === "MedicationRequest"
+    entry => entry.resource.resourceType === "MedicationRequest"
   )
 
   const medicationRequestEntryToDispense = medicationRequestEntries.filter(
