@@ -24,6 +24,7 @@ def create_app():
         or "sqlite:///" + os.path.join(app.instance_path, "epsdemo.sqlite"),
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
     )
+    
     db.init_app(app)
     migrate.init_app(app, db)
 

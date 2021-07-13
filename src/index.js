@@ -1,33 +1,35 @@
+import examplePrescriptions from "./prescriptions";
+
 const pageData = {
   examples: [
     // todo: commented out prescriptions either add missing prescription or fix issues in send
     new Prescription(
       "1",
       "Primary Care - Acute (nominated)",
-      PRIMARY_CARE_ACUTE_NOMINATED
+      examplePrescriptions.PRIMARY_CARE_ACUTE_NOMINATED
     ),
     //new Prescription("2", "Primary Care - Repeat Dispensing (nominated)", PRIMARY_CARE_REPEAT_DISPENSING_NOMINATED),
     new Prescription(
       "3",
       "Primary Care - Repeat Prescribing (nominated)",
-      PRIMARY_CARE_REPEAT_PRESCRIBING_NOMINATED
+      examplePrescriptions.PRIMARY_CARE_REPEAT_PRESCRIBING_NOMINATED
     ),
     new Prescription(
       "4",
       "Secondary Care - Acute (nominated)",
-      SECONDARY_CARE_COMMUNITY_ACUTE_NOMINATED
+      examplePrescriptions.SECONDARY_CARE_COMMUNITY_ACUTE_NOMINATED
     ),
     new Prescription(
       "5",
       "Secondary Care - Acute",
-      SECONDARY_CARE_COMMUNITY_ACUTE_NON_NOMINATED
+      examplePrescriptions.SECONDARY_CARE_COMMUNITY_ACUTE_NON_NOMINATED
     ),
     //new Prescription("6", "Secondary Care - Repeat Dispensing (nominated)", SECONDARY_CARE_REPEAT_DISPENSING_NOMINATED),
     //new Prescription("7", "Secondary Care - Repeat Prescribing (nominated)", SECONDARY_CARE_REPEAT_PRESCRIBING_NOMINATED),
     new Prescription(
       "8",
       "Homecare - Acute (nominated)",
-      HOMECARE_ACUTE_NOMINATED
+      examplePrescriptions.HOMECARE_ACUTE_NOMINATED
     ),
     //new Prescription("9", "Homecare - Repeat Dispensing (nominated)", HOMECARE_REPEAT_DISPENSING_NOMINATED),
     //new Prescription("10", "Homecare - Repeat Prescribing (nominated)", HOMECARE_REPEAT_PRESCRIBING_NOMINATED),
@@ -44,7 +46,7 @@ const pageData = {
   ],
   actions: [
     new PrescriptionAction("", ""),
-    new PrescriptionAction("cancel", "Cancel")
+    new PrescriptionAction("cancel", "Cancel"),
   ],
   reasons: [
     new CancellationReason("0001", "Prescribing Error"),
@@ -101,11 +103,6 @@ const pageData = {
   ),
   payloads: [],
 };
-
-if (pageData.environment !== "prod") {
-  pageData.actions.push(new PrescriptionAction("release", "Release"))
-  pageData.actions.push(new PrescriptionAction("dispense", "Dispense"))
-}
 
 function Prescription(id, description, message) {
   this.id = id;
@@ -343,11 +340,11 @@ rivets.formatters.appendPageMode = function (string) {
 
 rivets.formatters.displayEnvironment = function (environment) {
   if (environment === "prod") {
-    return "Production"
+    return "Production";
   } else if (environment === "int") {
-    return "Integration"
+    return "Integration";
   } else {
-    return environment
+    return environment;
   }
 };
 
@@ -375,7 +372,7 @@ function toUpperCaseIfPresent(field) {
   }
 }
 
-function sendLoadRequest() {
+window.sendLoadRequest = function() {
   const isCustom = pageData.selectedExampleId == "custom";
   const filePayloads = pageData.payloads;
   const textPayloads = [document.getElementById("prescription-textarea").value];
@@ -390,7 +387,7 @@ function sendLoadRequest() {
   }
 }
 
-function updateAuthMethod(authMethod) {
+window.updateAuthMethod = function(authMethod) {
   const response = makeRequest(
     "POST",
     "/login",
@@ -399,7 +396,6 @@ function updateAuthMethod(authMethod) {
   window.location.href = response.redirectUri;
 }
 
-// IE compatibility
 function makeRequest(method, url, body) {
   try {
     var xhr = new XMLHttpRequest();
@@ -414,7 +410,7 @@ function makeRequest(method, url, body) {
   return JSON.parse(xhr.responseText);
 }
 
-function getEditRequest(previousOrNext) {
+window.getEditRequest = function(previousOrNext) {
   try {
     const prescriptionId =
       previousOrNext === "previous"
@@ -434,7 +430,7 @@ function getEditRequest(previousOrNext) {
   }
 }
 
-function sendEditRequest() {
+window.sendEditRequest = function() {
   try {
     const bundles = getPayloads();
     bundles.forEach((bundle) => {
@@ -456,71 +452,76 @@ function sendEditRequest() {
 }
 
 const TEST_PATIENT = {
-  "resourceType": "Patient",
-  "identifier":  [
+  resourceType: "Patient",
+  identifier: [
     {
-      "extension":  [
+      extension: [
         {
-          "url": "https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-NHSNumberVerificationStatus",
-          "valueCodeableConcept": {
-            "coding":  [
+          url:
+            "https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-NHSNumberVerificationStatus",
+          valueCodeableConcept: {
+            coding: [
               {
-                "system": "https://fhir.hl7.org.uk/CodeSystem/UKCore-NHSNumberVerificationStatus",
-                "code": "01",
-                "display": "Number present and verified"
-              }
-            ]
-          }
-        }
+                system:
+                  "https://fhir.hl7.org.uk/CodeSystem/UKCore-NHSNumberVerificationStatus",
+                code: "01",
+                display: "Number present and verified",
+              },
+            ],
+          },
+        },
       ],
-      "system": "https://fhir.nhs.uk/Id/nhs-number",
-      "value": "9990548609"
-    }
+      system: "https://fhir.nhs.uk/Id/nhs-number",
+      value: "9990548609",
+    },
   ],
-  "name":  [
+  name: [
     {
-      "use": "official",
-      "family": "XXTESTPATIENT-TGNP",
-      "given":  [
-        "DONOTUSE"
-      ],
-    }
+      use: "official",
+      family: "XXTESTPATIENT-TGNP",
+      given: ["DONOTUSE"],
+    },
   ],
-  "gender": "male",
-  "birthDate": "1932-01-06",
-  "address":  [
+  gender: "male",
+  birthDate: "1932-01-06",
+  address: [
     {
-      "use": "home",
-      "postalCode": "LS1 6AE"
-    }
+      use: "home",
+      postalCode: "LS1 6AE",
+    },
   ],
-  "generalPractitioner":  [
+  generalPractitioner: [
     {
-      "identifier": {
-        "system": "https://fhir.nhs.uk/Id/ods-organization-code",
-        "value": "Y90001"
-      }
-    }
-  ]
-}
+      identifier: {
+        system: "https://fhir.nhs.uk/Id/ods-organization-code",
+        value: "Y90001",
+      },
+    },
+  ],
+};
 
 function sanitiseProdTestData(bundle) {
   if (pageData.environment !== "prod") {
-    return
+    return;
   }
 
-  const patientBundleEntry = bundle.entry.find(entry => entry.resource.resourceType === "Patient")
-  patientBundleEntry.resource = TEST_PATIENT
+  const patientBundleEntry = bundle.entry.find(
+    entry => entry.resource.resourceType === "Patient"
+  );
+  patientBundleEntry.resource = TEST_PATIENT;
 
-  const medicationRequestBundleEntry = bundle.entry.filter(entry => entry.resource.resourceType === "MedicationRequest")
-  medicationRequestBundleEntry.forEach((entry) => {
-    const medicationRequest = entry.resource
-    medicationRequest.note = [{text: "TEST PRESCRIPTION - DO NOT DISPENSE"}]
-    medicationRequest.dosageInstruction[0].patientInstruction = "TEST PRESCRIPTION - DO NOT DISPENSE"
-  })
+  const medicationRequestBundleEntry = bundle.entry.filter(
+    entry => entry.resource.resourceType === "MedicationRequest"
+  );
+  medicationRequestBundleEntry.forEach(entry => {
+    const medicationRequest = entry.resource;
+    medicationRequest.note = [{ text: "TEST PRESCRIPTION - DO NOT DISPENSE" }];
+    medicationRequest.dosageInstruction[0].patientInstruction =
+      "TEST PRESCRIPTION - DO NOT DISPENSE";
+  });
 }
 
-function sendSignRequest(skipSignaturePage) {
+window.sendSignRequest = function (skipSignaturePage) {
   try {
     const response = makeRequest(
       "POST",
@@ -534,7 +535,7 @@ function sendSignRequest(skipSignaturePage) {
   }
 }
 
-function sendPrescriptionRequest() {
+window.sendPrescriptionRequest = function() {
   try {
     const response = makeRequest("POST", "/prescribe/send", {});
     pageData.signResponse = null;
@@ -566,7 +567,7 @@ function sendPrescriptionRequest() {
   }
 }
 
-function sendCancelRequest() {
+window.sendCancelRequest = function() {
   try {
     const prescriptionId = Cookies.get("Current-Prescription-Id");
     const prescription = makeRequest(
@@ -617,7 +618,7 @@ function sendCancelRequest() {
   }
 }
 
-function sendReleaseRequest() {
+window.sendReleaseRequest = function() {
   try {
     const prescriptionId =
       pageData.selectedReleaseId === "custom"
@@ -669,7 +670,7 @@ function sendReleaseRequest() {
   }
 }
 
-function sendDispenseRequest() {
+window.sendDispenseRequest = function() {
   try {
     const prescriptionId = Cookies.get("Current-Prescription-Id");
     const bundle = makeRequest(
@@ -1827,7 +1828,7 @@ function createPrescriptionType(system, code) {
   };
 }
 
-function doPrescriptionAction(select) {
+window.doPrescriptionAction = function(select) {
   const value = select.value;
   const prescriptionId = Cookies.get("Current-Prescription-Id");
   switch (value) {
@@ -2014,7 +2015,7 @@ function createDispenseRequest(bundle) {
     'input[name="dispense-medications"]:checked'
   )[0].value;
   const medicationRequestEntries = bundle.entry.filter(
-    (entry) => entry.resource.resourceType === "MedicationRequest"
+    entry => entry.resource.resourceType === "MedicationRequest"
   );
 
   const medicationRequestEntryToDispense = medicationRequestEntries.filter(
@@ -2133,33 +2134,28 @@ function createDispenseRequest(bundle) {
       text: "4 times a day for 7 days",
     },
   ];
-  medicationDispense.quantity = clonedMedicationRequest.dispenseRequest?.quantity ?? undefined
-
-  bundle.entry = bundle.entry
-    .filter((entry) => entry.resource.resourceType !== "MessageHeader")
-    .filter((entry) => entry.resource.resourceType !== "MedicationRequest")
-    .filter((entry) => entry.resource.resourceType !== "Practitioner")
-    .filter((entry) => entry.resource.resourceType !== "PractitionerRole")
-    .filter((entry) => entry.resource.resourceType !== "CommunicationRequest")
-    .filter((entry) => entry.resource.resourceType !== "Location")
-    .filter((entry) => entry.resource.resourceType !== "Organization")
-    .filter((entry) => entry.resource.resourceType !== "HealthcareService")
-    .filter((entry) => entry.resource.resourceType !== "List");
-
-  bundle.entry.unshift(clonedHeaderEntry);
+  medicationDispense.quantity = clonedMedicationRequest.dispenseRequest?.quantity ?? undefined;
+  bundle.entry = []
+  bundle.entry.push(clonedHeaderEntry);
   bundle.entry.push(medicationDispenseEntry);
-
   return bundle;
 }
 
-function onLoad() {
+function setInitialState (mode, env, signResponse) {
+  pageData.mode = mode
+  pageData.environment = env
+  pageData.signResponse = signResponse
+}
+
+window.startApplication = async function(mode, env, signResponse) {
+  setInitialState(mode, env, signResponse)
   if (pageData.mode === "release" && pageData.prescriptionId) {
     pageData.selectedReleaseId = "custom";
     resetPageData("release");
   }
   if (pageData.mode === "dispense") {
     const prescriptionId = Cookies.get("Current-Prescription-Id");
-    const response = makeRequest(
+    const response = await makeRequest(
       "GET",
       `/prescribe/edit?prescription_id=${prescriptionId}`
     );
@@ -2173,12 +2169,18 @@ function onLoad() {
   ) {
     sendPrescriptionRequest();
   }
+  if (pageData.mode === "send") {
+    if (env !== "prod") {
+      pageData.actions.push(new PrescriptionAction("release", "Release"));
+      pageData.actions.push(new PrescriptionAction("dispense", "Dispense"));
+    }
+  }
   document
     .getElementById("prescription-test-pack")
     .addEventListener("change", handleFileSelect, false);
   if (pageData.mode === "cancel") {
     const prescriptionId = Cookies.get("Current-Prescription-Id");
-    const response = makeRequest(
+    const response = await makeRequest(
       "GET",
       `/prescribe/edit?prescription_id=${prescriptionId}`
     );
@@ -2189,32 +2191,32 @@ function onLoad() {
   document.querySelector("#main-content").style.display = "";
 }
 
-// IE compat, no default values for function args
 function resetPageData(pageMode) {
-  pageData.mode = pageMode;
-  pageData.errorList = null;
-  pageData.sendResponse = null;
-  pageData.signResponse = null;
-  pageData.cancelResponse = null;
-  pageData.showCustomExampleInput =
-    pageMode === "load" ? pageData.selectedExampleId === "custom" : false;
-  pageData.showCustomPharmacyInput =
-    pageMode === "edit" || pageMode === "release"
-      ? pageData.selectedPharmacy === "custom"
-      : false;
-  pageData.showCustomPrescriptionIdInput =
-    pageMode === "release" ? pageData.selectedReleaseId === "custom" : false;
-  pageData.releaseResponse = null;
-  pageData.dispenseResponse = null;
-  pageData.selectedPharmacy =
-    pageMode === "edit" || pageMode === "release"
-      ? pageData.selectedPharmacy ?? "VNFKT"
-      : null;
-  if (pageData.mode == "sign") {
-    pageData.previous_prescription_id = Cookies.get("Previous-Prescription-Id");
-    pageData.next_prescription_id = Cookies.get("Next-Prescription-Id");
-  }
+pageData.mode = pageMode;
+pageData.errorList = null;
+pageData.sendResponse = null;
+pageData.signResponse = null;
+pageData.cancelResponse = null;
+pageData.showCustomExampleInput =
+  pageMode === "load" ? pageData.selectedExampleId === "custom" : false;
+pageData.showCustomPharmacyInput =
+  pageMode === "edit" || pageMode === "release"
+    ? pageData.selectedPharmacy === "custom"
+    : false;
+pageData.showCustomPrescriptionIdInput =
+  pageMode === "release" ? pageData.selectedReleaseId === "custom" : false;
+pageData.releaseResponse = null;
+pageData.dispenseResponse = null;
+pageData.selectedPharmacy =
+  pageMode === "edit" || pageMode === "release"
+    ? pageData.selectedPharmacy ?? "VNFKT"
+    : null;
+if (pageData.mode == "sign") {
+  pageData.previous_prescription_id = Cookies.get("Previous-Prescription-Id");
+  pageData.next_prescription_id = Cookies.get("Next-Prescription-Id");
 }
+}
+window.resetPageData = resetPageData
 
 function bind() {
   rivets.bind(document.querySelector("#main-content"), pageData);

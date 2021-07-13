@@ -5,27 +5,15 @@
   <title>EPSAT</title>
   <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.png') }}">
   <link href="https://nhsuk.github.io/nhsuk-frontend/assets/nhsuk.css" rel="stylesheet">
-  <script type="application/javascript" src="../static/rivets.bundled.min.js"></script>
-  <script type="application/javascript" src="../static/js.cookie-2.2.1.min.js"></script>
+  <script type="application/javascript" src="{{ url_for('static', filename='rivets.bundled.min.js') }}"></script>
+  <script type="application/javascript" src="{{ url_for('static', filename='js.cookie-2.2.1.min.js') }}"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.0/jszip.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.0/xlsx.js"></script>
-  <script type="application/javascript" src="../static/prescriptions.js"></script>
-  <script type="application/javascript" src="../static/client.js"></script>
-  <script type="application/javascript">
-    pageData.mode = "{{page_mode}}"
-    pageData.environment = "{{environment}}"
-  </script>
-  {% if sign_response is not none and page_mode == "send" %}
-  <script type="text/javascript">
-    pageData.signResponse = {}
-    pageData.signResponse.signature = "{{sign_response.signature}}"
-  </script>
-  {% endif %}
   <style rv-if="environment | isProd">
     body{background-color: #f6b8b8;}
   </style>
 </head>
-<body onload="onLoad()">
+<body>
   <header class="nhsuk-header nhsuk-header--transactional" role="banner">
     <div class="nhsuk-width-container nhsuk-header__container">
       <div class="nhsuk-header__logo nhsuk-header__logo--only">
@@ -36,7 +24,7 @@
             <path class="nhsuk-logo__text"
               d="M3.9 1.5h4.4l2.6 9h.1l1.8-9h3.3l-2.8 13H9l-2.7-9h-.1l-1.8 9H1.1M17.3 1.5h3.6l-1 4.9h4L25 1.5h3.5l-2.7 13h-3.5l1.1-5.6h-4.1l-1.2 5.6h-3.4M37.7 4.4c-.7-.3-1.6-.6-2.9-.6-1.4 0-2.5.2-2.5 1.3 0 1.8 5.1 1.2 5.1 5.1 0 3.6-3.3 4.5-6.4 4.5-1.3 0-2.9-.3-4-.7l.8-2.7c.7.4 2.1.7 3.2.7s2.8-.2 2.8-1.5c0-2.1-5.1-1.3-5.1-5 0-3.4 2.9-4.4 5.8-4.4 1.6 0 3.1.2 4 .6">
             </path>
-            <image src="https://assets.nhs.uk/images/nhs-logo.png" xlink:href=""></image>
+            <image src="https://assets.nhs.uk/images/nhs-logo.png"></image>
           </svg>
         </a>
       </div>
@@ -79,7 +67,7 @@
               <div rv-show="mode | isSign">
                 <h1 class="nhsuk-fieldset__heading">Prescription
                   <div style="float:right;display:inline;width:150px;margin-left:20px;">
-                    <a href="/download" id="download-messages" download="messages.zip"><img style="width: 35%;" src="../static/json.png" title="FHIR"></a>
+                    <a href="/download" id="download-messages" download="messages.zip"><img style="width: 35%;" src="{{ url_for('static', filename='json.png') }}" title="FHIR"></a>
                   </div>
                 </h1>
               </div>
@@ -406,9 +394,9 @@
                     </svg>
                   </div>
                   <div style="float:left;display: inline;width: 150px;margin-top: -7px;">
-                    <a id="send-request-download-fhir" download="send_request.json"><img style="width: 25%;" src="../static/json.png" title="Request"/></a>
-                    <a id="send-request-download-xml" download="send_request.xml"><img style="width: 25%;" src="../static/xml.png" title="Request"/></a>
-                    <a id="send-response-download" download="send_response.json"><img style="width: 25%;" src="../static/json.png" title="Response"/></a>
+                    <a id="send-request-download-fhir" download="send_request.json"><img style="width: 25%;" src="{{ url_for('static', filename='json.png') }}" title="Request"/></a>
+                    <a id="send-request-download-xml" download="send_request.xml"><img style="width: 25%;" src="{{ url_for('static', filename='xml.png') }}" title="Request"/></a>
+                    <a id="send-response-download" download="send_response.json"><img style="width: 25%;" src="{{ url_for('static', filename='json.png') }}" title="Response"/></a>
                   </div>
                 </dd>
                 <dd class="nhsuk-summary-list__value" style="padding-top:0;">
@@ -508,9 +496,9 @@
                     </svg>
                   </div>
                   <div style="float:left;display: inline;width: 150px;margin-top: -7px;">
-                    <a id="cancel-request-download-fhir" download="cancel_request.json"><img style="width: 25%;" src="../static/json.png" title="Request"/></a>
-                    <a id="cancel-request-download-xml" download="cancel_request.xml"><img style="width: 25%;" src="../static/xml.png" title="Request"/></a>
-                    <a id="cancel-response-download" download="cancel_response.json"><img style="width: 25%;" src="../static/json.png" title="Response"/></a>
+                    <a id="cancel-request-download-fhir" download="cancel_request.json"><img style="width: 25%;" src="{{ url_for('static', filename='json.png') }}" title="Request"/></a>
+                    <a id="cancel-request-download-xml" download="cancel_request.xml"><img style="width: 25%;" src="{{ url_for('static', filename='xml.png') }}" title="Request"/></a>
+                    <a id="cancel-response-download" download="cancel_response.json"><img style="width: 25%;" src="{{ url_for('static', filename='json.png') }}" title="Response"/></a>
                   </div>
                 </dd>
               </div>
@@ -578,9 +566,9 @@
                     </svg>
                   </div>
                   <div style="float:left;display: inline;width: 150px;margin-top: -7px;">
-                    <a id="release-request-download-fhir" download="release_request.json"><img style="width: 25%;" src="../static/json.png" title="Request"/></a>
-                    <a id="release-request-download-xml" download="release_request.xml"><img style="width: 25%;" src="../static/xml.png" title="Request"/></a>
-                    <a id="release-response-download" download="release_response.json"><img style="width: 25%;" src="../static/json.png" title="Response"/></a>
+                    <a id="release-request-download-fhir" download="release_request.json"><img style="width: 25%;" src="{{ url_for('static', filename='json.png') }}" title="Request"/></a>
+                    <a id="release-request-download-xml" download="release_request.xml"><img style="width: 25%;" src="{{ url_for('static', filename='xml.png') }}" title="Request"/></a>
+                    <a id="release-response-download" download="release_response.json"><img style="width: 25%;" src="{{ url_for('static', filename='json.png') }}" title="Response"/></a>
                   </div>
                 </dd>
               </div>
@@ -627,9 +615,9 @@
                     </svg>
                   </div>
                   <div style="float:left;display: inline;width: 150px;margin-top: -7px;">
-                    <a id="dispense-request-download-fhir" download="dispense_request.json"><img style="width: 25%;" src="../static/json.png" title="Request"/></a>
-                    <a id="dispense-request-download-xml" download="dispense_request.xml"><img style="width: 25%;" src="../static/xml.png" title="Request"/></a>
-                    <a id="dispense-response-download" download="dispense_response.json"><img style="width: 25%;" src="../static/json.png" title="Response"/></a>
+                    <a id="dispense-request-download-fhir" download="dispense_request.json"><img style="width: 25%;" src="{{ url_for('static', filename='json.png') }}" title="Request"/></a>
+                    <a id="dispense-request-download-xml" download="dispense_request.xml"><img style="width: 25%;" src="{{ url_for('static', filename='xml.png') }}" title="Request"/></a>
+                    <a id="dispense-response-download" download="dispense_response.json"><img style="width: 25%;" src="{{ url_for('static', filename='json.png') }}" title="Response"/></a>
                   </div>
                 </dd>
               </div>
@@ -747,5 +735,17 @@
       </div>
     </main>
   </div>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", (event) => {
+      const mode = "{{page_mode}}"
+      const env = "{{environment}}"
+      {% if sign_response is not none and page_mode == "send" %}
+      const signResponse = {signature: "{{sign_response.signature}}"}
+      {% else %}
+      const signResponse = null
+      {% endif %}
+      startApplication(mode, env, signResponse)
+    });
+  </script>
 </body>
 </html>
