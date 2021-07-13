@@ -20,7 +20,7 @@ const config = {
         new HtmlWebpackPlugin({
             template: 'src/index.html',
             filename: "templates/client.html",
-            publicPath: "https://nhsd-epsat-int.herokuapp.com/",
+            publicPath: "/",
             inject: "head",
             scriptLoading: "blocking"
 
@@ -29,15 +29,7 @@ const config = {
             patterns: [
                 { from: "./src/static", to: path.join(__dirname, "/static") },
             ],
-        }),
-        new ReplaceInFileWebpackPlugin([{
-          dir: 'static',
-          files: ['main.js'],
-          rules: [{
-              search: '"use strict";',
-              replace: ''
-          }]
-        }])
+        })
     ],
     module: {
         rules: [
