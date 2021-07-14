@@ -21,32 +21,32 @@ docker_service:
           - name: DEMO_BASE_PATH
             value: "https://{{ APIGEE_HOSTNAME }}/{{ SERVICE_BASE_PATH }}"
           - name: EPS_BASE_PATH
-            value: "https://int.api.service.nhs.uk/electronic-prescriptions/FHIR/R4"
+            value: "https://{{ APIGEE_HOSTNAME }}/electronic-prescriptions/FHIR/R4"
           - name: OAUTH_BASE_PATH
-            value: "https://int.api.service.nhs.uk/oauth2"
+            value: "https://{{ APIGEE_HOSTNAME }}/oauth2"
           - name: OAUTH_REDIRECT_URI
             value: "https://{{ APIGEE_HOSTNAME }}/{{ SERVICE_BASE_PATH }}/callback"
           - name: SIGNING_BASE_PATH
-            value: "https://int.api.service.nhs.uk/signing-service"
+            value: "https://{{ APIGEE_HOSTNAME }}/signing-service"
       secrets:
           - name: DEMO_APP_CLIENT_ID
-            valueFrom: "/ptl/api-deployment/eps-api-tool/test-client/client-id"
+            valueFrom: "/{{ account }}/api-deployment/eps-api-tool/test-client/client-id"
           - name: DEMO_APP_KEY_ID
-            valueFrom: "/ptl/api-deployment/eps-api-tool/test-client/local-jwt-key-id"
+            valueFrom: "/{{ account }}/api-deployment/eps-api-tool/test-client/local-jwt-key-id"
           - name: RSS_JWT_ISSUER
-            valueFrom: "/ptl/api-deployment/eps-api-tool/test-client/rss-jwt-issuer"
+            valueFrom: "/{{ account }}/api-deployment/eps-api-tool/test-client/rss-jwt-issuer"
           - name: RSS_JWT_KID
-            valueFrom: "/ptl/api-deployment/eps-api-tool/test-client/rss-jwt-key-id"
+            valueFrom: "/{{ account }}/api-deployment/eps-api-tool/test-client/rss-jwt-key-id"
           - name: RSS_JWT_SUBJECT
-            valueFrom: "/ptl/api-deployment/eps-api-tool/test-client/rss-jwt-subject"
+            valueFrom: "/{{ account }}/api-deployment/eps-api-tool/test-client/rss-jwt-subject"
           - name: RSS_JWT_PRIVATE_KEY
-            valueFrom: "ptl/eps-api-tool/test-client/rss-jwt-private-key"
+            valueFrom: "/{{ account }}/eps-api-tool/test-client/rss-jwt-private-key"
           - name: DEMO_APP_PRIVATE_KEY
-            valueFrom: "ptl/eps-api-tool/test-client/local-jwt-private-key"
+            valueFrom: "/{{ account }}/eps-api-tool/test-client/local-jwt-private-key"
           - name: DEMO_APP_CLIENT_SECRET
-            valueFrom: "ptl/eps-api-tool/test-client/client-secret"
+            valueFrom: "/{{ account }}/eps-api-tool/test-client/client-secret"
           - name: SESSION_TOKEN_ENCRYPTION_KEY
-            valueFrom: "ptl/eps-api-tool/test-client/session-token-encryption-key"
+            valueFrom: "/{{ account }}/eps-api-tool/test-client/session-token-encryption-key"
       health_check:
           matcher: "200"
           path: "/_healthcheck"
