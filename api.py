@@ -27,21 +27,24 @@ def make_eps_api_prepare_request(access_token, body):
 
 def make_eps_api_process_message_request(access_token, body):
     print("Response from EPS process request...")
-    return make_eps_api_request("$process-message", access_token, body)
+    response = make_eps_api_request("$process-message", access_token, body)
+    return response.json(), response.status_code
 
 
 def make_eps_api_convert_message_request(access_token, body):
     print("Response from EPS convert request...")
-    return make_eps_api_request("$convert", access_token, body)
+    response = make_eps_api_request("$convert", access_token, body)
+    return response, response.status_code
 
 
 def make_eps_api_release_request(access_token, body):
     print("Response from EPS release request...")
-    return make_eps_api_request("Task/$release", access_token, body)
+    response = make_eps_api_request("Task/$release", access_token, body)
+    return response.json(), response.status_code
 
 
 def make_eps_api_request(path, access_token, body):
-    eps_api_response = httpx.post(
+    return httpx.post(
         f"{EPS_BASE_PATH}/{path}",
         headers={
             "x-request-id": str(uuid.uuid4()),
@@ -51,7 +54,6 @@ def make_eps_api_request(path, access_token, body):
         json=body,
         verify=False,
     )
-    return eps_api_response.json(), eps_api_response.status_code
 
 
 def make_sign_api_signature_upload_request(auth_method, access_token, digest, algorithm):
