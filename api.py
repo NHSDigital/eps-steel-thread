@@ -28,9 +28,11 @@ def make_eps_api_prepare_request(access_token, body):
 def make_eps_api_process_message_request(access_token, body):
     response = make_eps_api_request("$process-message", access_token, body)
     print("Response from EPS process request...")
-    print("RESPONSE:" + response)
+    print("RESPONSE:")
+    print(response)
     response_json = response.json()
-    print("RESPONSE JSON:" + response_json)
+    print("RESPONSE JSON:")
+    print(response_json)
     return response
 
 
