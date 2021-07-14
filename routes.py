@@ -242,7 +242,6 @@ def post_sign():
         auth_method, get_access_token(), prepare_response["digest"], prepare_response["algorithm"]
     )
     print("Response from Signing Service signature upload request...")
-    print(json.dumps(sign_response))
     response = app.make_response({"redirectUri": sign_response["redirectUri"]})
     set_skip_signature_page_cookie(response, str(skip_signature_page))
     add_prepare_response(short_prescription_id, prepare_response)
