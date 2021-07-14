@@ -212,15 +212,15 @@ rivets.formatters.prescriptionEndorsements = function (extensions) {
   return extensions
     ? extensions
       .filter(
-        (extension) =>
+        extension =>
           extension.url ===
             "https://fhir.nhs.uk/StructureDefinition/Extension-DM-PrescriptionEndorsement"
       )
       .flatMap(
-        (prescriptionEndorsement) =>
+        prescriptionEndorsement =>
           prescriptionEndorsement.valueCodeableConcept.coding
       )
-      .map((coding) => coding.code)
+      .map(coding => coding.code)
       .join(", ")
     : ""
 }
@@ -264,8 +264,8 @@ rivets.formatters.dosageInstruction = function (dosageInstructions) {
 
 rivets.formatters.dispenserNotes = function (notes) {
   return notes
-    ?.filter((note) => note.text)
-    .map((note) => note.text)
+    ?.filter(note => note.text)
+    .map(note => note.text)
     .join(". ")
 }
 
@@ -379,7 +379,7 @@ window.sendLoadRequest = function() {
   const payloads = filePayloads
     .concat(textPayloads)
     .filter(Boolean)
-    .map((payload) => JSON.parse(payload))
+    .map(payload => JSON.parse(payload))
   if (isCustom && !payloads.length) {
     addError("Unable to parse custom prescription(s)")
   } else {
@@ -433,7 +433,7 @@ window.getEditRequest = function(previousOrNext) {
 window.sendEditRequest = function() {
   try {
     const bundles = getPayloads()
-    bundles.forEach((bundle) => {
+    bundles.forEach(bundle => {
       updateBundleIds(bundle)
       updateNominatedPharmacy(bundle, getOdsCode())
       sanitiseProdTestData(bundle)
@@ -728,19 +728,19 @@ function getPrescriber(cancelResponse, success) {
   )[0]
   const practitionerRoleReference = medicationRequest.requester.reference
   const practitionerRoleEntry = cancelResponse.entry.filter(
-    (e) => e.fullUrl === practitionerRoleReference
+    e => e.fullUrl === practitionerRoleReference
   )[0]
   const practitionerRole = practitionerRoleEntry.resource
   const practitionerRoleSdsRole = practitionerRole.code
-    .flatMap((code) => code.coding)
+    .flatMap(code => code.coding)
     .filter(
-      (coding) =>
+      coding =>
         coding.system ===
         "https://fhir.hl7.org.uk/CodeSystem/UKCore-SDSJobRoleName"
     )[0]
   const practitionerReference = practitionerRole.practitioner.reference
   const practitionerEntry = cancelResponse.entry.filter(
-    (e) => e.fullUrl === practitionerReference
+    e => e.fullUrl === practitionerReference
   )[0]
   const practitioner = practitionerEntry.resource
   const practitionerName = practitioner.name[0]
@@ -763,7 +763,7 @@ function getCanceller(cancelResponse, success) {
     "MedicationRequest"
   )[0]
   const practitionerRoleReferenceExtension = medicationRequest.extension.filter(
-    (e) =>
+    e =>
       e.url ===
       "https://fhir.nhs.uk/StructureDefinition/Extension-DM-ResponsiblePractitioner"
   )
@@ -773,19 +773,19 @@ function getCanceller(cancelResponse, success) {
   const practitionerRoleReference =
     practitionerRoleReferenceExtension[0].valueReference.reference
   const practitionerRoleEntry = cancelResponse.entry.filter(
-    (e) => e.fullUrl === practitionerRoleReference
+    e => e.fullUrl === practitionerRoleReference
   )[0]
   const practitionerRole = practitionerRoleEntry.resource
   const practitionerRoleSdsRole = practitionerRole.code
-    .flatMap((code) => code.coding)
+    .flatMap(code => code.coding)
     .filter(
-      (coding) =>
+      coding =>
         coding.system ===
         "https://fhir.hl7.org.uk/CodeSystem/UKCore-SDSJobRoleName"
     )[0]
   const practitionerReference = practitionerRole.practitioner.reference
   const practitionerEntry = cancelResponse.entry.filter(
-    (e) => e.fullUrl === practitionerReference
+    e => e.fullUrl === practitionerReference
   )[0]
   const practitioner = practitionerEntry.resource
   const practitionerName = practitioner.name[0]
@@ -948,23 +948,23 @@ function getSummary(payload) {
     "CommunicationRequest"
   )
   const patientInstructions = communicationRequests
-    .flatMap((communicationRequest) => communicationRequest.payload)
+    .flatMap(communicationRequest => communicationRequest.payload)
     .filter(Boolean)
-    .filter((payload) => payload.contentString)
-    .map((payload) => payload.contentString)
+    .filter(payload => payload.contentString)
+    .map(payload => payload.contentString)
     .join("\n")
 
   const startDate =
     medicationRequests[0].dispenseRequest.validityPeriod?.start ??
     new Date().toISOString().slice(0, 10)
   const medicationRepeatInformation = medicationRequests[0].extension.filter(
-    (e) =>
+    e =>
       e.url ===
       "https://fhir.hl7.org.uk/StructureDefinition/Extension-UKCore-MedicationRepeatInformation"
   )
   const numberOfRepeatPrescriptionsIssuedExtension = medicationRepeatInformation.length
     ? medicationRepeatInformation[0].extension.filter(
-      (e) => e.url === "numberOfRepeatPrescriptionsIssued"
+      e => e.url === "numberOfRepeatPrescriptionsIssued"
     )
     : null
   const numberOfRepeatPrescriptionsIssued =
@@ -999,7 +999,7 @@ function getPayloads() {
   const payloads = filePayloads
     .concat(textPayloads)
     .filter(Boolean)
-    .map((payload) => JSON.parse(payload))
+    .map(payload => JSON.parse(payload))
   if (isCustom && !payloads.length) {
     addError("Unable to parse custom prescription(s)")
   } else {
@@ -1074,7 +1074,7 @@ function handleFileSelect(evt) {
 
 function groupBy(list, keyGetter) {
   const map = new Map()
-  list.forEach((item) => {
+  list.forEach(item => {
     const key = keyGetter(item)
     const collection = map.get(key)
     if (!collection) {
@@ -1087,7 +1087,7 @@ function groupBy(list, keyGetter) {
 }
 
 function createPatients(rows) {
-  return rows.map((row) => {
+  return rows.map(row => {
     return {
       fullUrl: "urn:uuid:78d3c2eb-009e-4ec8-a358-b042954aa9b2",
       resource: {
@@ -1157,8 +1157,8 @@ function createPatients(rows) {
 
 function createPrescriptions(patients, rows) {
   pageData.payloads = []
-  const prescriptionRows = groupBy(rows, (row) => row["Test"])
-  prescriptionRows.forEach((prescriptionRows) => {
+  const prescriptionRows = groupBy(rows, row => row["Test"])
+  prescriptionRows.forEach(prescriptionRows => {
     const prescription = prescriptionRows[0]
 
     if (
@@ -1430,7 +1430,7 @@ function createPrescription(
     prescriptionRows,
     repeatsIssued,
     maxRepeatsAllowed
-  ).forEach((medicationRequest) =>
+  ).forEach(medicationRequest =>
     fhirPrescription.entry.push(medicationRequest)
   )
   createPlaceResources(careSetting, fhirPrescription)
@@ -1605,7 +1605,7 @@ function createMedicationRequests(
   repeatsIssued,
   maxRepeatsAllowed
 ) {
-  return xlsxRowGroup.map((row) => {
+  return xlsxRowGroup.map(row => {
     const id = uuidv4()
     return {
       fullUrl: `urn:uuid:${id}`,
@@ -1781,7 +1781,7 @@ function getMedicationRequestExtensions(row, repeatsIssued, maxRepeatsAllowed) {
     )
   }
 
-  row["Instructions for Prescribing"]?.split(", ").forEach((endorsement) =>
+  row["Instructions for Prescribing"]?.split(", ").forEach(endorsement =>
     extension.push({
       url:
         "https://fhir.nhs.uk/StructureDefinition/Extension-DM-PrescriptionEndorsement",
@@ -1802,7 +1802,7 @@ function getMedicationRequestExtensions(row, repeatsIssued, maxRepeatsAllowed) {
 
 function getNhsNumber(fhirPatient) {
   return fhirPatient.resource.identifier.filter(
-    (i) => i.system === "https://fhir.nhs.uk/Id/nhs-number"
+    i => i.system === "https://fhir.nhs.uk/Id/nhs-number"
   )[0].value
 }
 
@@ -1882,12 +1882,12 @@ function createCancellation(bundle) {
     'input[name="cancel-medications"]:checked'
   )[0].value
   const medicationRequestEntries = bundle.entry.filter(
-    (entry) => entry.resource.resourceType === "MedicationRequest"
+    entry => entry.resource.resourceType === "MedicationRequest"
   )
 
-  const medicationEntryToCancel = medicationRequestEntries.filter((e) =>
+  const medicationEntryToCancel = medicationRequestEntries.filter(e =>
     e.resource.medicationCodeableConcept.coding.some(
-      (c) => c.code === medicationToCancelSnomed
+      c => c.code === medicationToCancelSnomed
     )
   )[0]
 
@@ -1897,7 +1897,7 @@ function createCancellation(bundle) {
   const medicationRequest = clonedMedicationRequestEntry.resource
   medicationRequest.status = "cancelled"
   const cancellationReason = pageData.reasons.filter(
-    (r) => r.id === pageData.selectedCancellationReasonId
+    r => r.id === pageData.selectedCancellationReasonId
   )[0]
   medicationRequest.statusReason = {
     coding: [
@@ -1910,12 +1910,12 @@ function createCancellation(bundle) {
     ]
   }
   bundle.entry = bundle.entry.filter(
-    (entry) => entry.resource.resourceType !== "MedicationRequest"
+    entry => entry.resource.resourceType !== "MedicationRequest"
   )
   bundle.entry.push(clonedMedicationRequestEntry)
 
   const canceller = pageData.cancellers.filter(
-    (canceller) => canceller.id === pageData.selectedCancellerId
+    canceller => canceller.id === pageData.selectedCancellerId
   )[0]
 
   if (canceller.id !== "same-as-original-author") {
@@ -1931,7 +1931,7 @@ function createCancellation(bundle) {
     })
 
     const practitionerRoleEntry = bundle.entry.filter(
-      (entry) => entry.resource.resourceType === "PractitionerRole"
+      entry => entry.resource.resourceType === "PractitionerRole"
     )[0]
     const cancelPractitionerRoleEntry = JSON.parse(
       JSON.stringify(practitionerRoleEntry)
@@ -1946,21 +1946,21 @@ function createCancellation(bundle) {
         value: canceller.sdsRoleProfileId
       }
     ]
-    cancelPractitionerRole.code.forEach((code) =>
+    cancelPractitionerRole.code.forEach(code =>
       code.coding
         .filter(
-          (coding) =>
+          coding =>
             coding.system ===
             "https://fhir.hl7.org.uk/CodeSystem/UKCore-SDSJobRoleName"
         )
-        .forEach((coding) => {
+        .forEach(coding => {
           (coding.code = canceller.id), (coding.display = canceller.display)
         })
     )
     bundle.entry.push(cancelPractitionerRoleEntry)
 
     const practitionerEntry = bundle.entry.filter(
-      (entry) => entry.resource.resourceType === "Practitioner"
+      entry => entry.resource.resourceType === "Practitioner"
     )[0]
     const cancelPractitionerEntry = JSON.parse(
       JSON.stringify(practitionerEntry)
@@ -2009,7 +2009,7 @@ function createDispenseRequest(bundle) {
 
   const clonedHeaderEntry = JSON.parse(
     JSON.stringify(
-      bundle.entry.filter((e) => e.resource.resourceType === "MessageHeader")[0]
+      bundle.entry.filter(e => e.resource.resourceType === "MessageHeader")[0]
     )
   )
   clonedHeaderEntry.resource.response = {
@@ -2025,9 +2025,9 @@ function createDispenseRequest(bundle) {
   )
 
   const medicationRequestEntryToDispense = medicationRequestEntries.filter(
-    (e) =>
+    e =>
       e.resource.medicationCodeableConcept.coding.some(
-        (c) => c.code === medicationToDispenseSnomed
+        c => c.code === medicationToDispenseSnomed
       )
   )[0]
 
@@ -2062,7 +2062,7 @@ function createDispenseRequest(bundle) {
   medicationDispense.medicationCodeableConcept =
     clonedMedicationRequest.medicationCodeableConcept
   const patientEntry = bundle.entry.filter(
-    (e) => e.resource.resourceType === "Patient"
+    e => e.resource.resourceType === "Patient"
   )[0]
   medicationDispense.subject = {
     type: "Patient",
@@ -2234,7 +2234,7 @@ function bind() {
       }
       for (var i = 0; i < files.length; i++) {
         let reader = new FileReader()
-        reader.onload = (event) => {
+        reader.onload = event => {
           pageData.payloads.push(event.target.result)
         }
         reader.readAsText(files[i])
