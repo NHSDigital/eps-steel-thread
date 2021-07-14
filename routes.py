@@ -238,7 +238,7 @@ def post_sign():
     skip_signature_page = sign_request["skipSignaturePage"]
     short_prescription_id = get_prescription_id_from_cookie()
     prepare_request = load_prepare_request(short_prescription_id)
-    prepare_response_json = make_eps_api_prepare_request(get_access_token(), prepare_request)
+    prepare_response_json, prepare_response_code = make_eps_api_prepare_request(get_access_token(), prepare_request)
     auth_method = get_auth_method_from_cookie()
     sign_response = make_sign_api_signature_upload_request(
         auth_method, get_access_token(), prepare_response_json["digest"], prepare_response_json["algorithm"]
