@@ -42,7 +42,7 @@ def make_eps_api_release_request(access_token, body):
 
 
 def make_eps_api_request(path, access_token, body):
-    return httpx.post(
+    eps_api_response = httpx.post(
         f"{EPS_BASE_PATH}/{path}",
         headers={
             "x-request-id": str(uuid.uuid4()),
@@ -52,6 +52,7 @@ def make_eps_api_request(path, access_token, body):
         json=body,
         verify=False,
     )
+    return eps_api_response.json(), eps_api_response.status_code
 
 
 def make_sign_api_signature_upload_request(auth_method, access_token, digest, algorithm):
