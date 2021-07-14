@@ -288,6 +288,8 @@ def post_send():
     send_request_xml, _code = make_eps_api_convert_message_request(get_access_token(), send_request_json)
     send_response_json, send_response_code = make_eps_api_process_message_request(get_access_token(), send_request_json)
 
+    print(send_request_json)
+    print(send_response_json)
     return {
         "prescription_id": short_prescription_id,
         "success": send_response_code == 200,
