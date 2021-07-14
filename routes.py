@@ -311,7 +311,7 @@ def post_cancel():
             "success": cancel_response.status_code == 200,
             "request": json.dumps(cancel_request),
             "request_xml": cancel_request_xml.text,
-            "response": json.dumps(cancel_response.json()),
+            "response": cancel_response.json(),
         }
     )
     return response
