@@ -67,7 +67,8 @@ RELEASE_URL = "/dispense/release"
 DISPENSE_URL = "/dispense/dispense"
 
 def stringifyJson(json_content):
-    return json.dumps(json_content, ensure_ascii=False).encode('utf8').decode('utf8')
+    return json.dumps(json_content, ensure_ascii=False)
+#     return json.dumps(json_content, ensure_ascii=False).encode('utf8').decode('utf8')
 
 def exclude_from_auth(*args, **kw):
     def wrapper(endpoint_method):
