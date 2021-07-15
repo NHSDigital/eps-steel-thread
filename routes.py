@@ -304,7 +304,7 @@ def get_cancel():
 @app.route(CANCEL_URL, methods=["POST"])
 def post_cancel():
     request = flask.request.json
-    short_prescription_id = get_prescription_id(request_json)
+    short_prescription_id = get_prescription_id(request)
     convert_response, _code = make_eps_api_convert_message_request(get_access_token(), request)
     cancel_response, cancel_response_code = make_eps_api_process_message_request(get_access_token(), request)
     response = app.make_response(
