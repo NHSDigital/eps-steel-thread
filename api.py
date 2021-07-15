@@ -20,23 +20,27 @@ DEMO_APP_REMOTE_SIGNING_KID = os.environ["RSS_JWT_KID"]
 
 
 def make_eps_api_prepare_request(access_token, body):
-    response = make_eps_api_request("$prepare", access_token, body)
-    response_json = response.json()
     print("Response from EPS prepare request...")
-    print(json.dumps(response_json))
+    response_json = make_eps_api_request("$prepare", access_token, body).json()
     return {p["name"]: p["valueString"] for p in response_json["parameter"]}
 
 
 def make_eps_api_process_message_request(access_token, body):
-    return make_eps_api_request("$process-message", access_token, body)
+    print("Response from EPS process request...")
+    response = make_eps_api_request("$process-message", access_token, body)
+    return response.json(), response.status_code
 
 
 def make_eps_api_convert_message_request(access_token, body):
-    return make_eps_api_request("$convert", access_token, body)
+    print("Response from EPS convert request...")
+    response = make_eps_api_request("$convert", access_token, body)
+    return response.text, response.status_code
 
 
 def make_eps_api_release_request(access_token, body):
-    return make_eps_api_request("Task/$release", access_token, body)
+    print("Response from EPS release request...")
+    response = make_eps_api_request("Task/$release", access_token, body)
+    return response.json(), response.status_code
 
 
 def make_eps_api_request(path, access_token, body):
@@ -86,7 +90,6 @@ def make_sign_api_signature_upload_request(auth_method, access_token, digest, al
     )
 
     print("Sending Signing Service signature upload request...")
-    print(jwt_request)
 
     return httpx.post(
         f"{signing_base_url}/signaturerequest",
