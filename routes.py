@@ -68,7 +68,6 @@ DISPENSE_URL = "/dispense/dispense"
 
 def stringifyJson(json_content):
     return json.dumps(json_content, ensure_ascii=False)
-#     return json.dumps(json_content, ensure_ascii=False).encode('utf8').decode('utf8')
 
 def exclude_from_auth(*args, **kw):
     def wrapper(endpoint_method):
@@ -285,18 +284,15 @@ def get_send():
 @app.route(SEND_URL, methods=["POST"])
 def post_send():
     short_prescription_id = get_prescription_id_from_cookie()
-    send_request_json = load_send_request(short_prescription_id)
-    send_request_xml, _code = make_eps_api_convert_message_request(get_access_token(), send_request_json)
-    send_response_json, send_response_code = make_eps_api_process_message_request(get_access_token(), send_request_json)
-
-    print(send_request_json)
-    print(send_response_json)
+    request = load_send_request(short_prescription_id)
+    convert_response, _code = make_eps_api_convert_message_request(get_access_token(), request)
+    send_response, send_response_code = make_eps_api_process_message_request(get_access_token(), request)
     return {
         "prescription_id": short_prescription_id,
         "success": send_response_code == 200,
-        "request_xml": send_request_xml.text,
-        "request": stringifyJson(send_request_json),
-        "response": stringifyJson(send_response_json),
+        "request_xml": convert_response,
+        "request": stringifyJson(request),
+        "response": stringifyJson(send_response),
     }
 
 
@@ -307,17 +303,17 @@ def get_cancel():
 
 @app.route(CANCEL_URL, methods=["POST"])
 def post_cancel():
-    cancel_request_json = flask.request.json
-    short_prescription_id = get_prescription_id(cancel_request_json)
-    cancel_request_xml, _code = make_eps_api_convert_message_request(get_access_token(), cancel_request_json)
-    cancel_response_json, cancel_response_code = make_eps_api_process_message_request(get_access_token(), cancel_request_json)
+    request = flask.request.json
+    short_prescription_id = get_prescription_id(request_json)
+    convert_response, _code = make_eps_api_convert_message_request(get_access_token(), request)
+    cancel_response, cancel_response_code = make_eps_api_process_message_request(get_access_token(), request)
     response = app.make_response(
         {
             "prescription_id": short_prescription_id,
             "success": cancel_response_code == 200,
-            "request": stringifyJson(cancel_request_json),
-            "request_xml": cancel_request_xml.text,
-            "response": stringifyJson(cancel_response_json),
+            "request": stringifyJson(request),
+            "request_xml": convert_response,
+            "response": stringifyJson(cancel_response),
         }
     )
     return response
@@ -338,7 +334,7 @@ def post_release():
     short_prescription_id = release.get("prescriptionId")
     ods_code = release["odsCode"]
     if short_prescription_id:
-        release_request_json = {
+        request = {
             "resourceType": "Parameters",
             "id": str(uuid.uuid4()),
             "parameter": [
@@ -362,7 +358,7 @@ def post_release():
             }]
         }
     else:
-        release_request_json = {
+        request = {
             "resourceType": "Parameters",
             "id": str(uuid.uuid4()),
             "parameter": [
@@ -373,17 +369,17 @@ def post_release():
                 {"name": "status", "valueCode": "accepted"},
             ],
         }
-    release_response_json, release_response_code = make_eps_api_release_request(
+    convert_response, _code = make_eps_api_convert_message_request(get_access_token(), request)
+    release_response, release_response_code = make_eps_api_release_request(
         get_access_token(),
-        release_request_json,
+        request,
     )
-    release_request_xml, _code = make_eps_api_convert_message_request(get_access_token(), release_request_json)
     return {
-        "body": stringifyJson(release_response_json),
+        "body": stringifyJson(release_response),
         "success": release_response_code == 200,
-        "request_xml": release_request_xml.text,
-        "request": stringifyJson(release_request_json),
-        "response": stringifyJson(release_response_json),
+        "request_xml": convert_response,
+        "request": stringifyJson(request),
+        "response": stringifyJson(release_response),
     }
 
 
@@ -398,18 +394,18 @@ def get_dispense():
 def post_dispense():
     if (config.ENVIRONMENT == "prod"):
         return app.make_response("Bad Request", 400)
-    dispense_request_json = flask.request.json
-    dispense_response_json, dispense_response_code = make_eps_api_process_message_request(
+    request = flask.request.json
+    convert_response, _code = make_eps_api_convert_message_request(get_access_token(), request)
+    dispense_response, dispense_response_code = make_eps_api_process_message_request(
         get_access_token(),
-        dispense_request_json
+        request
     )
-    dispense_request_xml, _code = make_eps_api_convert_message_request(get_access_token(), dispense_request_json)
     return {
-        "body": stringifyJson(dispense_response_json),
+        "body": stringifyJson(dispense_response),
         "success": dispense_response_code == 200,
-        "request_xml": dispense_request_xml.text,
-        "request": stringifyJson(dispense_request_json),
-        "response": stringifyJson(dispense_response_json),
+        "request_xml": convert_response,
+        "request": stringifyJson(request),
+        "response": stringifyJson(dispense_response),
     }
 
 

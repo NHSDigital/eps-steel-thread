@@ -34,7 +34,7 @@ def make_eps_api_process_message_request(access_token, body):
 def make_eps_api_convert_message_request(access_token, body):
     print("Response from EPS convert request...")
     response = make_eps_api_request("$convert", access_token, body)
-    return response, response.status_code
+    return response.text, response.status_code
 
 
 def make_eps_api_release_request(access_token, body):
