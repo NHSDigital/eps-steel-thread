@@ -65,6 +65,7 @@ SEND_URL = "/prescribe/send"
 CANCEL_URL = "/prescribe/cancel"
 RELEASE_URL = "/dispense/release"
 DISPENSE_URL = "/dispense/dispense"
+HEALTHCHECK_URL = "/_healthcheck"
 
 def stringifyJson(json_content):
     return json.dumps(json_content, ensure_ascii=False)
@@ -130,6 +131,16 @@ def get_authorize_url(state, auth_method):
     }
     return f"{oauth_base_path}/authorize?{urlencode(query_params)}"
 
+
+@app.route("/_healthcheck", methods=["GET"])
+@exclude_from_auth()
+def get_healthcheck():
+    return app.make_response()
+
+@app.route("/_status", methods=["GET"])
+@exclude_from_auth()
+def get_status():
+    return app.make_response()
 
 @app.route("/login", methods=["GET"])
 @exclude_from_auth()

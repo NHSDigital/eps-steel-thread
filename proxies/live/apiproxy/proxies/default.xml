@@ -19,6 +19,20 @@
             </Response>
             <Condition>(proxy.pathsuffix MatchesPath "/_ping") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
         </Flow>
+        <Flow name="StatusEndpoint">
+            <Description/>
+            <Request>
+                <Step>
+                    <Name>KeyValueMapOperations.GetSharedSecureVariables</Name>
+                </Step>
+                <Step>
+                    <Condition>private.apigee.status-endpoint-api-key NotEquals request.header.apikey</Condition>
+                    <Name>RaiseFault.401Unauthorized</Name>
+                </Step>
+            </Request>
+            <Response/>
+            <Condition>(proxy.pathsuffix MatchesPath "/_status") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
+        </Flow>
     </Flows>
     <PreFlow/>
     <HTTPProxyConnection>
