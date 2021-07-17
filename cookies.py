@@ -70,7 +70,7 @@ def set_auth_method_cookie(response, auth_method):
     response.set_cookie(
         "Auth-Method",
         auth_method,
-        expires=datetime.datetime.utcnow() + datetime.timedelta(seconds=float(600)),
+        expires=datetime.datetime.utcnow() + datetime.timedelta(days=1),
         secure=not DEV_MODE,
         httponly=True,
     )
