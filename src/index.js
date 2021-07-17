@@ -483,7 +483,7 @@ window.getEditRequest = function(previousOrNext) {
     pageData.previous_prescription_id = Cookies.get("Previous-Prescription-Id")
     pageData.next_prescription_id = Cookies.get("Next-Prescription-Id")
     resetPageData("sign")
-    pageData.signRequestSummary = getSummary(response)
+    pageData.prescription = getPrescriptionSummary(response)
   } catch (e) {
     console.log(e)
     addError("Communication error")
@@ -504,7 +504,8 @@ window.sendEditRequest = function() {
       JSON.stringify(bundles)
     )
     resetPageData("sign")
-    pageData.signRequestSummary = getSummary(response)
+    pageData.prescription = getPrescriptionSummary(response.bundle)
+    pageData.prescriptionErrors = response.errors
   } catch (e) {
     console.log(e)
     addError("Communication error")
@@ -628,13 +629,12 @@ window.sendCancelRequest = function() {
     pageData.cancelResponse = {}
     pageData.cancelResponse.prescriptionId = response.prescription_id
     pageData.cancelResponse.success = response.success
-    const parsedCancelResponse = JSON.parse(response.response)
     pageData.cancelResponse.prescriber = getPrescriber(
-      parsedCancelResponse,
+      response.response,
       response.success
     )
     pageData.cancelResponse.canceller = getCanceller(
-      parsedCancelResponse,
+      response.response,
       response.success
     )
     pageData.cancelResponse.fhirRequest = response.request
@@ -926,7 +926,7 @@ function addError(message) {
   })
 }
 
-function getSummary(payload) {
+function getPrescriptionSummary(payload) {
   const patient = getResourcesOfType(payload, "Patient")[0]
   const practitioner = getResourcesOfType(payload, "Practitioner")[0]
   const encounter = getResourcesOfType(payload, "Encounter")[0]
@@ -2157,7 +2157,7 @@ window.startApplication = async function(mode, env, signResponse) {
       "GET",
       `/prescribe/edit?prescription_id=${prescriptionId}`
     )
-    pageData.signRequestSummary = getSummary(response)
+    pageData.prescription = getPrescriptionSummary(response)
     resetPageData("dispense")
   }
   if (
@@ -2182,7 +2182,7 @@ window.startApplication = async function(mode, env, signResponse) {
       "GET",
       `/prescribe/edit?prescription_id=${prescriptionId}`
     )
-    pageData.signRequestSummary = getSummary(response)
+    pageData.prescription = getPrescriptionSummary(response)
     resetPageData("cancel")
   }
   bind()

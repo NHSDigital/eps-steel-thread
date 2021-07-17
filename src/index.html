@@ -210,9 +210,9 @@
             <dl class="nhsuk-summary-list">
               <div class="nhsuk-summary-list__row">
                 <dt class="nhsuk-summary-list__key">ID</dt>
-                <dd class="nhsuk-summary-list__value">{signRequestSummary.id}</dd>
-                <dt class="nhsuk-summary-list__key" rv-show="signRequestSummary.repeatNumber">Repeat Number</dt>
-                <dd class="nhsuk-summary-list__value" rv-show="signRequestSummary.repeatNumber">{signRequestSummary.repeatNumber}</dd>
+                <dd class="nhsuk-summary-list__value">{prescription.id}</dd>
+                <dt class="nhsuk-summary-list__key" rv-show="prescription.repeatNumber">Repeat Number</dt>
+                <dd class="nhsuk-summary-list__value" rv-show="prescription.repeatNumber">{prescription.repeatNumber}</dd>
               </div>
             </dl>
           </div>
@@ -220,15 +220,15 @@
             <dl class="nhsuk-summary-list">
               <div class="nhsuk-summary-list__row">
                 <dt class="nhsuk-summary-list__key">Start Date</dt>
-                <dd class="nhsuk-summary-list__value">{signRequestSummary.author.startDate}</dd>
+                <dd class="nhsuk-summary-list__value">{prescription.author.startDate}</dd>
               </div>
             </dl>
           </div>
-          <div class="nhsuk-panel" rv-show="signRequestSummary.patientInstructions">
+          <div class="nhsuk-panel" rv-show="prescription.patientInstructions">
             <dl class="nhsuk-summary-list">
               <div class="nhsuk-summary-list__row">
                 <dt class="nhsuk-summary-list__key">Patient Instructions</dt>
-                <dd class="nhsuk-summary-list__value">{signRequestSummary.patientInstructions}</dd>
+                <dd class="nhsuk-summary-list__value">{prescription.patientInstructions}</dd>
               </div>
             </dl>
           </div>
@@ -267,25 +267,25 @@
           <div class="nhsuk-panel-with-label">
             <h3 class="nhsuk-panel-with-label__label">Patient</h3>
             <dl class="nhsuk-summary-list">
-              <div class="nhsuk-summary-list__row" rv-each-name="signRequestSummary.patient.name">
+              <div class="nhsuk-summary-list__row" rv-each-name="prescription.patient.name">
                 <dt class="nhsuk-summary-list__key">Name</dt>
                 <dd class="nhsuk-summary-list__value">{name | fullName | joinWithSpaces}</dd>
               </div>
               <div class="nhsuk-summary-list__row">
                 <dt class="nhsuk-summary-list__key">NHS number</dt>
-                <dd class="nhsuk-summary-list__value">{signRequestSummary.patient.identifier |
+                <dd class="nhsuk-summary-list__value">{prescription.patient.identifier |
                   nhsNumber}</dd>
               </div>
               <div class="nhsuk-summary-list__row">
                 <dt class="nhsuk-summary-list__key">Date of birth</dt>
-                <dd class="nhsuk-summary-list__value">{signRequestSummary.patient.birthDate}</dd>
+                <dd class="nhsuk-summary-list__value">{prescription.patient.birthDate}</dd>
               </div>
               <div class="nhsuk-summary-list__row">
                 <dt class="nhsuk-summary-list__key">Gender</dt>
-                <dd class="nhsuk-summary-list__value">{signRequestSummary.patient.gender | titleCase}
+                <dd class="nhsuk-summary-list__value">{prescription.patient.gender | titleCase}
                 </dd>
               </div>
-              <div class="nhsuk-summary-list__row" rv-each-address="signRequestSummary.patient.address">
+              <div class="nhsuk-summary-list__row" rv-each-address="prescription.patient.address">
                 <dt class="nhsuk-summary-list__key">Address</dt>
                 <dd class="nhsuk-summary-list__value">
                   <div rv-each-line="address | fullAddress">
@@ -314,7 +314,7 @@
                   </tr>
                 </thead>
                 <tbody class="nhsuk-table__body">
-                  <tr class="nhsuk-table__row" rv-each-medication="signRequestSummary.medicationRequests">
+                  <tr class="nhsuk-table__row" rv-each-medication="prescription.medicationRequests">
                     <td class="nhsuk-table__cell">{medication.medicationCodeableConcept.coding | snomedCode}</td>
                     <td class="nhsuk-table__cell">
                       <div class="nhsuk-label nhsuk-label--s">{medication.medicationCodeableConcept.coding | snomedCodeDescription}</div>
@@ -336,16 +336,16 @@
           <div class="nhsuk-panel-with-label">
             <h3 class="nhsuk-panel-with-label__label">Prescriber</h3>
             <dl class="nhsuk-summary-list">
-              <div class="nhsuk-summary-list__row" rv-each-name="signRequestSummary.practitioner.name">
+              <div class="nhsuk-summary-list__row" rv-each-name="prescription.practitioner.name">
                 <dt class="nhsuk-summary-list__key">Name</dt>
                 <dd class="nhsuk-summary-list__value">{name | fullName | joinWithSpaces}</dd>
               </div>
               <div class="nhsuk-summary-list__row">
                 <dt class="nhsuk-summary-list__key">Organization</dt>
-                <dd class="nhsuk-summary-list__value">{signRequestSummary.prescribingOrganization.name}
-                  ({signRequestSummary.prescribingOrganization.identifier | odsCode})</dd>
+                <dd class="nhsuk-summary-list__value">{prescription.prescribingOrganization.name}
+                  ({prescription.prescribingOrganization.identifier | odsCode})</dd>
               </div>
-              <div class="nhsuk-summary-list__row" rv-each-address="signRequestSummary.prescribingOrganization.address">
+              <div class="nhsuk-summary-list__row" rv-each-address="prescription.prescribingOrganization.address">
                 <dt class="nhsuk-summary-list__key">Address</dt>
                 <dd class="nhsuk-summary-list__value">
                   <div rv-each-line="address | fullAddress">
@@ -355,8 +355,8 @@
               </div>
               <div class="nhsuk-summary-list__row">
                 <dt class="nhsuk-summary-list__key">Trust / CCG</dt>
-                <dd class="nhsuk-summary-list__value">{signRequestSummary.parentOrganization.name}
-                  ({signRequestSummary.parentOrganization.identifier | odsCode})</dd>
+                <dd class="nhsuk-summary-list__value">{prescription.parentOrganization.name}
+                  ({prescription.parentOrganization.identifier | odsCode})</dd>
               </div>
             </dl>
           </div>
@@ -460,7 +460,7 @@
                 <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m">Choose a medication to cancel</legend>
               </div>
               <div class="nhsuk-checkboxes">
-                <div class="nhsuk-checkboxes__item" rv-each-medication="signRequestSummary.medicationRequests">
+                <div class="nhsuk-checkboxes__item" rv-each-medication="prescription.medicationRequests">
                   <input class="nhsuk-radios__input" name="cancel-medications" type="radio" rv-value="medication.medicationCodeableConcept.coding | snomedCode">
                   <label class="nhsuk-label nhsuk-radios__label" rv-for="medication.medicationCodeableConcept.coding | snomedCode">
                     {medication.medicationCodeableConcept.coding | snomedCodeDescription}
@@ -479,7 +479,7 @@
                 <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m">Choose a medication to dispense</legend>
               </div>
               <div class="nhsuk-checkboxes">
-                <div class="nhsuk-checkboxes__item" rv-each-medication="signRequestSummary.medicationRequests">
+                <div class="nhsuk-checkboxes__item" rv-each-medication="prescription.medicationRequests">
                   <input class="nhsuk-radios__input" name="dispense-medications" type="radio" rv-value="medication.medicationCodeableConcept.coding | snomedCode">
                   <label class="nhsuk-label nhsuk-radios__label" rv-for="medication.medicationCodeableConcept.coding | snomedCode">
                     {medication.medicationCodeableConcept.coding | snomedCodeDescription}
@@ -515,6 +515,20 @@
                     <a rv-href="cancelResponse.fhirResponse | downloadJson" download="cancel_response.json"><img style="width: 25%;" src="{{ url_for('static', filename='json.png') }}" title="Response"/></a>
                   </div>
                 </dd>
+              </div>
+              <div style="width: 960px">
+                <button class="accordion">Request (FHIR)</button>
+                <div class="panel">
+                  <pre rv-html="cancelResponse.fhirRequest | json"></pre>
+                </div>
+                <button class="accordion">Request (HL7v3)</button>
+                <div class="panel">
+                  <pre rv-html="cancelResponse.hl7Request | xml"></pre>
+                </div>
+                <button class="accordion">Response (FHIR)</button>
+                <div class="panel">
+                  <pre rv-html="cancelResponse.fhirResponse | json"></pre>
+                </div>
               </div>
             </dl>
           </div>
@@ -586,6 +600,20 @@
                   </div>
                 </dd>
               </div>
+              <div style="width: 960px">
+                <button class="accordion">Request (FHIR)</button>
+                <div class="panel">
+                  <pre rv-html="releaseResponse.fhirRequest | json"></pre>
+                </div>
+                <button class="accordion">Request (HL7v3)</button>
+                <div class="panel">
+                  <pre rv-html="releaseResponse.hl7Request | xml"></pre>
+                </div>
+                <button class="accordion">Response (FHIR)</button>
+                <div class="panel">
+                  <pre rv-html="releaseResponse.fhirResponse | json"></pre>
+                </div>
+              </div>
             </dl>
           </div>
         </div>
@@ -634,6 +662,20 @@
                     <a rv-href="dispenseResponse.fhirResponse | downloadJson" download="dispense_response.json"><img style="width: 25%;" src="{{ url_for('static', filename='json.png') }}" title="Response"/></a>
                   </div>
                 </dd>
+              </div>
+              <div style="width: 960px">
+                <button class="accordion">Request (FHIR)</button>
+                <div class="panel">
+                  <pre rv-html="dispenseResponse.fhirRequest | json"></pre>
+                </div>
+                <button class="accordion">Request (HL7v3)</button>
+                <div class="panel">
+                  <pre rv-html="dispenseResponse.hl7Request | xml"></pre>
+                </div>
+                <button class="accordion">Response (FHIR)</button>
+                <div class="panel">
+                  <pre rv-html="dispenseResponse.fhirResponse | json"></pre>
+                </div>
               </div>
             </dl>
           </div>
