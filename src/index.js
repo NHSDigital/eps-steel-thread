@@ -684,11 +684,11 @@ window.sendReleaseRequest = function() {
 window.sendDispenseRequest = function() {
   try {
     const prescriptionId = Cookies.get("Current-Prescription-Id")
-    const response = makeRequest(
+    const prescription = makeRequest(
       "GET",
       `/prescribe/edit?prescription_id=${prescriptionId}`
     )
-    const dispenseRequest = createDispenseRequest(response.bundle)
+    const dispenseRequest = createDispenseRequest(prescription.bundle)
     const response = makeRequest(
       "POST",
       "/dispense/dispense",
