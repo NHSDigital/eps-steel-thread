@@ -617,11 +617,6 @@
             </dl>
           </div>
         </div>
-        <div class="nhsuk-grid-column-full" rv-hide="releaseResponse.prescriptions">
-          <div class="nhsuk-summary-list">
-            <code>{releaseResponse.body | safe}</code>
-          </div>
-        </div>
         <div class="nhsuk-grid-column-full" rv-show="releaseResponse.prescriptions">
           <table class="table table-bordered results-table dataTable no-footer" id="resultstable" role="grid"
             aria-describedby="resultstable_info">
@@ -678,11 +673,6 @@
                 </div>
               </div>
             </dl>
-          </div>
-        </div>
-        <div class="nhsuk-grid-column-full">
-          <div class="nhsuk-summary-list">
-            <code>{dispenseResponse.body | safe}</code>
           </div>
         </div>
       </div>

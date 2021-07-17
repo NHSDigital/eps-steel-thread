@@ -66,9 +66,6 @@ CANCEL_URL = "/prescribe/cancel"
 RELEASE_URL = "/dispense/release"
 DISPENSE_URL = "/dispense/dispense"
 
-def stringifyJson(json_content):
-    return json.dumps(json_content, ensure_ascii=False)
-
 def exclude_from_auth(*args, **kw):
     def wrapper(endpoint_method):
         endpoint_method._exclude_from_auth = False
@@ -378,7 +375,6 @@ def post_release():
         request,
     )
     return {
-        "body": stringifyJson(release_response),
         "success": release_response_code == 200,
         "request_xml": convert_response,
         "request": request,
@@ -404,11 +400,10 @@ def post_dispense():
         request
     )
     return {
-        "body": stringifyJson(dispense_response),
         "success": dispense_response_code == 200,
         "request_xml": convert_response,
-        "request": stringifyJson(request),
-        "response": stringifyJson(dispense_response),
+        "request": request,
+        "response": dispense_response,
     }
 
 

@@ -663,9 +663,8 @@ window.sendReleaseRequest = function() {
     )
     pageData.showCustomPharmacyInput = false
     pageData.releaseResponse = {}
-    pageData.releaseResponse.body = !response.success ? response.body : ""
     pageData.releaseResponse.prescriptions = response.success
-      ? JSON.parse(response.body).entry.map(function (entry) {
+      ? JSON.parse(response.response).entry.map(function (entry) {
         const bundle = entry.resource
         const originalShortFormId = getMedicationRequests(bundle)[0]
           .groupIdentifier.value
@@ -696,7 +695,6 @@ window.sendDispenseRequest = function() {
       JSON.stringify(dispenseRequest)
     )
     pageData.dispenseResponse = {}
-    pageData.dispenseResponse.body = response.body
     pageData.dispenseResponse.success = response.success
     pageData.dispenseResponse.fhirRequest = response.request
     pageData.dispenseResponse.hl7Request = response.request_xml
