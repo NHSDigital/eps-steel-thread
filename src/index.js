@@ -1,4 +1,5 @@
 import examplePrescriptions from "./prescriptions"
+import "./site.css"
 
 const pageData = {
   examples: [
@@ -348,6 +349,65 @@ rivets.formatters.displayEnvironment = function (environment) {
   }
 }
 
+rivets.formatters.json = function(json)
+{
+  if (!json) {
+    return json
+  }
+  json = sortObject(json, false)
+  json = JSON.stringify(json, undefined, 2)
+  return json
+};
+
+rivets.formatters.downloadJson = function(json)
+{
+  if (!json) {
+    return json
+  }
+  const encoded_json = encodeURI(rivets.formatters.json(json))
+  return `data:application/json,${encoded_json}`
+};
+
+function sortObject(unordered, sortArrays = false) {
+  if (!unordered || typeof unordered !== 'object') {
+    return unordered;
+  }
+  if (Array.isArray(unordered)) {
+    const newArr = unordered.map((item) => sortObject(item, sortArrays));
+    if (sortArrays) {
+      newArr.sort();
+    }
+    return newArr;
+  }
+  const ordered = {};
+  Object.keys(unordered)
+    .sort()
+    .reverse()
+    .forEach((key) => {
+      ordered[key] = sortObject(unordered[key], sortArrays);
+    });
+  return ordered;
+}
+
+rivets.formatters.xml = function(xml)
+{
+  if (!xml) {
+    return xml
+  }
+  xml = xml.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return xml
+};
+
+rivets.formatters.downloadXml = function(xml)
+{
+  if (!xml) {
+    return xml
+  }
+  // component includes '#' which is present in xml
+  const encoded_xml = encodeURIComponent(xml)
+  return `data:application/xml,${encoded_xml}`
+};
+
 function concatenateIfPresent(fields) {
   return fields.filter(Boolean).reduce(function (currentValues, valuesToAdd) {
     return currentValues.concat(valuesToAdd)
@@ -542,26 +602,9 @@ window.sendPrescriptionRequest = function() {
     pageData.sendResponse = {}
     pageData.sendResponse.prescriptionId = response.prescription_id
     pageData.sendResponse.success = response.success
-    document.getElementById(
-      "send-request-download-fhir"
-    ).href = `data:application/json,${encodeURI(
-      JSON.stringify(response.request, null, 2)
-        .replace(/\\/g, "")
-        .replace(/"/, "")
-        .replace(/.$/, "")
-    )}`
-    // component includes '#' which is present in xml
-    document.getElementById(
-      "send-request-download-xml"
-    ).href = `data:application/xml,${encodeURIComponent(response.request_xml)}`
-    document.getElementById(
-      "send-response-download"
-    ).href = `data:application/json,${encodeURI(
-      JSON.stringify(response.response, null, 2)
-        .replace(/\\/g, "")
-        .replace(/"/, "")
-        .replace(/.$/, "")
-    )}`
+    pageData.sendResponse.fhirRequest = response.request
+    pageData.sendResponse.hl7Request = response.request_xml
+    pageData.sendResponse.fhirResponse = response.response
   } catch (e) {
     console.log(e)
     addError("Communication error")
@@ -594,26 +637,9 @@ window.sendCancelRequest = function() {
       parsedCancelResponse,
       response.success
     )
-    document.getElementById(
-      "cancel-request-download-fhir"
-    ).href = `data:application/json,${encodeURI(
-      JSON.stringify(response.request, null, 2)
-        .replace(/\\/g, "")
-        .replace(/"/, "")
-        .replace(/.$/, "")
-    )}`
-    // component includes '#' which is present in xml
-    document.getElementById(
-      "cancel-request-download-xml"
-    ).href = `data:application/xml,${encodeURIComponent(response.request_xml)}`
-    document.getElementById(
-      "cancel-response-download"
-    ).href = `data:application/json,${encodeURI(
-      JSON.stringify(response.response, null, 2)
-        .replace(/\\/g, "")
-        .replace(/"/, "")
-        .replace(/.$/, "")
-    )}`
+    pageData.cancelResponse.fhirRequest = response.request
+    pageData.cancelResponse.hl7Request = response.request_xml
+    pageData.cancelResponse.fhirResponse = response.response
   } catch (e) {
     console.log(e)
     addError("Communication error")
@@ -647,26 +673,9 @@ window.sendReleaseRequest = function() {
       })
       : null
     pageData.releaseResponse.success = response.success
-    document.getElementById(
-      "release-request-download-fhir"
-    ).href = `data:application/json,${encodeURI(
-      JSON.stringify(response.request, null, 2)
-        .replace(/\\/g, "")
-        .replace(/"/, "")
-        .replace(/.$/, "")
-    )}`
-    // component includes '#' which is present in xml
-    document.getElementById(
-      "release-request-download-xml"
-    ).href = `data:application/xml,${encodeURIComponent(response.request_xml)}`
-    document.getElementById(
-      "release-response-download"
-    ).href = `data:application/json,${encodeURI(
-      JSON.stringify(response.response, null, 2)
-        .replace(/\\/g, "")
-        .replace(/"/, "")
-        .replace(/.$/, "")
-    )}`
+    pageData.releaseResponse.fhirRequest = response.request
+    pageData.releaseResponse.hl7Request = response.request_xml
+    pageData.releaseResponse.fhirResponse = response.response
   } catch (e) {
     console.log(e)
     addError("Communication error")
@@ -689,26 +698,9 @@ window.sendDispenseRequest = function() {
     pageData.dispenseResponse = {}
     pageData.dispenseResponse.body = response.body
     pageData.dispenseResponse.success = response.success
-    document.getElementById(
-      "dispense-request-download-fhir"
-    ).href = `data:application/json,${encodeURI(
-      JSON.stringify(response.request, null, 2)
-        .replace(/\\/g, "")
-        .replace(/"/, "")
-        .replace(/.$/, "")
-    )}`
-    // component includes '#' which is present in xml
-    document.getElementById(
-      "dispense-request-download-xml"
-    ).href = `data:application/xml,${encodeURIComponent(response.request_xml)}`
-    document.getElementById(
-      "dispense-response-download"
-    ).href = `data:application/json,${encodeURI(
-      JSON.stringify(response.response, null, 2)
-        .replace(/\\/g, "")
-        .replace(/"/, "")
-        .replace(/.$/, "")
-    )}`
+    pageData.dispenseResponse.fhirRequest = response.request
+    pageData.dispenseResponse.hl7Request = response.request_xml
+    pageData.dispenseResponse.fhirResponse = response.response
   } catch (e) {
     console.log(e)
     addError("Communication error")
@@ -2242,5 +2234,18 @@ function bind() {
     } catch (err) {
       console.error(err)
     }
+  }
+  var acc = document.getElementsByClassName("accordion");
+  var i;
+  for (i = 0; i < acc.length; i++) {
+    acc[i].addEventListener("click", function() {
+      this.classList.toggle("active");
+      var panel = this.nextElementSibling;
+      if (panel.style.maxHeight) {
+        panel.style.maxHeight = null;
+      } else {
+        panel.style.maxHeight = (parseInt(panel.scrollHeight) + 25) + "px";
+      }
+    });
   }
 }

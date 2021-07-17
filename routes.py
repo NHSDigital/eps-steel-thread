@@ -66,6 +66,8 @@ CANCEL_URL = "/prescribe/cancel"
 RELEASE_URL = "/dispense/release"
 DISPENSE_URL = "/dispense/dispense"
 
+def stringifyJson(json_content):
+    return json.dumps(json_content, ensure_ascii=False)
 
 def exclude_from_auth(*args, **kw):
     def wrapper(endpoint_method):
@@ -201,11 +203,13 @@ def update_pagination(response, short_prescription_ids, current_short_prescripti
 @app.route(EDIT_URL, methods=["GET"])
 @exclude_from_auth()
 def get_edit():
-    current_short_prescription_id = flask.request.args.get("prescription_id")
-    bundle = load_prepare_request(current_short_prescription_id)
+    short_prescription_id = flask.request.args.get("prescription_id")
+    if short_prescription_id is None:
+        flask.redirect("/login")
+    bundle = load_prepare_request(short_prescription_id)
     response = app.make_response(bundle)
     short_prescription_ids = get_prescription_ids_from_cookie()
-    update_pagination(response, short_prescription_ids, current_short_prescription_id)
+    update_pagination(response, short_prescription_ids, short_prescription_id)
     return response
 
 
@@ -242,7 +246,6 @@ def post_sign():
         auth_method, get_access_token(), prepare_response["digest"], prepare_response["algorithm"]
     )
     print("Response from Signing Service signature upload request...")
-    print(json.dumps(sign_response))
     response = app.make_response({"redirectUri": sign_response["redirectUri"]})
     set_skip_signature_page_cookie(response, str(skip_signature_page))
     add_prepare_response(short_prescription_id, prepare_response)
@@ -256,6 +259,8 @@ def get_send():
         auth_method, get_access_token(), flask.request.args.get("token")
     )
     short_prescription_id = get_prescription_id_from_cookie()
+    if short_prescription_id is None:
+        return flask.redirect("/login")
     prepare_response = load_prepare_response(short_prescription_id)
     payload = prepare_response["digest"]
     signature = signature_response_json["signature"]
@@ -283,15 +288,15 @@ def get_send():
 @app.route(SEND_URL, methods=["POST"])
 def post_send():
     short_prescription_id = get_prescription_id_from_cookie()
-    send_request = load_send_request(short_prescription_id)
-    send_request_xml = make_eps_api_convert_message_request(get_access_token(), send_request)
-    send_prescription_response = make_eps_api_process_message_request(get_access_token(), send_request)
+    request = load_send_request(short_prescription_id)
+    convert_response, _code = make_eps_api_convert_message_request(get_access_token(), request)
+    send_response, send_response_code = make_eps_api_process_message_request(get_access_token(), request)
     return {
         "prescription_id": short_prescription_id,
-        "success": send_prescription_response.status_code == 200,
-        "request_xml": send_request_xml.text,
-        "request": json.dumps(send_request),
-        "response": json.dumps(send_prescription_response.json()),
+        "success": send_response_code == 200,
+        "request_xml": convert_response,
+        "request": request,
+        "response": send_response,
     }
 
 
@@ -302,20 +307,17 @@ def get_cancel():
 
 @app.route(CANCEL_URL, methods=["POST"])
 def post_cancel():
-    cancel_request = flask.request.json
-    short_prescription_id = get_prescription_id(cancel_request)
-    cancel_request_xml = make_eps_api_convert_message_request(get_access_token(), cancel_request)
-    cancel_response = make_eps_api_process_message_request(get_access_token(), cancel_request)
-    response = app.make_response(
-        {
-            "prescription_id": short_prescription_id,
-            "success": cancel_response.status_code == 200,
-            "request": json.dumps(cancel_request),
-            "request_xml": cancel_request_xml.text,
-            "response": json.dumps(cancel_response.json()),
-        }
-    )
-    return response
+    request = flask.request.json
+    short_prescription_id = get_prescription_id(request)
+    convert_response, _code = make_eps_api_convert_message_request(get_access_token(), request)
+    cancel_response, cancel_response_code = make_eps_api_process_message_request(get_access_token(), request)
+    return {
+        "prescription_id": short_prescription_id,
+        "success": cancel_response_code == 200,
+        "request": request,
+        "request_xml": convert_response,
+        "response": cancel_response
+    }
 
 
 @app.route(RELEASE_URL, methods=["GET"])
@@ -333,7 +335,7 @@ def post_release():
     short_prescription_id = release.get("prescriptionId")
     ods_code = release["odsCode"]
     if short_prescription_id:
-        release_request_body = {
+        request = {
             "resourceType": "Parameters",
             "id": str(uuid.uuid4()),
             "parameter": [
@@ -357,7 +359,7 @@ def post_release():
             }]
         }
     else:
-        release_request_body = {
+        request = {
             "resourceType": "Parameters",
             "id": str(uuid.uuid4()),
             "parameter": [
@@ -368,17 +370,17 @@ def post_release():
                 {"name": "status", "valueCode": "accepted"},
             ],
         }
-    response = make_eps_api_release_request(
+    convert_response, _code = make_eps_api_convert_message_request(get_access_token(), request)
+    release_response, release_response_code = make_eps_api_release_request(
         get_access_token(),
-        release_request_body,
+        request,
     )
-    release_request_xml = make_eps_api_convert_message_request(get_access_token(), release_request_body)
     return {
-        "body": json.dumps(response.json()),
-        "success": response.status_code == 200,
-        "request_xml": release_request_xml.text,
-        "request": json.dumps(release_request_body),
-        "response": json.dumps(response.json()),
+        "body": stringifyJson(release_response),
+        "success": release_response_code == 200,
+        "request_xml": convert_response,
+        "request": request,
+        "response": release_response,
     }
 
 
@@ -393,24 +395,24 @@ def get_dispense():
 def post_dispense():
     if (config.ENVIRONMENT == "prod"):
         return app.make_response("Bad Request", 400)
-    dispense_request = flask.request.json
-    response = make_eps_api_process_message_request(
+    request = flask.request.json
+    convert_response, _code = make_eps_api_convert_message_request(get_access_token(), request)
+    dispense_response, dispense_response_code = make_eps_api_process_message_request(
         get_access_token(),
-        dispense_request
+        request
     )
-    dispense_request_xml = make_eps_api_convert_message_request(get_access_token(), dispense_request)
     return {
-        "body": json.dumps(response.json()),
-        "success": response.status_code == 200,
-        "request_xml": dispense_request_xml.text,
-        "request": json.dumps(dispense_request),
-        "response": json.dumps(response.json()),
+        "body": stringifyJson(dispense_response),
+        "success": dispense_response_code == 200,
+        "request_xml": convert_response,
+        "request": stringifyJson(request),
+        "response": stringifyJson(dispense_response),
     }
 
 
 @app.route("/logout", methods=["GET"])
 def get_logout():
-    return redirect_and_set_cookies("login", "", 0)
+    return redirect_and_set_cookies("login", "", "", 0, 0)
 
 
 @app.route("/callback", methods=["GET"])
@@ -421,7 +423,11 @@ def get_callback():
     auth_method = get_auth_method_from_cookie()
     token_response_json = exchange_code_for_token(code, auth_method)
     access_token = token_response_json["access_token"]
-    expires_in = token_response_json["expires_in"]
+    refresh_token = token_response_json["refresh_token"]
+    access_token_expires_in = token_response_json["expires_in"]
+    refresh_token_expires_in = token_response_json["refresh_token_expires_in"]
     access_token_encrypted = fernet.encrypt(access_token.encode("utf-8")).decode("utf-8")
-    expires = datetime.datetime.utcnow() + datetime.timedelta(seconds=float(expires_in))
-    return redirect_and_set_cookies(state, access_token_encrypted, expires)
+    refresh_token_encrypted = fernet.encrypt(refresh_token.encode("utf-8")).decode("utf-8")
+    access_token_expires = datetime.datetime.utcnow() + datetime.timedelta(seconds=float(access_token_expires_in))
+    refresh_token_expires = datetime.datetime.utcnow() + datetime.timedelta(seconds=float(refresh_token_expires_in))
+    return redirect_and_set_cookies(state, access_token_encrypted, refresh_token_encrypted, access_token_expires, refresh_token_expires)

@@ -394,9 +394,9 @@
                     </svg>
                   </div>
                   <div style="float:left;display: inline;width: 150px;margin-top: -7px;">
-                    <a id="send-request-download-fhir" download="send_request.json"><img style="width: 25%;" src="{{ url_for('static', filename='json.png') }}" title="Request"/></a>
-                    <a id="send-request-download-xml" download="send_request.xml"><img style="width: 25%;" src="{{ url_for('static', filename='xml.png') }}" title="Request"/></a>
-                    <a id="send-response-download" download="send_response.json"><img style="width: 25%;" src="{{ url_for('static', filename='json.png') }}" title="Response"/></a>
+                    <a rv-href="sendResponse.fhirRequest | downloadJson" download="send_request.json"><img style="width: 25%;" src="{{ url_for('static', filename='json.png') }}" title="Request (FHIR)"/></a>
+                    <a rv-href="sendResponse.hl7Request | downloadXml" download="send_request.xml"><img style="width: 25%;" src="{{ url_for('static', filename='xml.png') }}" title="Request (HL7v3)"/></a>
+                    <a rv-href="sendResponse.fhirResponse | downloadJson" download="send_response.json"><img style="width: 25%;" src="{{ url_for('static', filename='json.png') }}" title="Response"/></a>
                   </div>
                 </dd>
                 <dd class="nhsuk-summary-list__value" style="padding-top:0;">
@@ -405,6 +405,20 @@
                     <option rv-each-action="actions" rv-id="action.id" rv-value="action.id">{action.description}</option>
                   </select>
                 </dd>
+              </div>
+              <div style="width: 960px">
+                <button class="accordion">Request (FHIR)</button>
+                <div class="panel">
+                  <pre rv-html="sendResponse.fhirRequest | json"></pre>
+                </div>
+                <button class="accordion">Request (HL7v3)</button>
+                <div class="panel">
+                  <pre rv-html="sendResponse.hl7Request | xml"></pre>
+                </div>
+                <button class="accordion">Response (FHIR)</button>
+                <div class="panel">
+                  <pre rv-html="sendResponse.fhirResponse | json"></pre>
+                </div>
               </div>
             </dl>
           </div>
@@ -496,9 +510,9 @@
                     </svg>
                   </div>
                   <div style="float:left;display: inline;width: 150px;margin-top: -7px;">
-                    <a id="cancel-request-download-fhir" download="cancel_request.json"><img style="width: 25%;" src="{{ url_for('static', filename='json.png') }}" title="Request"/></a>
-                    <a id="cancel-request-download-xml" download="cancel_request.xml"><img style="width: 25%;" src="{{ url_for('static', filename='xml.png') }}" title="Request"/></a>
-                    <a id="cancel-response-download" download="cancel_response.json"><img style="width: 25%;" src="{{ url_for('static', filename='json.png') }}" title="Response"/></a>
+                    <a rv-href="cancelResponse.fhirRequest | downloadJson" download="cancel_request.json"><img style="width: 25%;" src="{{ url_for('static', filename='json.png') }}" title="Request (FHIR)"/></a>
+                    <a rv-href="cancelResponse.hl7Request | downloadXml" download="cancel_request.xml"><img style="width: 25%;" src="{{ url_for('static', filename='xml.png') }}" title="Request (HL7v3)"/></a>
+                    <a rv-href="cancelResponse.fhirResponse | downloadJson" download="cancel_response.json"><img style="width: 25%;" src="{{ url_for('static', filename='json.png') }}" title="Response"/></a>
                   </div>
                 </dd>
               </div>
@@ -566,9 +580,9 @@
                     </svg>
                   </div>
                   <div style="float:left;display: inline;width: 150px;margin-top: -7px;">
-                    <a id="release-request-download-fhir" download="release_request.json"><img style="width: 25%;" src="{{ url_for('static', filename='json.png') }}" title="Request"/></a>
-                    <a id="release-request-download-xml" download="release_request.xml"><img style="width: 25%;" src="{{ url_for('static', filename='xml.png') }}" title="Request"/></a>
-                    <a id="release-response-download" download="release_response.json"><img style="width: 25%;" src="{{ url_for('static', filename='json.png') }}" title="Response"/></a>
+                    <a rv-href="releaseResponse.fhirRequest | downloadJson" download="release_request.json"><img style="width: 25%;" src="{{ url_for('static', filename='json.png') }}" title="Request (FHIR)"/></a>
+                    <a rv-href="releaseResponse.hl7Request | downloadXml" download="release_request.xml"><img style="width: 25%;" src="{{ url_for('static', filename='xml.png') }}" title="Request (HL7v3)"/></a>
+                    <a rv-href="releaseResponse.fhirResponse | downloadJson" download="release_response.json"><img style="width: 25%;" src="{{ url_for('static', filename='json.png') }}" title="Response"/></a>
                   </div>
                 </dd>
               </div>
@@ -615,9 +629,9 @@
                     </svg>
                   </div>
                   <div style="float:left;display: inline;width: 150px;margin-top: -7px;">
-                    <a id="dispense-request-download-fhir" download="dispense_request.json"><img style="width: 25%;" src="{{ url_for('static', filename='json.png') }}" title="Request"/></a>
-                    <a id="dispense-request-download-xml" download="dispense_request.xml"><img style="width: 25%;" src="{{ url_for('static', filename='xml.png') }}" title="Request"/></a>
-                    <a id="dispense-response-download" download="dispense_response.json"><img style="width: 25%;" src="{{ url_for('static', filename='json.png') }}" title="Response"/></a>
+                    <a rv-href="dispenseResponse.fhirRequest | downloadJson" download="dispense_request.json"><img style="width: 25%;" src="{{ url_for('static', filename='json.png') }}" title="Request (FHIR)"/></a>
+                    <a rv-href="dispenseResponse.hl7Request | downloadXml" download="dispense_request.xml"><img style="width: 25%;" src="{{ url_for('static', filename='xml.png') }}" title="Request (HL7v3)"/></a>
+                    <a rv-href="dispenseResponse.fhirResponse | downloadJson" download="dispense_response.json"><img style="width: 25%;" src="{{ url_for('static', filename='json.png') }}" title="Response"/></a>
                   </div>
                 </dd>
               </div>
