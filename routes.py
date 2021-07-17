@@ -204,7 +204,9 @@ def get_edit():
     if short_prescription_id is None:
         flask.redirect("/login")
     bundle = load_prepare_request(short_prescription_id)
-    response = app.make_response(bundle)
+    response = app.make_response({
+        "bundle": bundle
+    })
     short_prescription_ids = get_prescription_ids_from_cookie()
     update_pagination(response, short_prescription_ids, short_prescription_id)
     return response

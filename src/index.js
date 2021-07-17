@@ -615,12 +615,12 @@ window.sendPrescriptionRequest = function() {
 window.sendCancelRequest = function() {
   try {
     const prescriptionId = Cookies.get("Current-Prescription-Id")
-    const prescription = makeRequest(
+    const response = makeRequest(
       "GET",
       `/prescribe/edit?prescription_id=${prescriptionId}`
     )
     resetPageData("cancel")
-    const cancellation = createCancellation(prescription)
+    const cancellation = createCancellation(response.bundle)
     const response = makeRequest(
       "POST",
       "/prescribe/cancel",
@@ -684,11 +684,11 @@ window.sendReleaseRequest = function() {
 window.sendDispenseRequest = function() {
   try {
     const prescriptionId = Cookies.get("Current-Prescription-Id")
-    const bundle = makeRequest(
+    const response = makeRequest(
       "GET",
       `/prescribe/edit?prescription_id=${prescriptionId}`
     )
-    const dispenseRequest = createDispenseRequest(bundle)
+    const dispenseRequest = createDispenseRequest(response.bundle)
     const response = makeRequest(
       "POST",
       "/dispense/dispense",
