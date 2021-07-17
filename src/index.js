@@ -483,7 +483,7 @@ window.getEditRequest = function(previousOrNext) {
     pageData.previous_prescription_id = Cookies.get("Previous-Prescription-Id")
     pageData.next_prescription_id = Cookies.get("Next-Prescription-Id")
     resetPageData("sign")
-    pageData.prescription = getPrescriptionSummary(response)
+    pageData.prescription = getPrescriptionSummary(response.bundle)
   } catch (e) {
     console.log(e)
     addError("Communication error")
@@ -2158,7 +2158,7 @@ window.startApplication = async function(mode, env, signResponse) {
       "GET",
       `/prescribe/edit?prescription_id=${prescriptionId}`
     )
-    pageData.prescription = getPrescriptionSummary(response)
+    pageData.prescription = getPrescriptionSummary(response.bundle)
     resetPageData("dispense")
   }
   if (
@@ -2183,7 +2183,7 @@ window.startApplication = async function(mode, env, signResponse) {
       "GET",
       `/prescribe/edit?prescription_id=${prescriptionId}`
     )
-    pageData.prescription = getPrescriptionSummary(response)
+    pageData.prescription = getPrescriptionSummary(response.bundle)
     resetPageData("cancel")
   }
   bind()
