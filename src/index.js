@@ -664,7 +664,7 @@ window.sendReleaseRequest = function() {
     pageData.showCustomPharmacyInput = false
     pageData.releaseResponse = {}
     pageData.releaseResponse.prescriptions = response.success
-      ? JSON.parse(response.response).entry.map(function (entry) {
+      ? response.response.entry.map(function (entry) {
         const bundle = entry.resource
         const originalShortFormId = getMedicationRequests(bundle)[0]
           .groupIdentifier.value
