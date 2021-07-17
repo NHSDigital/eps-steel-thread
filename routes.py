@@ -241,16 +241,20 @@ def post_sign():
     skip_signature_page = sign_request["skipSignaturePage"]
     short_prescription_id = get_prescription_id_from_cookie()
     prepare_request = load_prepare_request(short_prescription_id)
-    prepare_response = make_eps_api_prepare_request(get_access_token(), prepare_request)
-    auth_method = get_auth_method_from_cookie()
-    sign_response = make_sign_api_signature_upload_request(
-        auth_method, get_access_token(), prepare_response["digest"], prepare_response["algorithm"]
-    )
-    print("Response from Signing Service signature upload request...")
-    response = app.make_response({"redirectUri": sign_response["redirectUri"]})
-    set_skip_signature_page_cookie(response, str(skip_signature_page))
-    add_prepare_response(short_prescription_id, prepare_response)
-    return response
+    prepare_response, status_code = make_eps_api_prepare_request(get_access_token(), prepare_request)
+    if status_code == 200:
+        prepare_response = {p["name"]: p["valueString"] for p in prepare_response["parameter"]}
+        auth_method = get_auth_method_from_cookie()
+        sign_response = make_sign_api_signature_upload_request(
+            auth_method, get_access_token(), prepare_response["digest"], prepare_response["algorithm"]
+        )
+        print("Response from Signing Service signature upload request...")
+        response = app.make_response({"redirectUri": sign_response["redirectUri"]})
+        set_skip_signature_page_cookie(response, str(skip_signature_page))
+        add_prepare_response(short_prescription_id, prepare_response)
+        return response
+    else:
+        return render_client("load")
 
 
 @app.route(SEND_URL, methods=["GET"])
