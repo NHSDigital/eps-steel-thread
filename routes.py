@@ -254,7 +254,7 @@ def post_sign():
         add_prepare_response(short_prescription_id, prepare_response)
         return response
     else:
-        return render_client("load")
+        return {}
 
 
 @app.route(SEND_URL, methods=["GET"])
