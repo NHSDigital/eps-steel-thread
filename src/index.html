@@ -345,6 +345,10 @@
                 <dd class="nhsuk-summary-list__value">{prescription.prescribingOrganization.name}
                   ({prescription.prescribingOrganization.identifier | odsCode})</dd>
               </div>
+              <div class="nhsuk-summary-list__row" rv-each-telecom="prescription.practitionerRole.telecom">
+                <dt class="nhsuk-summary-list__key">Telecom</dt>
+                <dd class="nhsuk-summary-list__value">{telecom.value}</dd>
+              </div>
               <div class="nhsuk-summary-list__row" rv-each-address="prescription.prescribingOrganization.address">
                 <dt class="nhsuk-summary-list__key">Address</dt>
                 <dd class="nhsuk-summary-list__value">

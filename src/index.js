@@ -927,6 +927,7 @@ function addError(message) {
 function getPrescriptionSummary(payload) {
   const patient = getResourcesOfType(payload, "Patient")[0]
   const practitioner = getResourcesOfType(payload, "Practitioner")[0]
+  const practitionerRole = getResourcesOfType(payload, "PractitionerRole")[0]
   const encounter = getResourcesOfType(payload, "Encounter")[0]
   const organizations = getResourcesOfType(payload, "Organization")
   const prescribingOrganization = organizations[0] // todo: add logic to handle primary/secondary-care
@@ -964,6 +965,7 @@ function getPrescriptionSummary(payload) {
       : medicationRepeatInformation.length
         ? numberOfRepeatPrescriptionsIssuedExtension[0].valueUnsignedInt
         : null
+  practitionerRole.telecom = practitionerRole.telecom ?? []
   return {
     id: medicationRequests[0].groupIdentifier.value,
     author: {
@@ -975,6 +977,7 @@ function getPrescriptionSummary(payload) {
       : null,
     patient: patient,
     practitioner: practitioner,
+    practitionerRole: practitionerRole,
     encounter: encounter,
     prescribingOrganization: prescribingOrganization,
     parentOrganization: parentOrganization,
