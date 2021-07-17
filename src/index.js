@@ -615,12 +615,12 @@ window.sendPrescriptionRequest = function() {
 window.sendCancelRequest = function() {
   try {
     const prescriptionId = Cookies.get("Current-Prescription-Id")
-    const response = makeRequest(
+    const prescription = makeRequest(
       "GET",
       `/prescribe/edit?prescription_id=${prescriptionId}`
     )
     resetPageData("cancel")
-    const cancellation = createCancellation(response.bundle)
+    const cancellation = createCancellation(prescription.bundle)
     const response = makeRequest(
       "POST",
       "/prescribe/cancel",
