@@ -296,7 +296,7 @@ def post_send():
         "success": send_response_code == 200,
         "request_xml": convert_response,
         "request": request,
-        "response": send_response,
+        "response": send_response
     }
 
 
@@ -380,7 +380,7 @@ def post_release():
         "success": release_response_code == 200,
         "request_xml": convert_response,
         "request": request,
-        "response": release_response,
+        "response": release_response
     }
 
 
