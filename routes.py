@@ -254,7 +254,9 @@ def post_sign():
         add_prepare_response(short_prescription_id, prepare_response)
         return response
     else:
-        return "Request to prepare an EPS prescription failed.", 400
+        return {
+            "prepareError": prepare_response.json()
+        }
 
 
 @app.route(SEND_URL, methods=["GET"])

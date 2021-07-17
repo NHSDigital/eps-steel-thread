@@ -589,7 +589,12 @@ window.sendSignRequest = function (skipSignaturePage) {
       "/prescribe/sign",
       JSON.stringify({skipSignaturePage})
     )
-    window.location.href = response.redirectUri
+    if (response.prepareError) {
+      addError(response.prepareError)
+    }
+    else {
+      window.location.href = response.redirectUri
+    }
   } catch (e) {
     console.log(e)
     addError("Communication error")
