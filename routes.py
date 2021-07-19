@@ -256,7 +256,7 @@ def post_sign():
         return response
     else:
         return {
-            "prepareError": prepare_response.json()
+            "prepareError": prepare_response
         }
 
 
