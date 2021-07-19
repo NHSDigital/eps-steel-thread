@@ -344,6 +344,8 @@ rivets.formatters.displayEnvironment = function (environment) {
     return "Production"
   } else if (environment === "int") {
     return "Integration"
+  } else if (environment === "internal-dev") {
+    return "Development"
   } else {
     return environment
   }
