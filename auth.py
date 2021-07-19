@@ -3,6 +3,7 @@ import os
 import httpx
 from urllib.parse import urlencode
 from app import app, fernet
+import config
 
 DEV_MODE = os.environ.get("DEV_MODE", False)
 
@@ -38,7 +39,7 @@ def redirect_and_set_cookies(state, access_token_encrypted, refresh_token_encryp
 
 
 def get_oauth_base_path(auth_method):
-    if auth_method == "simulated":
+    if auth_method == "simulated" and config.ENVIRONMENT == "int":
         return f"{OAUTH_BASE_PATH}-no-smartcard"
     else:
         return f"{OAUTH_BASE_PATH}"

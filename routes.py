@@ -110,7 +110,7 @@ def login():
 
 
 def get_oauth_base_path(auth_method):
-    if auth_method == "simulated":
+    if auth_method == "simulated" and config.ENVIRONMENT == "int":
         return f"{OAUTH_BASE_PATH}-no-smartcard"
     else:
         return f"{OAUTH_BASE_PATH}"
