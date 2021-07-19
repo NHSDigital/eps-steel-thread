@@ -128,13 +128,13 @@ def get_authorize_url(state, auth_method):
     return f"{oauth_base_path}/authorize?{urlencode(query_params)}"
 
 
-@app.route("/login", methods=["GET"])
+@app.route("/change-auth", methods=["GET"])
 @exclude_from_auth()
 def get_login():
     return render_client("login")
 
 
-@app.route("/login", methods=["POST"])
+@app.route("/change-auth", methods=["POST"])
 @exclude_from_auth()
 def post_login():
     login_request = flask.request.json
@@ -202,7 +202,7 @@ def update_pagination(response, short_prescription_ids, current_short_prescripti
 def get_edit():
     short_prescription_id = flask.request.args.get("prescription_id")
     if short_prescription_id is None:
-        flask.redirect("/login")
+        flask.redirect("/change-auth")
     bundle = load_prepare_request(short_prescription_id)
     response = app.make_response({
         "bundle": bundle

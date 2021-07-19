@@ -452,7 +452,7 @@ window.sendLoadRequest = function() {
 window.updateAuthMethod = function(authMethod) {
   const response = makeRequest(
     "POST",
-    "/login",
+    "/change-auth",
     JSON.stringify({authMethod: authMethod})
   )
   window.location.href = response.redirectUri
@@ -467,7 +467,7 @@ function makeRequest(method, url, body) {
     xhr.send(body)
   } catch {
     // if we get an undetecable cors error caused by oauth triggering on a post, then redirect to login
-    window.location.href = "/login"
+    window.location.href = "/change-auth"
   }
   return JSON.parse(xhr.responseText)
 }

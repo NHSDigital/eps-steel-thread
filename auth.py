@@ -18,7 +18,7 @@ EDIT_URL = "/prescribe/edit"
 SIGN_URL = "/prescribe/sign"
 SEND_URL = "/prescribe/send"
 RELEASE_URL = "/dispense/release"
-REDIRECT_URL_FOR_STATE = {"login": "/login", "home": "/"}
+REDIRECT_URL_FOR_STATE = {"login": "/change-auth", "home": "/"}
 
 
 def redirect_and_set_cookies(state, access_token_encrypted, refresh_token_encrypted, access_token_expiry, refresh_token_expiry):

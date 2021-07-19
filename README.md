@@ -14,7 +14,7 @@ The site is hosted in heroku and has a development and production version
 
 Smartcard auth is enabled by default so when navigating to homepage and selecting login you will be redirected to authenticate with a smartcard.
 
-If you don't have a smartcard you can navigate to `/login` to select simulated auth instead
+If you don't have a smartcard you can navigate to `/change-auth` to select simulated auth instead
 
 ## Backend
 
