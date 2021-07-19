@@ -3,6 +3,7 @@ import httpx
 import os
 import time
 import json
+import config
 from jwt import JWT, jwk_from_pem
 
 DEMO_APP_CLIENT_ID = os.environ["DEMO_APP_CLIENT_ID"]
@@ -109,7 +110,7 @@ def make_sign_api_signature_download_request(auth_method, access_token, token):
 
 
 def get_signing_base_path(auth_method):
-    if auth_method == "simulated":
+    if auth_method == "simulated" and config.ENVIRONMENT == "int":
         return f"{SIGNING_BASE_PATH}-no-smartcard"
     else:
         return f"{SIGNING_BASE_PATH}"
