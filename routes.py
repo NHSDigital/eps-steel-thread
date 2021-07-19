@@ -248,6 +248,8 @@ def post_sign():
         sign_response = make_sign_api_signature_upload_request(
             auth_method, get_access_token(), prepare_response["digest"], prepare_response["algorithm"]
         )
+        print("Signature upload response...")
+        print(json.dumps(sign_response))
         response = app.make_response({"redirectUri": sign_response["redirectUri"]})
         set_skip_signature_page_cookie(response, str(skip_signature_page))
         add_prepare_response(short_prescription_id, prepare_response)
@@ -266,7 +268,7 @@ def get_send():
     )
     short_prescription_id = get_prescription_id_from_cookie()
     if short_prescription_id is None:
-        return flask.redirect("/login")
+        return flask.redirect("/change-auth")
     prepare_response = load_prepare_response(short_prescription_id)
     payload = prepare_response["digest"]
     signature = signature_response_json["signature"]

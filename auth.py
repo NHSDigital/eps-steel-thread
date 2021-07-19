@@ -80,6 +80,12 @@ def get_access_token():
     refresh_token = flask.request.cookies.get("Refresh-Token")
     auth_method = flask.request.cookies.get("Auth-Method", "cis2")
     if not access_token_session:
-        refresh_token_session(refresh_token, auth_method)
+        token_response = refresh_token_session(refresh_token, auth_method)
+        print("Refreshed token session. Got response...")
+        print(json.dumps(response))
+        access_token_expiry = token_response["expires_in"]
+        callback_response.set_cookie(
+            "Access-Token-Session", "True", expires=access_token_expiry, secure=secure_flag, httponly=True
+        )
     if access_token_encrypted is not None:
         return fernet.decrypt(access_token_encrypted.encode("utf-8")).decode("utf-8")
