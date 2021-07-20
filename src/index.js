@@ -594,7 +594,7 @@ window.sendSignRequest = function (skipSignaturePage) {
     if (response.prepareError) {
       response.prepareError.issue
         .filter(issue => issue.severity === "error")
-        .filter(issue => !issue.severity.startsWith("Unable to find matching profile for urn:uuid:"))
+        .filter(issue => !issue.diagnostics.startsWith("Unable to find matching profile for urn:uuid:"))
         .map(issue => issue.diagnostics)
         .forEach(diagnostic => addError(diagnostic))
     }
