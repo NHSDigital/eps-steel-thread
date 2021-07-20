@@ -498,8 +498,7 @@ window.sendEditRequest = function() {
     )
     resetPageData("sign")
     pageData.prescription = getPrescriptionSummary(response.bundle)
-    pageData.prescriptionErrors = response.errors
-    prescriptionErrors.forEach(error => addError(error))
+    response.errors.forEach(error => addError(error))
   } catch (e) {
     console.log(e)
     addError("Failed to read prescription(s)")
