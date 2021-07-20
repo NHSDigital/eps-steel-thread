@@ -94,7 +94,20 @@ def auth_check():
         access_token_encrypted = flask.request.cookies.get("Access-Token")
         if access_token_encrypted is not None:
             try:
-                fernet.decrypt(access_token_encrypted.encode("utf-8")).decode("utf-8")
+                access_token = fernet.decrypt(access_token_encrypted.encode("utf-8")).decode("utf-8")
+                access_token_session = flask.request.cookies.get("Access-Token-Session")
+                refresh_token_encrypted = flask.request.cookies.get("Refresh-Token")
+                auth_method = flask.request.cookies.get("Auth-Method", "cis2")
+                if not access_token_session:
+                    refresh_token = fernet.decrypt(refresh_token_encrypted.encode("utf-8")).decode("utf-8")
+                    token_response = refresh_token_session(refresh_token, auth_method)
+                    print("Refreshed token session. Got response...")
+                    print(json.dumps(token_response))
+                    # todo: reset access token session expiry
+                    # access_token_expiry = token_response["expires_in"]
+                    # callback_response.set_cookie(
+                    #     "Access-Token-Session", "True", expires=access_token_expiry, secure=secure_flag, httponly=True
+                    # )
             except:
                 return login()
         else:
