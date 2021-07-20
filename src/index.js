@@ -508,9 +508,10 @@ window.sendEditRequest = function() {
     resetPageData("sign")
     pageData.prescription = getPrescriptionSummary(response.bundle)
     pageData.prescriptionErrors = response.errors
+    prescriptionErrors.forEach(error => addError(error))
   } catch (e) {
     console.log(e)
-    addError("Communication error")
+    addError("Failed to parse prescription")
   }
 }
 
