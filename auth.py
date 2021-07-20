@@ -83,7 +83,7 @@ def get_access_token():
     if not access_token_session:
         token_response = refresh_token_session(refresh_token, auth_method)
         print("Refreshed token session. Got response...")
-        print(json.dumps(response))
+        print(json.dumps(token_response))
         access_token_expiry = token_response["expires_in"]
         callback_response.set_cookie(
             "Access-Token-Session", "True", expires=access_token_expiry, secure=secure_flag, httponly=True
