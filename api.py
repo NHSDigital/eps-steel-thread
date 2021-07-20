@@ -3,6 +3,7 @@ import httpx
 import os
 import time
 import json
+import config
 from jwt import JWT, jwk_from_pem
 
 DEMO_APP_CLIENT_ID = os.environ["DEMO_APP_CLIENT_ID"]
@@ -20,25 +21,25 @@ DEMO_APP_REMOTE_SIGNING_KID = os.environ["RSS_JWT_KID"]
 
 
 def make_eps_api_prepare_request(access_token, body):
-    print("Response from EPS prepare request...")
-    response_json = make_eps_api_request("$prepare", access_token, body).json()
-    return {p["name"]: p["valueString"] for p in response_json["parameter"]}
+    print("Making EPS prepare request...")
+    response = make_eps_api_request("$prepare", access_token, body)
+    return response.json(), response.status_code
 
 
 def make_eps_api_process_message_request(access_token, body):
-    print("Response from EPS process request...")
+    print("Making EPS process request...")
     response = make_eps_api_request("$process-message", access_token, body)
     return response.json(), response.status_code
 
 
 def make_eps_api_convert_message_request(access_token, body):
-    print("Response from EPS convert request...")
+    print("Making EPS convert request...")
     response = make_eps_api_request("$convert", access_token, body)
     return response.text, response.status_code
 
 
 def make_eps_api_release_request(access_token, body):
-    print("Response from EPS release request...")
+    print("Making EPS release request...")
     response = make_eps_api_request("Task/$release", access_token, body)
     return response.json(), response.status_code
 
@@ -109,7 +110,7 @@ def make_sign_api_signature_download_request(auth_method, access_token, token):
 
 
 def get_signing_base_path(auth_method):
-    if auth_method == "simulated":
+    if auth_method == "simulated" and config.ENVIRONMENT == "int":
         return f"{SIGNING_BASE_PATH}-no-smartcard"
     else:
         return f"{SIGNING_BASE_PATH}"

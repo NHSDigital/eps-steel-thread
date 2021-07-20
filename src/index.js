@@ -1,4 +1,5 @@
 import examplePrescriptions from "./prescriptions"
+import "./site.css"
 
 const pageData = {
   examples: [
@@ -343,10 +344,71 @@ rivets.formatters.displayEnvironment = function (environment) {
     return "Production"
   } else if (environment === "int") {
     return "Integration"
+  } else if (environment === "internal-dev") {
+    return "Development"
   } else {
     return environment
   }
 }
+
+rivets.formatters.json = function(json)
+{
+  if (!json) {
+    return json
+  }
+  json = sortObject(json, false)
+  json = JSON.stringify(json, undefined, 2)
+  return json
+};
+
+rivets.formatters.downloadJson = function(json)
+{
+  if (!json) {
+    return json
+  }
+  const encoded_json = encodeURI(rivets.formatters.json(json))
+  return `data:application/json,${encoded_json}`
+};
+
+function sortObject(unordered, sortArrays = false) {
+  if (!unordered || typeof unordered !== 'object') {
+    return unordered;
+  }
+  if (Array.isArray(unordered)) {
+    const newArr = unordered.map((item) => sortObject(item, sortArrays));
+    if (sortArrays) {
+      newArr.sort();
+    }
+    return newArr;
+  }
+  const ordered = {};
+  Object.keys(unordered)
+    .sort()
+    .reverse()
+    .forEach((key) => {
+      ordered[key] = sortObject(unordered[key], sortArrays);
+    });
+  return ordered;
+}
+
+rivets.formatters.xml = function(xml)
+{
+  if (!xml) {
+    return xml
+  }
+  xml = xml.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return xml
+};
+
+rivets.formatters.downloadXml = function(xml)
+{
+  if (!xml) {
+    return xml
+  }
+  // component includes '#' which is present in xml
+  const encoded_xml = encodeURIComponent(xml)
+  return `data:application/xml,${encoded_xml}`
+};
 
 function concatenateIfPresent(fields) {
   return fields.filter(Boolean).reduce(function (currentValues, valuesToAdd) {
@@ -373,24 +435,14 @@ function toUpperCaseIfPresent(field) {
 }
 
 window.sendLoadRequest = function() {
-  const isCustom = pageData.selectedExampleId === "custom"
-  const filePayloads = pageData.payloads
-  const textPayloads = [document.getElementById("prescription-textarea").value]
-  const payloads = filePayloads
-    .concat(textPayloads)
-    .filter(Boolean)
-    .map(payload => JSON.parse(payload))
-  if (isCustom && !payloads.length) {
-    addError("Unable to parse custom prescription(s)")
-  } else {
-    resetPageData("edit")
-  }
+  resetErrors()
+  resetPageData("edit")
 }
 
 window.updateAuthMethod = function(authMethod) {
   const response = makeRequest(
     "POST",
-    "/login",
+    "/change-auth",
     JSON.stringify({authMethod: authMethod})
   )
   window.location.href = response.redirectUri
@@ -405,7 +457,7 @@ function makeRequest(method, url, body) {
     xhr.send(body)
   } catch {
     // if we get an undetecable cors error caused by oauth triggering on a post, then redirect to login
-    window.location.href = "/login"
+    window.location.href = "/change-auth"
   }
   return JSON.parse(xhr.responseText)
 }
@@ -423,7 +475,7 @@ window.getEditRequest = function(previousOrNext) {
     pageData.previous_prescription_id = Cookies.get("Previous-Prescription-Id")
     pageData.next_prescription_id = Cookies.get("Next-Prescription-Id")
     resetPageData("sign")
-    pageData.signRequestSummary = getSummary(response)
+    pageData.prescription = getPrescriptionSummary(response.bundle)
   } catch (e) {
     console.log(e)
     addError("Communication error")
@@ -431,6 +483,7 @@ window.getEditRequest = function(previousOrNext) {
 }
 
 window.sendEditRequest = function() {
+  resetErrors()
   try {
     const bundles = getPayloads()
     bundles.forEach(bundle => {
@@ -444,10 +497,11 @@ window.sendEditRequest = function() {
       JSON.stringify(bundles)
     )
     resetPageData("sign")
-    pageData.signRequestSummary = getSummary(response)
+    pageData.prescription = getPrescriptionSummary(response.bundle)
+    response.errors.forEach(error => addError(error))
   } catch (e) {
     console.log(e)
-    addError("Communication error")
+    addError("Failed to read prescription(s)")
   }
 }
 
@@ -500,6 +554,10 @@ const TEST_PATIENT = {
   ]
 }
 
+function resetErrors() {
+  pageData.errorList = undefined
+}
+
 function sanitiseProdTestData(bundle) {
   if (pageData.environment !== "prod") {
     return
@@ -522,13 +580,23 @@ function sanitiseProdTestData(bundle) {
 }
 
 window.sendSignRequest = function (skipSignaturePage) {
+  resetErrors()
   try {
     const response = makeRequest(
       "POST",
       "/prescribe/sign",
       JSON.stringify({skipSignaturePage})
     )
-    window.location.href = response.redirectUri
+    if (response.prepareError) {
+      response.prepareError.issue
+        .filter(issue => issue.severity === "error")
+        .filter(issue => !issue.diagnostics.startsWith("Unable to find matching profile for urn:uuid:"))
+        .map(issue => issue.diagnostics)
+        .forEach(diagnostic => addError(diagnostic))
+    }
+    else {
+      window.location.href = response.redirectUri
+    }
   } catch (e) {
     console.log(e)
     addError("Communication error")
@@ -536,32 +604,16 @@ window.sendSignRequest = function (skipSignaturePage) {
 }
 
 window.sendPrescriptionRequest = function() {
+  resetErrors()
   try {
     const response = makeRequest("POST", "/prescribe/send", {})
     pageData.signResponse = null
     pageData.sendResponse = {}
     pageData.sendResponse.prescriptionId = response.prescription_id
     pageData.sendResponse.success = response.success
-    document.getElementById(
-      "send-request-download-fhir"
-    ).href = `data:application/json,${encodeURI(
-      JSON.stringify(response.request, null, 2)
-        .replace(/\\/g, "")
-        .replace(/"/, "")
-        .replace(/.$/, "")
-    )}`
-    // component includes '#' which is present in xml
-    document.getElementById(
-      "send-request-download-xml"
-    ).href = `data:application/xml,${encodeURIComponent(response.request_xml)}`
-    document.getElementById(
-      "send-response-download"
-    ).href = `data:application/json,${encodeURI(
-      JSON.stringify(response.response, null, 2)
-        .replace(/\\/g, "")
-        .replace(/"/, "")
-        .replace(/.$/, "")
-    )}`
+    pageData.sendResponse.fhirRequest = response.request
+    pageData.sendResponse.hl7Request = response.request_xml
+    pageData.sendResponse.fhirResponse = response.response
   } catch (e) {
     console.log(e)
     addError("Communication error")
@@ -576,7 +628,7 @@ window.sendCancelRequest = function() {
       `/prescribe/edit?prescription_id=${prescriptionId}`
     )
     resetPageData("cancel")
-    const cancellation = createCancellation(prescription)
+    const cancellation = createCancellation(prescription.bundle)
     const response = makeRequest(
       "POST",
       "/prescribe/cancel",
@@ -585,35 +637,17 @@ window.sendCancelRequest = function() {
     pageData.cancelResponse = {}
     pageData.cancelResponse.prescriptionId = response.prescription_id
     pageData.cancelResponse.success = response.success
-    const parsedCancelResponse = JSON.parse(response.response)
     pageData.cancelResponse.prescriber = getPrescriber(
-      parsedCancelResponse,
+      response.response,
       response.success
     )
     pageData.cancelResponse.canceller = getCanceller(
-      parsedCancelResponse,
+      response.response,
       response.success
     )
-    document.getElementById(
-      "cancel-request-download-fhir"
-    ).href = `data:application/json,${encodeURI(
-      JSON.stringify(response.request, null, 2)
-        .replace(/\\/g, "")
-        .replace(/"/, "")
-        .replace(/.$/, "")
-    )}`
-    // component includes '#' which is present in xml
-    document.getElementById(
-      "cancel-request-download-xml"
-    ).href = `data:application/xml,${encodeURIComponent(response.request_xml)}`
-    document.getElementById(
-      "cancel-response-download"
-    ).href = `data:application/json,${encodeURI(
-      JSON.stringify(response.response, null, 2)
-        .replace(/\\/g, "")
-        .replace(/"/, "")
-        .replace(/.$/, "")
-    )}`
+    pageData.cancelResponse.fhirRequest = response.request
+    pageData.cancelResponse.hl7Request = response.request_xml
+    pageData.cancelResponse.fhirResponse = response.response
   } catch (e) {
     console.log(e)
     addError("Communication error")
@@ -637,9 +671,8 @@ window.sendReleaseRequest = function() {
     )
     pageData.showCustomPharmacyInput = false
     pageData.releaseResponse = {}
-    pageData.releaseResponse.body = !response.success ? response.body : ""
     pageData.releaseResponse.prescriptions = response.success
-      ? JSON.parse(response.body).entry.map(function (entry) {
+      ? response.response.entry.map(function (entry) {
         const bundle = entry.resource
         const originalShortFormId = getMedicationRequests(bundle)[0]
           .groupIdentifier.value
@@ -647,26 +680,9 @@ window.sendReleaseRequest = function() {
       })
       : null
     pageData.releaseResponse.success = response.success
-    document.getElementById(
-      "release-request-download-fhir"
-    ).href = `data:application/json,${encodeURI(
-      JSON.stringify(response.request, null, 2)
-        .replace(/\\/g, "")
-        .replace(/"/, "")
-        .replace(/.$/, "")
-    )}`
-    // component includes '#' which is present in xml
-    document.getElementById(
-      "release-request-download-xml"
-    ).href = `data:application/xml,${encodeURIComponent(response.request_xml)}`
-    document.getElementById(
-      "release-response-download"
-    ).href = `data:application/json,${encodeURI(
-      JSON.stringify(response.response, null, 2)
-        .replace(/\\/g, "")
-        .replace(/"/, "")
-        .replace(/.$/, "")
-    )}`
+    pageData.releaseResponse.fhirRequest = response.request
+    pageData.releaseResponse.hl7Request = response.request_xml
+    pageData.releaseResponse.fhirResponse = response.response
   } catch (e) {
     console.log(e)
     addError("Communication error")
@@ -676,39 +692,21 @@ window.sendReleaseRequest = function() {
 window.sendDispenseRequest = function() {
   try {
     const prescriptionId = Cookies.get("Current-Prescription-Id")
-    const bundle = makeRequest(
+    const prescription = makeRequest(
       "GET",
       `/prescribe/edit?prescription_id=${prescriptionId}`
     )
-    const dispenseRequest = createDispenseRequest(bundle)
+    const dispenseRequest = createDispenseRequest(prescription.bundle)
     const response = makeRequest(
       "POST",
       "/dispense/dispense",
       JSON.stringify(dispenseRequest)
     )
     pageData.dispenseResponse = {}
-    pageData.dispenseResponse.body = response.body
     pageData.dispenseResponse.success = response.success
-    document.getElementById(
-      "dispense-request-download-fhir"
-    ).href = `data:application/json,${encodeURI(
-      JSON.stringify(response.request, null, 2)
-        .replace(/\\/g, "")
-        .replace(/"/, "")
-        .replace(/.$/, "")
-    )}`
-    // component includes '#' which is present in xml
-    document.getElementById(
-      "dispense-request-download-xml"
-    ).href = `data:application/xml,${encodeURIComponent(response.request_xml)}`
-    document.getElementById(
-      "dispense-response-download"
-    ).href = `data:application/json,${encodeURI(
-      JSON.stringify(response.response, null, 2)
-        .replace(/\\/g, "")
-        .replace(/"/, "")
-        .replace(/.$/, "")
-    )}`
+    pageData.dispenseResponse.fhirRequest = response.request
+    pageData.dispenseResponse.hl7Request = response.request_xml
+    pageData.dispenseResponse.fhirResponse = response.response
   } catch (e) {
     console.log(e)
     addError("Communication error")
@@ -934,9 +932,10 @@ function addError(message) {
   })
 }
 
-function getSummary(payload) {
+function getPrescriptionSummary(payload) {
   const patient = getResourcesOfType(payload, "Patient")[0]
   const practitioner = getResourcesOfType(payload, "Practitioner")[0]
+  const practitionerRole = getResourcesOfType(payload, "PractitionerRole")[0]
   const encounter = getResourcesOfType(payload, "Encounter")[0]
   const organizations = getResourcesOfType(payload, "Organization")
   const prescribingOrganization = organizations[0] // todo: add logic to handle primary/secondary-care
@@ -974,6 +973,7 @@ function getSummary(payload) {
       : medicationRepeatInformation.length
         ? numberOfRepeatPrescriptionsIssuedExtension[0].valueUnsignedInt
         : null
+  practitionerRole.telecom = practitionerRole.telecom ?? []
   return {
     id: medicationRequests[0].groupIdentifier.value,
     author: {
@@ -985,6 +985,7 @@ function getSummary(payload) {
       : null,
     patient: patient,
     practitioner: practitioner,
+    practitionerRole: practitionerRole,
     encounter: encounter,
     prescribingOrganization: prescribingOrganization,
     parentOrganization: parentOrganization,
@@ -996,13 +997,11 @@ function getPayloads() {
   const isCustom = pageData.selectedExampleId === "custom"
   const filePayloads = pageData.payloads
   const textPayloads = [document.getElementById("prescription-textarea").value]
-  const payloads = filePayloads
-    .concat(textPayloads)
-    .filter(Boolean)
-    .map(payload => JSON.parse(payload))
-  if (isCustom && !payloads.length) {
-    addError("Unable to parse custom prescription(s)")
-  } else {
+  try {
+    const payloads = filePayloads
+      .concat(textPayloads)
+      .filter(Boolean)
+      .map(payload => JSON.parse(payload))
     return isCustom
       ? payloads
       : [
@@ -1010,6 +1009,9 @@ function getPayloads() {
           return example.id === pageData.selectedExampleId
         })[0].message
       ]
+  }
+  catch (e) {
+    addError("Unable to parse custom prescription(s)")
   }
 }
 
@@ -2165,7 +2167,7 @@ window.startApplication = async function(mode, env, signResponse) {
       "GET",
       `/prescribe/edit?prescription_id=${prescriptionId}`
     )
-    pageData.signRequestSummary = getSummary(response)
+    pageData.prescription = getPrescriptionSummary(response.bundle)
     resetPageData("dispense")
   }
   if (
@@ -2190,7 +2192,7 @@ window.startApplication = async function(mode, env, signResponse) {
       "GET",
       `/prescribe/edit?prescription_id=${prescriptionId}`
     )
-    pageData.signRequestSummary = getSummary(response)
+    pageData.prescription = getPrescriptionSummary(response.bundle)
     resetPageData("cancel")
   }
   bind()
@@ -2242,5 +2244,18 @@ function bind() {
     } catch (err) {
       console.error(err)
     }
+  }
+  var acc = document.getElementsByClassName("accordion");
+  var i;
+  for (i = 0; i < acc.length; i++) {
+    acc[i].addEventListener("click", function() {
+      this.classList.toggle("active");
+      var panel = this.nextElementSibling;
+      if (panel.style.maxHeight) {
+        panel.style.maxHeight = null;
+      } else {
+        panel.style.maxHeight = (parseInt(panel.scrollHeight) + 25) + "px";
+      }
+    });
   }
 }

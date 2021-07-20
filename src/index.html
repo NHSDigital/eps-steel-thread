@@ -210,9 +210,9 @@
             <dl class="nhsuk-summary-list">
               <div class="nhsuk-summary-list__row">
                 <dt class="nhsuk-summary-list__key">ID</dt>
-                <dd class="nhsuk-summary-list__value">{signRequestSummary.id}</dd>
-                <dt class="nhsuk-summary-list__key" rv-show="signRequestSummary.repeatNumber">Repeat Number</dt>
-                <dd class="nhsuk-summary-list__value" rv-show="signRequestSummary.repeatNumber">{signRequestSummary.repeatNumber}</dd>
+                <dd class="nhsuk-summary-list__value">{prescription.id}</dd>
+                <dt class="nhsuk-summary-list__key" rv-show="prescription.repeatNumber">Repeat Number</dt>
+                <dd class="nhsuk-summary-list__value" rv-show="prescription.repeatNumber">{prescription.repeatNumber}</dd>
               </div>
             </dl>
           </div>
@@ -220,15 +220,15 @@
             <dl class="nhsuk-summary-list">
               <div class="nhsuk-summary-list__row">
                 <dt class="nhsuk-summary-list__key">Start Date</dt>
-                <dd class="nhsuk-summary-list__value">{signRequestSummary.author.startDate}</dd>
+                <dd class="nhsuk-summary-list__value">{prescription.author.startDate}</dd>
               </div>
             </dl>
           </div>
-          <div class="nhsuk-panel" rv-show="signRequestSummary.patientInstructions">
+          <div class="nhsuk-panel" rv-show="prescription.patientInstructions">
             <dl class="nhsuk-summary-list">
               <div class="nhsuk-summary-list__row">
                 <dt class="nhsuk-summary-list__key">Patient Instructions</dt>
-                <dd class="nhsuk-summary-list__value">{signRequestSummary.patientInstructions}</dd>
+                <dd class="nhsuk-summary-list__value">{prescription.patientInstructions}</dd>
               </div>
             </dl>
           </div>
@@ -267,25 +267,25 @@
           <div class="nhsuk-panel-with-label">
             <h3 class="nhsuk-panel-with-label__label">Patient</h3>
             <dl class="nhsuk-summary-list">
-              <div class="nhsuk-summary-list__row" rv-each-name="signRequestSummary.patient.name">
+              <div class="nhsuk-summary-list__row" rv-each-name="prescription.patient.name">
                 <dt class="nhsuk-summary-list__key">Name</dt>
                 <dd class="nhsuk-summary-list__value">{name | fullName | joinWithSpaces}</dd>
               </div>
               <div class="nhsuk-summary-list__row">
                 <dt class="nhsuk-summary-list__key">NHS number</dt>
-                <dd class="nhsuk-summary-list__value">{signRequestSummary.patient.identifier |
+                <dd class="nhsuk-summary-list__value">{prescription.patient.identifier |
                   nhsNumber}</dd>
               </div>
               <div class="nhsuk-summary-list__row">
                 <dt class="nhsuk-summary-list__key">Date of birth</dt>
-                <dd class="nhsuk-summary-list__value">{signRequestSummary.patient.birthDate}</dd>
+                <dd class="nhsuk-summary-list__value">{prescription.patient.birthDate}</dd>
               </div>
               <div class="nhsuk-summary-list__row">
                 <dt class="nhsuk-summary-list__key">Gender</dt>
-                <dd class="nhsuk-summary-list__value">{signRequestSummary.patient.gender | titleCase}
+                <dd class="nhsuk-summary-list__value">{prescription.patient.gender | titleCase}
                 </dd>
               </div>
-              <div class="nhsuk-summary-list__row" rv-each-address="signRequestSummary.patient.address">
+              <div class="nhsuk-summary-list__row" rv-each-address="prescription.patient.address">
                 <dt class="nhsuk-summary-list__key">Address</dt>
                 <dd class="nhsuk-summary-list__value">
                   <div rv-each-line="address | fullAddress">
@@ -314,7 +314,7 @@
                   </tr>
                 </thead>
                 <tbody class="nhsuk-table__body">
-                  <tr class="nhsuk-table__row" rv-each-medication="signRequestSummary.medicationRequests">
+                  <tr class="nhsuk-table__row" rv-each-medication="prescription.medicationRequests">
                     <td class="nhsuk-table__cell">{medication.medicationCodeableConcept.coding | snomedCode}</td>
                     <td class="nhsuk-table__cell">
                       <div class="nhsuk-label nhsuk-label--s">{medication.medicationCodeableConcept.coding | snomedCodeDescription}</div>
@@ -336,16 +336,20 @@
           <div class="nhsuk-panel-with-label">
             <h3 class="nhsuk-panel-with-label__label">Prescriber</h3>
             <dl class="nhsuk-summary-list">
-              <div class="nhsuk-summary-list__row" rv-each-name="signRequestSummary.practitioner.name">
+              <div class="nhsuk-summary-list__row" rv-each-name="prescription.practitioner.name">
                 <dt class="nhsuk-summary-list__key">Name</dt>
                 <dd class="nhsuk-summary-list__value">{name | fullName | joinWithSpaces}</dd>
               </div>
               <div class="nhsuk-summary-list__row">
                 <dt class="nhsuk-summary-list__key">Organization</dt>
-                <dd class="nhsuk-summary-list__value">{signRequestSummary.prescribingOrganization.name}
-                  ({signRequestSummary.prescribingOrganization.identifier | odsCode})</dd>
+                <dd class="nhsuk-summary-list__value">{prescription.prescribingOrganization.name}
+                  ({prescription.prescribingOrganization.identifier | odsCode})</dd>
               </div>
-              <div class="nhsuk-summary-list__row" rv-each-address="signRequestSummary.prescribingOrganization.address">
+              <div class="nhsuk-summary-list__row" rv-each-telecom="prescription.practitionerRole.telecom">
+                <dt class="nhsuk-summary-list__key">Telecom</dt>
+                <dd class="nhsuk-summary-list__value">{telecom.value}</dd>
+              </div>
+              <div class="nhsuk-summary-list__row" rv-each-address="prescription.prescribingOrganization.address">
                 <dt class="nhsuk-summary-list__key">Address</dt>
                 <dd class="nhsuk-summary-list__value">
                   <div rv-each-line="address | fullAddress">
@@ -355,8 +359,8 @@
               </div>
               <div class="nhsuk-summary-list__row">
                 <dt class="nhsuk-summary-list__key">Trust / CCG</dt>
-                <dd class="nhsuk-summary-list__value">{signRequestSummary.parentOrganization.name}
-                  ({signRequestSummary.parentOrganization.identifier | odsCode})</dd>
+                <dd class="nhsuk-summary-list__value">{prescription.parentOrganization.name}
+                  ({prescription.parentOrganization.identifier | odsCode})</dd>
               </div>
             </dl>
           </div>
@@ -394,9 +398,9 @@
                     </svg>
                   </div>
                   <div style="float:left;display: inline;width: 150px;margin-top: -7px;">
-                    <a id="send-request-download-fhir" download="send_request.json"><img style="width: 25%;" src="{{ url_for('static', filename='json.png') }}" title="Request"/></a>
-                    <a id="send-request-download-xml" download="send_request.xml"><img style="width: 25%;" src="{{ url_for('static', filename='xml.png') }}" title="Request"/></a>
-                    <a id="send-response-download" download="send_response.json"><img style="width: 25%;" src="{{ url_for('static', filename='json.png') }}" title="Response"/></a>
+                    <a rv-href="sendResponse.fhirRequest | downloadJson" download="send_request.json"><img style="width: 25%;" src="{{ url_for('static', filename='json.png') }}" title="Request (FHIR)"/></a>
+                    <a rv-href="sendResponse.hl7Request | downloadXml" download="send_request.xml"><img style="width: 25%;" src="{{ url_for('static', filename='xml.png') }}" title="Request (HL7v3)"/></a>
+                    <a rv-href="sendResponse.fhirResponse | downloadJson" download="send_response.json"><img style="width: 25%;" src="{{ url_for('static', filename='json.png') }}" title="Response"/></a>
                   </div>
                 </dd>
                 <dd class="nhsuk-summary-list__value" style="padding-top:0;">
@@ -405,6 +409,20 @@
                     <option rv-each-action="actions" rv-id="action.id" rv-value="action.id">{action.description}</option>
                   </select>
                 </dd>
+              </div>
+              <div style="width: 960px">
+                <button class="accordion">Request (FHIR)</button>
+                <div class="panel">
+                  <pre rv-html="sendResponse.fhirRequest | json"></pre>
+                </div>
+                <button class="accordion">Request (HL7v3)</button>
+                <div class="panel">
+                  <pre rv-html="sendResponse.hl7Request | xml"></pre>
+                </div>
+                <button class="accordion">Response (FHIR)</button>
+                <div class="panel">
+                  <pre rv-html="sendResponse.fhirResponse | json"></pre>
+                </div>
               </div>
             </dl>
           </div>
@@ -446,7 +464,7 @@
                 <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m">Choose a medication to cancel</legend>
               </div>
               <div class="nhsuk-checkboxes">
-                <div class="nhsuk-checkboxes__item" rv-each-medication="signRequestSummary.medicationRequests">
+                <div class="nhsuk-checkboxes__item" rv-each-medication="prescription.medicationRequests">
                   <input class="nhsuk-radios__input" name="cancel-medications" type="radio" rv-value="medication.medicationCodeableConcept.coding | snomedCode">
                   <label class="nhsuk-label nhsuk-radios__label" rv-for="medication.medicationCodeableConcept.coding | snomedCode">
                     {medication.medicationCodeableConcept.coding | snomedCodeDescription}
@@ -465,7 +483,7 @@
                 <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m">Choose a medication to dispense</legend>
               </div>
               <div class="nhsuk-checkboxes">
-                <div class="nhsuk-checkboxes__item" rv-each-medication="signRequestSummary.medicationRequests">
+                <div class="nhsuk-checkboxes__item" rv-each-medication="prescription.medicationRequests">
                   <input class="nhsuk-radios__input" name="dispense-medications" type="radio" rv-value="medication.medicationCodeableConcept.coding | snomedCode">
                   <label class="nhsuk-label nhsuk-radios__label" rv-for="medication.medicationCodeableConcept.coding | snomedCode">
                     {medication.medicationCodeableConcept.coding | snomedCodeDescription}
@@ -496,11 +514,25 @@
                     </svg>
                   </div>
                   <div style="float:left;display: inline;width: 150px;margin-top: -7px;">
-                    <a id="cancel-request-download-fhir" download="cancel_request.json"><img style="width: 25%;" src="{{ url_for('static', filename='json.png') }}" title="Request"/></a>
-                    <a id="cancel-request-download-xml" download="cancel_request.xml"><img style="width: 25%;" src="{{ url_for('static', filename='xml.png') }}" title="Request"/></a>
-                    <a id="cancel-response-download" download="cancel_response.json"><img style="width: 25%;" src="{{ url_for('static', filename='json.png') }}" title="Response"/></a>
+                    <a rv-href="cancelResponse.fhirRequest | downloadJson" download="cancel_request.json"><img style="width: 25%;" src="{{ url_for('static', filename='json.png') }}" title="Request (FHIR)"/></a>
+                    <a rv-href="cancelResponse.hl7Request | downloadXml" download="cancel_request.xml"><img style="width: 25%;" src="{{ url_for('static', filename='xml.png') }}" title="Request (HL7v3)"/></a>
+                    <a rv-href="cancelResponse.fhirResponse | downloadJson" download="cancel_response.json"><img style="width: 25%;" src="{{ url_for('static', filename='json.png') }}" title="Response"/></a>
                   </div>
                 </dd>
+              </div>
+              <div style="width: 960px">
+                <button class="accordion">Request (FHIR)</button>
+                <div class="panel">
+                  <pre rv-html="cancelResponse.fhirRequest | json"></pre>
+                </div>
+                <button class="accordion">Request (HL7v3)</button>
+                <div class="panel">
+                  <pre rv-html="cancelResponse.hl7Request | xml"></pre>
+                </div>
+                <button class="accordion">Response (FHIR)</button>
+                <div class="panel">
+                  <pre rv-html="cancelResponse.fhirResponse | json"></pre>
+                </div>
               </div>
             </dl>
           </div>
@@ -566,18 +598,27 @@
                     </svg>
                   </div>
                   <div style="float:left;display: inline;width: 150px;margin-top: -7px;">
-                    <a id="release-request-download-fhir" download="release_request.json"><img style="width: 25%;" src="{{ url_for('static', filename='json.png') }}" title="Request"/></a>
-                    <a id="release-request-download-xml" download="release_request.xml"><img style="width: 25%;" src="{{ url_for('static', filename='xml.png') }}" title="Request"/></a>
-                    <a id="release-response-download" download="release_response.json"><img style="width: 25%;" src="{{ url_for('static', filename='json.png') }}" title="Response"/></a>
+                    <a rv-href="releaseResponse.fhirRequest | downloadJson" download="release_request.json"><img style="width: 25%;" src="{{ url_for('static', filename='json.png') }}" title="Request (FHIR)"/></a>
+                    <a rv-href="releaseResponse.hl7Request | downloadXml" download="release_request.xml"><img style="width: 25%;" src="{{ url_for('static', filename='xml.png') }}" title="Request (HL7v3)"/></a>
+                    <a rv-href="releaseResponse.fhirResponse | downloadJson" download="release_response.json"><img style="width: 25%;" src="{{ url_for('static', filename='json.png') }}" title="Response"/></a>
                   </div>
                 </dd>
               </div>
+              <div style="width: 960px">
+                <button class="accordion">Request (FHIR)</button>
+                <div class="panel">
+                  <pre rv-html="releaseResponse.fhirRequest | json"></pre>
+                </div>
+                <button class="accordion">Request (HL7v3)</button>
+                <div class="panel">
+                  <pre rv-html="releaseResponse.hl7Request | xml"></pre>
+                </div>
+                <button class="accordion">Response (FHIR)</button>
+                <div class="panel">
+                  <pre rv-html="releaseResponse.fhirResponse | json"></pre>
+                </div>
+              </div>
             </dl>
-          </div>
-        </div>
-        <div class="nhsuk-grid-column-full" rv-hide="releaseResponse.prescriptions">
-          <div class="nhsuk-summary-list">
-            <code>{releaseResponse.body | safe}</code>
           </div>
         </div>
         <div class="nhsuk-grid-column-full" rv-show="releaseResponse.prescriptions">
@@ -615,18 +656,27 @@
                     </svg>
                   </div>
                   <div style="float:left;display: inline;width: 150px;margin-top: -7px;">
-                    <a id="dispense-request-download-fhir" download="dispense_request.json"><img style="width: 25%;" src="{{ url_for('static', filename='json.png') }}" title="Request"/></a>
-                    <a id="dispense-request-download-xml" download="dispense_request.xml"><img style="width: 25%;" src="{{ url_for('static', filename='xml.png') }}" title="Request"/></a>
-                    <a id="dispense-response-download" download="dispense_response.json"><img style="width: 25%;" src="{{ url_for('static', filename='json.png') }}" title="Response"/></a>
+                    <a rv-href="dispenseResponse.fhirRequest | downloadJson" download="dispense_request.json"><img style="width: 25%;" src="{{ url_for('static', filename='json.png') }}" title="Request (FHIR)"/></a>
+                    <a rv-href="dispenseResponse.hl7Request | downloadXml" download="dispense_request.xml"><img style="width: 25%;" src="{{ url_for('static', filename='xml.png') }}" title="Request (HL7v3)"/></a>
+                    <a rv-href="dispenseResponse.fhirResponse | downloadJson" download="dispense_response.json"><img style="width: 25%;" src="{{ url_for('static', filename='json.png') }}" title="Response"/></a>
                   </div>
                 </dd>
               </div>
+              <div style="width: 960px">
+                <button class="accordion">Request (FHIR)</button>
+                <div class="panel">
+                  <pre rv-html="dispenseResponse.fhirRequest | json"></pre>
+                </div>
+                <button class="accordion">Request (HL7v3)</button>
+                <div class="panel">
+                  <pre rv-html="dispenseResponse.hl7Request | xml"></pre>
+                </div>
+                <button class="accordion">Response (FHIR)</button>
+                <div class="panel">
+                  <pre rv-html="dispenseResponse.fhirResponse | json"></pre>
+                </div>
+              </div>
             </dl>
-          </div>
-        </div>
-        <div class="nhsuk-grid-column-full">
-          <div class="nhsuk-summary-list">
-            <code>{dispenseResponse.body | safe}</code>
           </div>
         </div>
       </div>
@@ -634,10 +684,10 @@
         <div class="nhsuk-grid-column-full">
           <div class="nhsuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1">
             <h2 class="nhsuk-error-summary__title" id="error-summary-title">
-              There is a problem
+              The following error(s) occured
             </h2>
             <div class="nhsuk-error-summary__body">
-              <p>An error occurred while sending the request. See console for details.</p>
+              <p rv-each-error="errorList">{error.message}</p>
             </div>
           </div>
         </div>

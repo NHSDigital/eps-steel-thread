@@ -66,9 +66,6 @@ CANCEL_URL = "/prescribe/cancel"
 RELEASE_URL = "/dispense/release"
 DISPENSE_URL = "/dispense/dispense"
 
-def stringifyJson(json_content):
-    return json.dumps(json_content, ensure_ascii=False)
-
 def exclude_from_auth(*args, **kw):
     def wrapper(endpoint_method):
         endpoint_method._exclude_from_auth = False
@@ -97,7 +94,20 @@ def auth_check():
         access_token_encrypted = flask.request.cookies.get("Access-Token")
         if access_token_encrypted is not None:
             try:
-                fernet.decrypt(access_token_encrypted.encode("utf-8")).decode("utf-8")
+                access_token = fernet.decrypt(access_token_encrypted.encode("utf-8")).decode("utf-8")
+                access_token_session = flask.request.cookies.get("Access-Token-Session")
+                refresh_token_encrypted = flask.request.cookies.get("Refresh-Token")
+                auth_method = flask.request.cookies.get("Auth-Method", "cis2")
+                if not access_token_session:
+                    refresh_token = fernet.decrypt(refresh_token_encrypted.encode("utf-8")).decode("utf-8")
+                    token_response = refresh_token_session(refresh_token, auth_method)
+                    print("Refreshed token session. Got response...")
+                    print(json.dumps(token_response))
+                    # todo: reset access token session expiry
+                    # access_token_expiry = token_response["expires_in"]
+                    # callback_response.set_cookie(
+                    #     "Access-Token-Session", "True", expires=access_token_expiry, secure=secure_flag, httponly=True
+                    # )
             except:
                 return login()
         else:
@@ -113,7 +123,7 @@ def login():
 
 
 def get_oauth_base_path(auth_method):
-    if auth_method == "simulated":
+    if auth_method == "simulated" and config.ENVIRONMENT == "int":
         return f"{OAUTH_BASE_PATH}-no-smartcard"
     else:
         return f"{OAUTH_BASE_PATH}"
@@ -131,13 +141,13 @@ def get_authorize_url(state, auth_method):
     return f"{oauth_base_path}/authorize?{urlencode(query_params)}"
 
 
-@app.route("/login", methods=["GET"])
+@app.route("/change-auth", methods=["GET"])
 @exclude_from_auth()
 def get_login():
     return render_client("login")
 
 
-@app.route("/login", methods=["POST"])
+@app.route("/change-auth", methods=["POST"])
 @exclude_from_auth()
 def post_login():
     login_request = flask.request.json
@@ -203,11 +213,15 @@ def update_pagination(response, short_prescription_ids, current_short_prescripti
 @app.route(EDIT_URL, methods=["GET"])
 @exclude_from_auth()
 def get_edit():
-    current_short_prescription_id = flask.request.args.get("prescription_id")
-    bundle = load_prepare_request(current_short_prescription_id)
-    response = app.make_response(bundle)
+    short_prescription_id = flask.request.args.get("prescription_id")
+    if short_prescription_id is None:
+        flask.redirect("/change-auth")
+    bundle = load_prepare_request(short_prescription_id)
+    response = app.make_response({
+        "bundle": bundle
+    })
     short_prescription_ids = get_prescription_ids_from_cookie()
-    update_pagination(response, short_prescription_ids, current_short_prescription_id)
+    update_pagination(response, short_prescription_ids, short_prescription_id)
     return response
 
 
@@ -222,7 +236,10 @@ def post_edit():
         add_prepare_request(short_prescription_id, bundle)
     first_bundle = request_bundles[0]
     current_short_prescription_id = get_prescription_id(first_bundle)
-    response = app.make_response(first_bundle)
+    response = app.make_response({
+        "bundle": first_bundle,
+        "errors": []
+    })
     update_pagination(response, short_prescription_ids, current_short_prescription_id)
     return response
 
@@ -238,16 +255,25 @@ def post_sign():
     skip_signature_page = sign_request["skipSignaturePage"]
     short_prescription_id = get_prescription_id_from_cookie()
     prepare_request = load_prepare_request(short_prescription_id)
-    prepare_response = make_eps_api_prepare_request(get_access_token(), prepare_request)
-    auth_method = get_auth_method_from_cookie()
-    sign_response = make_sign_api_signature_upload_request(
-        auth_method, get_access_token(), prepare_response["digest"], prepare_response["algorithm"]
-    )
-    print("Response from Signing Service signature upload request...")
-    response = app.make_response({"redirectUri": sign_response["redirectUri"]})
-    set_skip_signature_page_cookie(response, str(skip_signature_page))
-    add_prepare_response(short_prescription_id, prepare_response)
-    return response
+    print(json.dumps(prepare_request))
+    prepare_response, status_code = make_eps_api_prepare_request(get_access_token(), prepare_request)
+    print(json.dumps(prepare_response))
+    if status_code == 200:
+        prepare_response = {p["name"]: p["valueString"] for p in prepare_response["parameter"]}
+        auth_method = get_auth_method_from_cookie()
+        sign_response = make_sign_api_signature_upload_request(
+            auth_method, get_access_token(), prepare_response["digest"], prepare_response["algorithm"]
+        )
+        print("Signature upload response...")
+        print(json.dumps(sign_response))
+        response = app.make_response({"redirectUri": sign_response["redirectUri"]})
+        set_skip_signature_page_cookie(response, str(skip_signature_page))
+        add_prepare_response(short_prescription_id, prepare_response)
+        return response
+    else:
+        return {
+            "prepareError": prepare_response
+        }
 
 
 @app.route(SEND_URL, methods=["GET"])
@@ -257,6 +283,8 @@ def get_send():
         auth_method, get_access_token(), flask.request.args.get("token")
     )
     short_prescription_id = get_prescription_id_from_cookie()
+    if short_prescription_id is None:
+        return flask.redirect("/change-auth")
     prepare_response = load_prepare_response(short_prescription_id)
     payload = prepare_response["digest"]
     signature = signature_response_json["signature"]
@@ -291,8 +319,8 @@ def post_send():
         "prescription_id": short_prescription_id,
         "success": send_response_code == 200,
         "request_xml": convert_response,
-        "request": stringifyJson(request),
-        "response": stringifyJson(send_response),
+        "request": request,
+        "response": send_response
     }
 
 
@@ -307,16 +335,13 @@ def post_cancel():
     short_prescription_id = get_prescription_id(request)
     convert_response, _code = make_eps_api_convert_message_request(get_access_token(), request)
     cancel_response, cancel_response_code = make_eps_api_process_message_request(get_access_token(), request)
-    response = app.make_response(
-        {
-            "prescription_id": short_prescription_id,
-            "success": cancel_response_code == 200,
-            "request": stringifyJson(request),
-            "request_xml": convert_response,
-            "response": stringifyJson(cancel_response),
-        }
-    )
-    return response
+    return {
+        "prescription_id": short_prescription_id,
+        "success": cancel_response_code == 200,
+        "request": request,
+        "request_xml": convert_response,
+        "response": cancel_response
+    }
 
 
 @app.route(RELEASE_URL, methods=["GET"])
@@ -375,11 +400,10 @@ def post_release():
         request,
     )
     return {
-        "body": stringifyJson(release_response),
         "success": release_response_code == 200,
         "request_xml": convert_response,
-        "request": stringifyJson(request),
-        "response": stringifyJson(release_response),
+        "request": request,
+        "response": release_response
     }
 
 
@@ -401,17 +425,16 @@ def post_dispense():
         request
     )
     return {
-        "body": stringifyJson(dispense_response),
         "success": dispense_response_code == 200,
         "request_xml": convert_response,
-        "request": stringifyJson(request),
-        "response": stringifyJson(dispense_response),
+        "request": request,
+        "response": dispense_response,
     }
 
 
 @app.route("/logout", methods=["GET"])
 def get_logout():
-    return redirect_and_set_cookies("login", "", 0)
+    return redirect_and_set_cookies("login", "", "", 0, 0)
 
 
 @app.route("/callback", methods=["GET"])
@@ -422,7 +445,11 @@ def get_callback():
     auth_method = get_auth_method_from_cookie()
     token_response_json = exchange_code_for_token(code, auth_method)
     access_token = token_response_json["access_token"]
-    expires_in = token_response_json["expires_in"]
+    refresh_token = token_response_json["refresh_token"]
+    access_token_expires_in = token_response_json["expires_in"]
+    refresh_token_expires_in = token_response_json["refresh_token_expires_in"]
     access_token_encrypted = fernet.encrypt(access_token.encode("utf-8")).decode("utf-8")
-    expires = datetime.datetime.utcnow() + datetime.timedelta(seconds=float(expires_in))
-    return redirect_and_set_cookies(state, access_token_encrypted, expires)
+    refresh_token_encrypted = fernet.encrypt(refresh_token.encode("utf-8")).decode("utf-8")
+    access_token_expires = datetime.datetime.utcnow() + datetime.timedelta(seconds=float(access_token_expires_in))
+    refresh_token_expires = datetime.datetime.utcnow() + datetime.timedelta(seconds=float(refresh_token_expires_in))
+    return redirect_and_set_cookies(state, access_token_encrypted, refresh_token_encrypted, access_token_expires, refresh_token_expires)
