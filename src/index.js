@@ -436,7 +436,6 @@ function toUpperCaseIfPresent(field) {
 
 window.sendLoadRequest = function() {
   resetErrors()
-  getPayloads()
   resetPageData("edit")
 }
 
