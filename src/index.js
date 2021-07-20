@@ -592,7 +592,10 @@ window.sendSignRequest = function (skipSignaturePage) {
       JSON.stringify({skipSignaturePage})
     )
     if (response.prepareError) {
-      addError(response.prepareError)
+      response.prepareError.issue
+        .filter(issue => issue.severity === "error")
+        .filter(issue => !issue.severity.startsWith("Unable to find matching profile for urn:uuid:"))
+        .forEach(issue => addError(issue.diagnostics))
     }
     else {
       window.location.href = response.redirectUri

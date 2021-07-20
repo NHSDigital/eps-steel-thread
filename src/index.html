@@ -684,10 +684,10 @@
         <div class="nhsuk-grid-column-full">
           <div class="nhsuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1">
             <h2 class="nhsuk-error-summary__title" id="error-summary-title">
-              There is a problem
+              The following error(s) occured
             </h2>
             <div class="nhsuk-error-summary__body">
-              <p>An error occurred while sending the request. See console for details.</p>
+              <p rv-each-error="errorList">{error}</p>
             </div>
           </div>
         </div>
