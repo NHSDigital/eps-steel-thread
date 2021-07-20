@@ -237,7 +237,8 @@ def post_edit():
     first_bundle = request_bundles[0]
     current_short_prescription_id = get_prescription_id(first_bundle)
     response = app.make_response({
-        "bundle": first_bundle
+        "bundle": first_bundle,
+        "errors": []
     })
     update_pagination(response, short_prescription_ids, current_short_prescription_id)
     return response
