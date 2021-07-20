@@ -78,9 +78,10 @@ def refresh_token_session(refresh_token, auth_method):
 def get_access_token():
     access_token_encrypted = flask.request.cookies.get("Access-Token")
     access_token_session = flask.request.cookies.get("Access-Token-Session")
-    refresh_token = flask.request.cookies.get("Refresh-Token")
+    refresh_token_encrypted = flask.request.cookies.get("Refresh-Token")
     auth_method = flask.request.cookies.get("Auth-Method", "cis2")
     if not access_token_session:
+        refresh_token = fernet.decrypt(refresh_token_encrypted.encode("utf-8")).decode("utf-8")
         token_response = refresh_token_session(refresh_token, auth_method)
         print("Refreshed token session. Got response...")
         print(json.dumps(token_response))
