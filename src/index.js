@@ -511,7 +511,7 @@ window.sendEditRequest = function() {
     prescriptionErrors.forEach(error => addError(error))
   } catch (e) {
     console.log(e)
-    addError("Failed to parse prescription")
+    addError("Failed to read prescription(s)")
   }
 }
 
@@ -1001,13 +1001,11 @@ function getPayloads() {
   const isCustom = pageData.selectedExampleId === "custom"
   const filePayloads = pageData.payloads
   const textPayloads = [document.getElementById("prescription-textarea").value]
-  const payloads = filePayloads
-    .concat(textPayloads)
-    .filter(Boolean)
-    .map(payload => JSON.parse(payload))
-  if (isCustom && !payloads.length) {
-    addError("Unable to parse custom prescription(s)")
-  } else {
+  try {
+    const payloads = filePayloads
+      .concat(textPayloads)
+      .filter(Boolean)
+      .map(payload => JSON.parse(payload))
     return isCustom
       ? payloads
       : [
@@ -1015,6 +1013,9 @@ function getPayloads() {
           return example.id === pageData.selectedExampleId
         })[0].message
       ]
+  }
+  catch (e) {
+    addError("Unable to parse custom prescription(s)")
   }
 }
 
