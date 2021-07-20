@@ -255,6 +255,7 @@ def post_sign():
     skip_signature_page = sign_request["skipSignaturePage"]
     short_prescription_id = get_prescription_id_from_cookie()
     prepare_request = load_prepare_request(short_prescription_id)
+    print(json.dumps(prepare_request))
     prepare_response, status_code = make_eps_api_prepare_request(get_access_token(), prepare_request)
     if status_code == 200:
         prepare_response = {p["name"]: p["valueString"] for p in prepare_response["parameter"]}
