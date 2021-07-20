@@ -257,6 +257,7 @@ def post_sign():
     prepare_request = load_prepare_request(short_prescription_id)
     print(json.dumps(prepare_request))
     prepare_response, status_code = make_eps_api_prepare_request(get_access_token(), prepare_request)
+    print(json.dumps(prepare_response))
     if status_code == 200:
         prepare_response = {p["name"]: p["valueString"] for p in prepare_response["parameter"]}
         auth_method = get_auth_method_from_cookie()

@@ -555,7 +555,7 @@ const TEST_PATIENT = {
 }
 
 function resetErrors() {
-  pageData.errorList = []
+  pageData.errorList = undefined
 }
 
 function sanitiseProdTestData(bundle) {
