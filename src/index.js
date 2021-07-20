@@ -435,18 +435,9 @@ function toUpperCaseIfPresent(field) {
 }
 
 window.sendLoadRequest = function() {
-  const isCustom = pageData.selectedExampleId === "custom"
-  const filePayloads = pageData.payloads
-  const textPayloads = [document.getElementById("prescription-textarea").value]
-  const payloads = filePayloads
-    .concat(textPayloads)
-    .filter(Boolean)
-    .map(payload => JSON.parse(payload))
-  if (isCustom && !payloads.length) {
-    addError("Unable to parse custom prescription(s)")
-  } else {
-    resetPageData("edit")
-  }
+  resetErrors()
+  getPayloads()
+  resetPageData("edit")
 }
 
 window.updateAuthMethod = function(authMethod) {
@@ -493,6 +484,7 @@ window.getEditRequest = function(previousOrNext) {
 }
 
 window.sendEditRequest = function() {
+  resetErrors()
   try {
     const bundles = getPayloads()
     bundles.forEach(bundle => {
@@ -564,6 +556,10 @@ const TEST_PATIENT = {
   ]
 }
 
+function resetErrors() {
+  pageData.errorList = []
+}
+
 function sanitiseProdTestData(bundle) {
   if (pageData.environment !== "prod") {
     return
@@ -586,6 +582,7 @@ function sanitiseProdTestData(bundle) {
 }
 
 window.sendSignRequest = function (skipSignaturePage) {
+  resetErrors()
   try {
     const response = makeRequest(
       "POST",
@@ -609,6 +606,7 @@ window.sendSignRequest = function (skipSignaturePage) {
 }
 
 window.sendPrescriptionRequest = function() {
+  resetErrors()
   try {
     const response = makeRequest("POST", "/prescribe/send", {})
     pageData.signResponse = null
